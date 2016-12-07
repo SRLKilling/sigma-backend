@@ -6,6 +6,7 @@ from sigma_core.models.user import User
 from sigma_core.serializers.user import UserSerializer
 
 from django.core.mail import send_mail
+from rest_framework.permissions import AllowAny
 import random
 
 reset_mail = {
@@ -23,8 +24,8 @@ L'équipe Sigma.
 
 class UserViewSet(SigmaViewSet):
 
-    model_class = User
     serializer_class = UserSerializer
+    queryset = User.objects.all()
     
     #*********************************************************************************************#
     #**                                   Read actions                                          **#
@@ -86,7 +87,7 @@ class UserViewSet(SigmaViewSet):
         # super().destroy(request, pk)
 
 
-    @decorators.list_route(methods=['put'])
+    @list_route(methods=['put'])
     def change_password(self, request):
         """
         Allow current user to change his password.
@@ -115,7 +116,7 @@ class UserViewSet(SigmaViewSet):
 
         
     #Dangerous to send a password in clear...
-    @decorators.list_route(methods=['post'], permission_classes=[AllowAny])
+    @list_route(methods=['post'], permission_classes=[AllowAny])
     def reset_password(self, request):
         """
         Reset current user's password and send him an email with the new one.

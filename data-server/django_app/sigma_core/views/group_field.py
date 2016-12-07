@@ -8,8 +8,8 @@ from sigma_core.serializers.group_field import GroupFieldSerializer
 
 class GroupFieldViewSet(SigmaViewSet):
     
-    model_class = GroupField
     serializer_class = GroupFieldSerializer
+    queryset = GroupField.objects.all()
     
     
     #*********************************************************************************************#

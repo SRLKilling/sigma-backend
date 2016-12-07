@@ -17,15 +17,15 @@ class SigmaViewSet(viewsets.ViewSet):
             This method can be used to get a model instance based on it's primary key.
             If the instance does not exists, it will automatically throws a 404 error.
             
-            Static version : takes the model to use as its first argument.
+            Static version : takes the queryset to use as its first argument.
         """
-        return SigmaViewSet.get_or_404(self.model_class, pk)
+        return SigmaViewSet.get_or_404(self.__class__.queryset, pk)
     
     @staticmethod
-    def get_or_404(model_class, pk):
+    def get_or_404(qs, pk):
         try:
-            instance = model_class.object.get(pk=pk)
-        except model_class.DoesNotExist:
+            instance = qs.get(pk=pk)
+        except qs.model.DoesNotExist:
             raise NotFound()
             
         return instance
@@ -38,7 +38,7 @@ class SigmaViewSet(viewsets.ViewSet):
             
             Static version : takes the serializer to use as its first argument.
         """
-        return SigmaViewSet.get_deserialized(self.serializer_class, data, *args, **kwargs)
+        return SigmaViewSet.get_deserialized(self.__class__.serializer_class, data, *args, **kwargs)
         
     @staticmethod
     def get_deserialized(serializer_class, data, *args, **kwargs):
@@ -55,7 +55,7 @@ class SigmaViewSet(viewsets.ViewSet):
             
             Static version : takes the serializer to use as its fist argument.
         """
-        return SigmaViewSet.serialized_response(self.serializer_class, data)
+        return SigmaViewSet.serialized_response(self.__class__.serializer_class, data)
         
     @staticmethod
     def serialized_response(serializer_class, data):
@@ -76,7 +76,7 @@ class SigmaViewSet(viewsets.ViewSet):
     
     @staticmethod
     def call_method_if_exists(obj, name, *args, **kwargs):
-        if hasattr(obj, name)
+        if hasattr(obj, name):
             f = getattr(obj, name)
             return f(obj, *args, **kwargs)
         return None
@@ -91,7 +91,7 @@ class SigmaViewSet(viewsets.ViewSet):
             
             Static version : takes the model containing the `can_actionname` function, as its first argument.
         """
-        if hasattr(instance, 'can_' + actionname)
+        if hasattr(instance, 'can_' + actionname):
             f = getattr(instance, 'can_' + actionname)
             if not f(instance, user, *args, **kwargs):
                 raise PermissionDenied()

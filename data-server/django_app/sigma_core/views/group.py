@@ -1,17 +1,17 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route
-from sigma_core.view.sigma_viewset import SigmaViewSet
+from sigma_core.views.sigma_viewset import SigmaViewSet
 
 from sigma_core.models.group import Group
 from sigma_core.serializers.group import GroupSerializer
 
 
-from sigma_core.views.group_member import GroupMemberView
+from sigma_core.views.group_member import GroupMemberViewSet
 
 class GroupViewSet(SigmaViewSet):
 
-    model_class = Group
     serializer_class = GroupSerializer
+    queryset = Group.objects.all()
 
     #*********************************************************************************************#
     #**                                   Read actions                                          **#
@@ -49,7 +49,7 @@ class GroupViewSet(SigmaViewSet):
     
     def create_post(self, request, group_serializer, group):
         # Once a group is created, we need to create a membership for the creator (automaticly becoming the super admin)
-        GroupMemberView.create(request.user, group, True)
+        GroupMemberViewSet.create(request.user, group, True)
     
     
         

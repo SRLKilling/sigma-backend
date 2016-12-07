@@ -7,12 +7,12 @@ from sigma_core.serializers.group_invitation import GroupInvitationSerializer
 
 
 from sigma_core.models.group_member import GroupMember
-from sigma_core.views.group_member import GroupMemberView
+from sigma_core.views.group_member import GroupMemberViewSet
 
 class GroupInvitationViewSet(SigmaViewSet):
     
-    model_class = GroupInvitation
     serializer_class = GroupInvitationSerializer
+    queryset = GroupInvitation.objects.all()
     
     
     #*********************************************************************************************#
@@ -51,14 +51,14 @@ class GroupInvitationViewSet(SigmaViewSet):
             
             
     def create_pre_handler(self, request, invitation_serializer, invitation):
-        if GroupMember.is_member(invitation.invitee, invitation.group)
+        if GroupMember.is_member(invitation.invitee, invitation.group):
             raise ValidationError("The user is already a member of this group")
             
         elif Invitation.object.filter(invitee = invitation.invitee, group = invitation.group).exists():
             raise ValidationError("The user is already invited to this group")
         
-        elif invitation.group.can_anyone_ask:
-            data = GroupMemberView.create(invitation.invitee, invitation.group)
+        elif not invitation.group.need_validation_to_join:
+            data = GroupMemberViewSet.create(invitation.invitee, invitation.group)
             return Response(data, status=status.HTTP_201_CREATED)
         
         
@@ -75,7 +75,7 @@ class GroupInvitationViewSet(SigmaViewSet):
         if not invitation.can_accept(request.user):
             raise PermissionDenied()
         
-        data = GroupMemberView.create(invitation.invitee, invitation.group)
+        data = GroupMemberViewSet.create(invitation.invitee, invitation.group)
         invitation.delete()
         return Response(data, status=status.HTTP_201_CREATED)
         

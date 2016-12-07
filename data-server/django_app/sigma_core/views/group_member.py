@@ -1,14 +1,14 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route
-from sigma_core.view.sigma_viewset import SigmaViewSet
+from sigma_core.views.sigma_viewset import SigmaViewSet
 
 from sigma_core.models.group_member import GroupMember
 from sigma_core.serializers.group_member import GroupMemberSerializer
 
 class GroupMemberViewSet(SigmaViewSet):
 
-    model_class = GroupMember
     serializer_class = GroupMemberSerializer
+    queryset = GroupMember.objects.all()
     
     #*********************************************************************************************#
     #**                                   Read actions                                          **#
@@ -70,7 +70,7 @@ class GroupMemberViewSet(SigmaViewSet):
             raise PermissionDenied()
         
         if rights.is_super_administrator:
-            
+            pass                                                                                                # TODO : de-superadminer le gars qui file ses droits
             
         member_serializer, member = self.get_deserialized(GroupMember, rights, member, partial=True)
         member_serializer.save()
