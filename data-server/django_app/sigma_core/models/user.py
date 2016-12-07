@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
-from django.db.models import Q
-
 # TODO : Add unique username for frontends URLs
 
 
@@ -29,23 +27,26 @@ class UserManager(BaseUserManager):
 
         
 class User(AbstractBaseUser):
-
-    ##########
-    # Fields #
-    ##########
+    """
+        Modelize an sigma user.
+        Invitation can be issued both by the invitee and the inviter (depending on the group settings)
+        Invitation have a short life-time.
+        As soon as someone accepts or declines the invitation, the instance is destroyed.
+    """
+    
+    #*********************************************************************************************#
+    #**                                       Fields                                            **#
+    #*********************************************************************************************#
     
     email = models.EmailField(max_length=254, unique=True) # Users are identified by their email.
     lastname = models.CharField(max_length=255)
     firstname = models.CharField(max_length=128)
-    photo = models.CharField(max_length=20, default = 'img/4.jpg')
 
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     join_date = models.DateTimeField(auto_now_add=True)
 
-
     
-
     # Required by Django to abstract the User interface
     
     USERNAME_FIELD = 'email'
@@ -53,26 +54,32 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     def get_full_name(self):
-        return "{} {}".format(self.lastname, self.firstname)
+        return self.lastname + self.firstname
 
     def get_short_name(self):
         return self.email
-        
-    
-    #################
-    # Model methods #
-    #################
     
     def __str__(self):
         return self.email
         
         
+    #*********************************************************************************************#
+    #**                                    Permissions                                          **#
+    #*********************************************************************************************#
+    
+    
+    def can_retrieve(self, user):
+        """ Check whether `user` can retrieve information about the user
+            True if you share a group with this user.
+        """
+        return GroupMember.has_common_memberships(self, user)
+    
+    def can_update(self, user):
+        """ Check wheter `user` can update the user profile.
+            A user can only edit its own profile """
+        return self == user
         
 
-
-    ###############
-    # Permissions #
-    ###############
 
     # Perms for admin site
     def has_perm(self, perm, obj=None): # pragma: no cover

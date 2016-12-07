@@ -18,7 +18,7 @@ class GroupMemberViewSet(SigmaViewSet):
         """
             REST list action. Used to list all of a user's membership.
         """
-        qs = GroupInvitation.get_user_membership_qs(request.user)
+        qs = GroupInvitation.get_user_memberships_qs(request.user)
         return self.serialized_response(qs)
 
         

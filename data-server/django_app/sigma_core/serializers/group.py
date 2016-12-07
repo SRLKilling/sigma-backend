@@ -5,9 +5,8 @@ from sigma_core.models.group import Group
 
 class GroupSerializer(serializers.ModelSerializer):
     """
-    Serialize a Group without its relations with users.
+        Basic default serializer for a Group.
+        Include all fields
     """
     class Meta:
         model = Group
-
-    #members_count = serializers.IntegerField(read_only=True)

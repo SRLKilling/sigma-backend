@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route
-from sigma_core.view.sigma_viewset import SigmaViewSet
+from sigma_core.views.sigma_viewset import SigmaViewSet
 
 from sigma_core.models.group_invitation import GroupInvitation
 from sigma_core.serializers.group_invitation import GroupInvitationSerializer

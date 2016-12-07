@@ -85,6 +85,16 @@ class GroupMember(models.Model):
             return GroupMember.objects.get(group=group, user=user)
         except GroupMember.DoesNotExist:
             return None
+            
+    @staticmethod
+    def get_user_memberships_qs(user):
+        """ Return a queryset containing all of a user memberships """
+        return GroupMember.objects.filter(user=user)
+        
+    @staticmethod
+    def has_common_memberships(user1, user2):
+        """ Return a queryset containing user1 memberships where user2 is also a member of the same group """
+        return GroupMember.get_user_memberships_qs(user1).filter(group__in = get_user_memberships_qs(user2).select).exists()
     
     
     #*********************************************************************************************#

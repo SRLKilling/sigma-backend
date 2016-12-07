@@ -1,21 +1,25 @@
 from rest_framework import serializers
-import re
 
 from sigma_core.models.group_field import GroupField
-from sigma_core.models.group import Group
+
+import re
+
+
 
 class GroupFieldSerializer(serializers.ModelSerializer):
+    """
+        Basic default serializer for a Group field.
+        Include all fields.
+    """
+    
     class Meta:
         model = GroupField
         read_only_fields = ('group')
-
-    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all())
     
 
-
-    ################################################################
-    # VALIDATORS                                                   #
-    ################################################################
+    #*********************************************************************************************#
+    #**                                     Validators                                          **#
+    #*********************************************************************************************#
     
     # "Acceptable values" field validator
     accept_field_regex = [
@@ -26,10 +30,11 @@ class GroupFieldSerializer(serializers.ModelSerializer):
     ]
     
     def validate(self, data):
-        if GroupFieldSerializer.accept_field_regex[data['type']] == None or not 'accept' in data:
+        """
+            Validator that checks the structure of the 'accept' field depending on the field 'type'
+        """
+        if GroupFieldSerializer.accept_field_regex[data['type']] == None or ('accept' in data and GroupFieldSerializer.accept_field_regex[data['type']].match(data['accept'])):
             return data
             
-        if 'type' in data and GroupFieldSerializer.accept_field_regex[data['type']].match(data['accept']):
-            return data
         else:
             raise serializers.ValidationError("Le format des valeurs acceptables n'est pas valable.")
