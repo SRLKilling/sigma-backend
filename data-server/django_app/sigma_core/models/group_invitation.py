@@ -68,7 +68,7 @@ class GroupInvitation(models.Model):
         
         else:
             user_mb = GroupMember.get_membership(user, self.group)
-            return user_mb != None && user_mb.has_invite_right
+            return user_mb != None and user_mb.has_invite_right
             
     
     def can_create(self, user):
@@ -77,11 +77,11 @@ class GroupInvitation(models.Model):
             * Otherwise, the inviter must have the corresponding right.
         """            
         if self.issued_by_invitee:
-            return (self.inviteee == user) && (self.group.can_anyone_ask)
+            return (self.inviteee == user) and (self.group.can_anyone_ask)
             
         else:
             inviter_mb = GroupMember.get_membership(user, self.group)
-            return inviter_mb != None && inviter_mb.has_invite_right
+            return inviter_mb != None and inviter_mb.has_invite_right
             
             
     def can_accept(self, user):
@@ -94,7 +94,7 @@ class GroupInvitation(models.Model):
             
         else:
             user_mb = GroupMember.get_membership(user, self.group)
-            return user_mb != None && user_mb.has_invite_right
+            return user_mb != None and user_mb.has_invite_right
             
             
     def can_destroy(self, user):
@@ -109,5 +109,5 @@ class GroupInvitation(models.Model):
         
         else:
             user_mb = GroupMember.get_membership(user, self.group)
-            return user_mb != None && user_mb.has_invite_right
+            return user_mb != None and user_mb.has_invite_right
     

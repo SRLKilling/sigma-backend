@@ -110,7 +110,7 @@ class GroupMember(models.Model):
             * The member is not hidden, and the group is not public
             * The member is not hidden, and I'm connected to the member
         """
-        if user == self.user: or GroupMember.is_member(self.group, user):
+        if user == self.user or GroupMember.is_member(self.group, user):
             return True
         
         elif not self.hidden:
@@ -128,8 +128,7 @@ class GroupMember(models.Model):
         """
         user_membership = GroupMember.get_membership(self.group, user)
         
-        return (not self.is_super_administrator) and
-               ( (self.is_administrator and user_membership.is_super_administrator) or user_membership.is_administrator )
+        return (not self.is_super_administrator) and ( (self.is_administrator and user_membership.is_super_administrator) or user_membership.is_administrator )
             
             
     def can_destroy(self, user):
@@ -141,9 +140,6 @@ class GroupMember(models.Model):
         """
         user_membership = GroupMember.get_membership(self.group, user)
         
-        return (user_membership != None) and
-               (user_membership.can_kick or user_membership.is_administrator or user_membership.is_super_administrator) and
-               (not self.is_administrator or user_membership.is_super_administrator) and
-               (not self.is_super_administrator)
+        return (user_membership != None) and (user_membership.can_kick or user_membership.is_administrator or user_membership.is_super_administrator) and (not self.is_administrator or user_membership.is_super_administrator) and (not self.is_super_administrator)
                
                
