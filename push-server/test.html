@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<title>Test maggeule</title>
+		<script>
+			function test() {
+				var ws = new WebSocket("ws://localhost:8888/ws");
+				ws.onmessage = function(event) {
+					document.getElementById("result").innerHTML += event.data + "<br />";
+				}
+			}
+		</script>
+	</head>
+	<body onload="test();">
+
+		<div id="result"></div>
+
+	</body>
+</html>
