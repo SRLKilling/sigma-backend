@@ -2,6 +2,12 @@ import random
 import string
 import sys
 
+
+USER_NUM = 500
+GROUP_NUM = 300
+MEMBER_NUM = (5, 50)
+
+
 #*********************************************************************************************#
 #**                                  Useful methods                                         **#
 #*********************************************************************************************#
@@ -47,6 +53,24 @@ def randomlower(length):
     """
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
     
+def randombool(p=0.5):
+    """
+        Return True with probability p, and False with 1-p
+    """
+    return bool(random.getrandbits(1))
+    
+    
+def randint_norepeat(l, a, b):
+    """
+        Select a random int beetwen a and b, that is not already in list l
+    """
+    c = random.randint(a, b)
+    while c in l:
+        c = random.randint(a, b)
+    return c
+    
+def randomdate():
+    return "2016-05-08T15:35:59.028Z";
     
     
 #*********************************************************************************************#
@@ -71,30 +95,68 @@ def randomUser():
     user["email"] = randomlower(20) + "@sigma.fr"
     user["lastname"] = randomlower(8)
     user["firstname"] = randomlower(8)
-    user["join_date"] = "2016-05-08T15:35:59.028Z"
+    user["join_date"] = randomdate()
     user["is_active"] = True
     user["is_superuser"] = False
     user["is_staff"] = False
     return JSONizer('sigma_core.user', user)
         
         
+def randomGroup():
+    group = {}
+    group['name'] = randomlower(15)
+    group['description'] = randomlower(50)
+    group['is_protected'] = False
+    group['can_anyone_ask'] = randombool()
+    group['need_validation_to_join'] = randombool()
+    group['members_visibility'] = random.randint(0, 2)
+    group['group_visibility'] = random.randint(0, 2)
+    return JSONizer('sigma_core.group', group)
+    
+
+def generateMember(group, user, sa):
+    member = {}
+    member['group'] = group
+    member['user'] = user
+    member['created'] = randomdate()
+    member['hidden'] = randombool()
+    member['is_super_administrator'] = sa
+    member['is_administrator'] = member['is_super_administrator'] or randombool(0.1)
+    member['has_invite_right'] = member['is_administrator'] or randombool(0.2)
+    member['has_contact_right'] = member['is_administrator'] or randombool(0.2)
+    member['has_publish_right'] = member['is_administrator'] or randombool(0.2)
+    member['has_kick_right'] = member['is_administrator'] or randombool(0.2)
+    return JSONizer('sigma_core.groupmember', member)
+        
     
 #*********************************************************************************************#
 #**                                          Main                                           **#
 #*********************************************************************************************#
-    
 
-def generateFixtures(filepath, UserNum, GroupNum):
+
+def generateFixtures(filepath):
     f = open(filepath, 'w')
     f.write('[')
     
-    f.write( superUser() )          # Generate admin
-    for i in range(UserNum):        # Generate users
+    f.write( superUser() )                                              # Generate admin
+    
+    for i in range(USER_NUM):                                           # Generate users
         f.write( randomUser() )
+        
+    for i in range(GROUP_NUM):                                          # Generate groups
+        f.write( randomGroup() )
+        
+    for i in range(1, GROUP_NUM):       
+        member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
+        members = []
+        for j in range(member_num):                                     # Generate members
+            member = randint_norepeat(members, 1, USER_NUM)
+            members.append(member)
+            f.write( generateMember(i, member, (j==0)) )
         
     f.write(']')
 
     
 
 if __name__ == '__main__':
-    generateFixtures(sys.argv[1], 10, 5)
+    generateFixtures(sys.argv[1])
