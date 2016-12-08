@@ -19,6 +19,8 @@ PROXY = 'kuzh.polytechnique.fr:8080'
 
 PYTHON = 'python'
 
+DJANGO_MANAGER = ' data-server/manage.py '
+
 def install():
     for r in REQUIREMENTS:
         if PROXY != '':
@@ -27,7 +29,7 @@ def install():
             pip.main(['install', r, '--proxy', PROXY])
     
     
-    os.system(PYTHON + " data-server/django_app/manage.py collectstatic")
+    os.system(PYTHON + DJANGO_MANAGER + 'collectstatic')
     
     
 def usage():
@@ -59,7 +61,7 @@ def main():
          
         elif(op == "django"):
             args = ' '.join(argv[2:])
-            os.system(PYTHON + " data-server/manage.py " + args)
+            os.system(PYTHON + DJANGO_MANAGER + args)
             return
             
     usage()
