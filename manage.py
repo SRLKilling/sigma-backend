@@ -1,37 +1,61 @@
 import sys
 import os
-import pip
+import argparse
 
-REQUIREMENTS = [
+from settings import Settings
 
-    # Django and DRF related
-    "Django == 1.10",
-    "djangorestframework == 3.5.3",
-    "django-cors-headers == 1.3",
-    "django-oauth-toolkit == 0.11",
-    "django-filter == 0.2.1",
+
+#*********************************************************************************************#
+#**                                     Useful shortcuts                                    **#
+#*********************************************************************************************#
+
+def joinParams(params):
+    if isinstance(params, list) or isinstance(params, tuple):
+        params = ' '.join(params)
+    return params
+
+def runPython(params):
+    params = joinParams(params)
+    return os.system(Settings.ENV['PYTHON'] + ' ' + params)
     
-    # Tornado
-    "tornado == 4.4",
-]
+def runPip(params):
+    params = joinParams(params)
+    return os.system(Settings.ENV['PIP'] + ' ' + params)
 
-PROXY = 'kuzh.polytechnique.fr:8080'
+def runDjango(params):
+    params = joinParams(params)
+    return os.system(Settings.ENV['PYTHON'] + ' ' + Settings.PATH['DJANGO_MANAGER'] + ' ' + params)
 
-PYTHON = 'python'
-
-DJANGO_MANAGER = ' data-server/manage.py '
-
+    
+    
+    
+#*********************************************************************************************#
+#**                                         Actions                                         **#
+#*********************************************************************************************#
+    
 def install():
-    for r in REQUIREMENTS:
-        if PROXY != '':
-            pip.main(['install', r, '--proxy', PROXY])
+    for r in Settings.REQUIREMENTS:
+        if hasattr(Settings, 'PROXY') and Settings.PROXY != '':
+            runPip(['install', '"'+r+'"', '--proxy', Settings.PROXY])
         else:
-            pip.main(['install', r, '--proxy', PROXY])
+            runPip(['install', '"'+r+'"'])
+    
+def init():
+    runDjango('collectstatic')
+    runDjango('makemigrations')
+    runDjango('migrate')
     
     
-    os.system(PYTHON + DJANGO_MANAGER + 'collectstatic')
+def fixtures():
+    runPython([Settings.PATH['FIXTURES_GENERATOR'], Settings.PATH['FIXTURES_FILE']])
+    runDjango(['loaddata', Settings.PATH['FIXTURES_FILE']])
     
     
+    
+#*********************************************************************************************#
+#**                                           Main                                          **#
+#*********************************************************************************************#
+
 def usage():
     print("Incorrect parameters, use one of the following command")
     print("  install - install deps")
@@ -41,6 +65,9 @@ def usage():
     
     
 def main():
+    # TODO : add argparse support
+    # parser = argparse.ArgumentParser(description='Used to easily manage the backend.')
+    
     argv = sys.argv
     argc = len(sys.argv)
     
@@ -48,21 +75,22 @@ def main():
         op = argv[1]
         
         if(op == "install"):
-            install()
-            return
+            return install()
+            
+        elif(op == "init"):
+            return init()
+        
+        elif(op == "fixtures"):
+            return fixtures()
             
         elif(op == "run-push-server"):
-            os.system(PYTHON + " push-server/run-server.py")
-            return
+            return runPython('push-server/run-server.py')
             
         elif(op == "run-data-server"):
-            os.system(PYTHON + " data-server/run-server.py")
-            return
+            return runPython('data-server/run-server.py')
          
         elif(op == "django"):
-            args = ' '.join(argv[2:])
-            os.system(PYTHON + DJANGO_MANAGER + args)
-            return
+            return runDjango(argv[2:])
             
     usage()
     
