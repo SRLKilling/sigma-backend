@@ -1,10 +1,10 @@
-*/db.sqlite3
-*/fixtures.json
+**/db.sqlite3
+**/fixtures.json
 data-server/django_app/static/
 data-server/django_app/sigma_core/migrations/*
 
 .env/
 
-*.pyc
-*.pyo
-*/__pycache__/
+**.pyc
+**.pyo
+**/__pycache__/
