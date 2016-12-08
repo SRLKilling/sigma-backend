@@ -1,0 +1,8 @@
+data-server/django_app/db.sqlite3
+data-server/django_app/static/
+data-server/django_app/sigma_core/migrations/*
+
+.env/
+
+*.pyc
+*/__pycache__/

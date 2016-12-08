@@ -58,7 +58,8 @@ def main():
             return
          
         elif(op == "django"):
-            os.system(' '.join( [PYTHON + " data-server/manage.py", *argv[2:]] ))
+            args = ' '.join(argv[2:])
+            os.system(PYTHON + " data-server/manage.py " + args)
             return
             
     usage()
