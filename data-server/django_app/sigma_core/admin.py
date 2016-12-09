@@ -16,7 +16,7 @@ from sigma_core.models.group_acknowledgment import GroupAcknowledgment
 
 admin.site.unregister(AuthGroup)
 
-#admin.site.register(GroupMember)
+admin.site.register(GroupMember)
 #admin.site.register(GroupInvitation)
 #admin.site.register(GroupAcknowledgment)
 #admin.site.register(SharedPublication)

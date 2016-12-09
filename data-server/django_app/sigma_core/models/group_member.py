@@ -1,7 +1,5 @@
 from django.db import models
 
-from sigma_core.models.user import User
-
 class GroupMember(models.Model):
     """
         Modelize a membership relation between an User and a Group.
@@ -94,7 +92,7 @@ class GroupMember(models.Model):
     @staticmethod
     def has_common_memberships(user1, user2):
         """ Return a queryset containing user1 memberships where user2 is also a member of the same group """
-        return GroupMember.get_user_memberships_qs(user1).filter(group__in = get_user_memberships_qs(user2).select).exists()
+        return GroupMember.get_user_memberships_qs(user1).filter(group__in = GroupMember.get_user_memberships_qs(user2).values('group')).exists()
     
     
     #*********************************************************************************************#

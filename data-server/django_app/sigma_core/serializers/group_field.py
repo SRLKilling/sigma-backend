@@ -15,6 +15,7 @@ class GroupFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupField
         read_only_fields = ('group')
+        fields = ('group', 'name', 'type', 'accept', 'protected', 'multiple_values_allowed')
     
 
     #*********************************************************************************************#

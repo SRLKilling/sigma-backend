@@ -1,9 +1,8 @@
 from django.db import models
-from sigma_core.models.group import Group
 
 class GroupAcknowledgment(models.Model):
-    aknowledging = models.ForeignKey(Group, related_name='aknowledged_by')
-    aknowledged_by = models.ForeignKey(Group, related_name='aknowledging')
+    acknowledged = models.ForeignKey('Group', related_name='acknowledged_by')
+    acknowledged_by = models.ForeignKey('Group', related_name='acknowledged')
     
     validated = models.BooleanField(default=False)
     delegate_admin = models.BooleanField(default=True)

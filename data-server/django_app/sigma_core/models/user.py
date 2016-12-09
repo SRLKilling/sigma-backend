@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 # TODO : Add unique username for frontends URLs
 
+from sigma_core.models.group_member import GroupMember
+
 
 # Basic user manager required by Django
 class UserManager(BaseUserManager):
@@ -76,7 +78,7 @@ class User(AbstractBaseUser):
         """ Check whether `user` can retrieve information about the user
             True if you share a group with this user.
         """
-        return GroupMember.has_common_memberships(self, user)
+        return GroupMember.has_common_memberships(self, user)                                           # TODO : use a connection model / remove import
     
     def can_update(self, user):
         """ Check wheter `user` can update the user profile.

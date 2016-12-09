@@ -21,7 +21,7 @@ class GroupFieldViewSet(SigmaViewSet):
         """
             REST retrieve action. Used to retrieve a group_field.
         """
-        return self.basic_retrieve(request, pk)
+        return self.handle_action_pk('retrieve', request, pk)
     
     
     
@@ -35,7 +35,7 @@ class GroupFieldViewSet(SigmaViewSet):
             REST create action. Used to create a Group Field.
             If succeeded, returns HTTP_201_CREATED with the newly created Group field object.
         """
-        return self.basic_create(request)
+        return self.handle_action('create', request)
         
         
     
@@ -55,5 +55,5 @@ class GroupFieldViewSet(SigmaViewSet):
             If succeeded, returns HTTP_204_NO_CONTENT.
         """
         
-        return self.basic_destroy(request, pk)
+        return self.handle_action_pk('destroy', request, pk)
         

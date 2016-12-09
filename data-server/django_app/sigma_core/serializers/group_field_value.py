@@ -9,10 +9,7 @@ class GroupFieldValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupFieldValue
         read_only_fields = ('membership', 'field')
-
-    membership = serializers.PrimaryKeyRelatedField(queryset=GroupMember.objects.all())
-    field = serializers.PrimaryKeyRelatedField(queryset=GroupField.objects.all()) 
-
+        fields = ('membership', 'field', 'value')
 
     ################################################################
     # VALIDATORS                                                   #

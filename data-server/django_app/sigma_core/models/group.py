@@ -1,6 +1,7 @@
 from django.db import models
-from sigma_core.models.user import User
+
 from sigma_core.models.group_member import GroupMember
+from sigma_core.models.group_acknowledgment import GroupAcknowledgment
 
 class Group(models.Model):
     """
@@ -45,6 +46,9 @@ class Group(models.Model):
     """
     group_visibility = models.PositiveSmallIntegerField(choices=POSSIBLE_VISIBILITIES,default=0)
     
+    def __str__(self):
+        return 'Group %d : %s' % (self.pk, self.name)
+    
     
     
     
@@ -52,7 +56,16 @@ class Group(models.Model):
     #**                                      Getters                                            **#
     #*********************************************************************************************#
     
-    def aknowleding_group_qs(self):
+    @staticmethod
+    def get_user_groups_qs(user):
+        """
+            Returns a Queryset containing all the groups a user is member of
+        """
+        membersof = GroupMember.get_user_memberships_qs(user).values('group')
+        memberof_acknowledged = GroupAcknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
+        return Group.objects.all().filter( models.Q(pk__in = membersof) | models.Q(pk__in = memberof_acknowledged) | models.Q(group_visibility=Group.VISIBILITY_PUBLIC))
+    
+    def get_aknowleding_groups_qs(self):
         """
             Returns a Queryset containing the groups that are directly aknowleding this group
         """
@@ -63,7 +76,7 @@ class Group(models.Model):
     #**                                      Methods                                            **#
     #*********************************************************************************************#    
     
-    def can_retrieve(user):
+    def can_retrieve(self, user):
         """
             Returns True if the given user can access the group.
             This can happen in the following cases :
@@ -72,11 +85,11 @@ class Group(models.Model):
             * The group visibility is set to `VISIBILITY_NORMAL` and I'm a member of an aknowledging group
         """
             
-        if group.group_visibility == VISIBILITY_PUBLIC or GroupMember.is_member(group, user):
+        if self.group_visibility == Group.VISIBILITY_PUBLIC or GroupMember.is_member(self, user):
             return True
             
-        elif group.group_visibility == VISIBILITY_NORMAL:
-            for parent in group.parent_group_qs():
+        elif self.group_visibility == Group.VISIBILITY_NORMAL:
+            for parent in self.get_aknowleding_groups_qs():
                 if GroupMember.is_member(parent, user):
                     return True
             

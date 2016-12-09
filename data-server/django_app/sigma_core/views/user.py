@@ -35,7 +35,7 @@ class UserViewSet(SigmaViewSet):
         """
         Retrieve an User according to its id.
         """
-        return self.basic_retrieve(request, pk)
+        return self.handle_action('retrieve', request, pk)
         
         
     @list_route(methods=['get'])
@@ -43,7 +43,7 @@ class UserViewSet(SigmaViewSet):
         """
         Retrieve the data of the current user.
         """
-        return self.serialized_response(self)
+        return self.serialized_response(request.user)
     
     
     #*********************************************************************************************#

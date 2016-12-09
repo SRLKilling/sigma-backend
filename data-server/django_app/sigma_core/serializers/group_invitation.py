@@ -9,3 +9,5 @@ class GroupInvitationSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = GroupInvitation
+        fields = ('group', 'invitee', 'issued_by_invitee', 'date')
+        required = ('group', 'invitee', 'issued_by_invitee')

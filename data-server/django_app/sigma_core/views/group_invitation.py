@@ -1,5 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.response import Response
 from sigma_core.views.sigma_viewset import SigmaViewSet
 
 from sigma_core.models.group_invitation import GroupInvitation
@@ -23,15 +25,14 @@ class GroupInvitationViewSet(SigmaViewSet):
         """
             REST list action. Used to list all of a user's invitation.
         """
-        qs = GroupInvitation.get_user_invitations_qs(request.user)
-        return self.serialized_response(qs)
+        return self.handle_action_list(request,GroupInvitation.get_user_invitations_qs)
 
         
     def retrieve(self, request, pk):
         """
             REST retrieve action. Used to retrieve an invitation.
         """
-        return self.basic_retrieve(request, pk)
+        return self.handle_action_pk('retrieve', request, pk)
     
     
     
@@ -47,14 +48,14 @@ class GroupInvitationViewSet(SigmaViewSet):
             or the GroupMember object if invitation is not needed.
             The invitee must not be already invited or member.
         """
-        return self.basic_create(request)
+        return self.handle_action('create', request)
             
             
     def create_pre_handler(self, request, invitation_serializer, invitation):
-        if GroupMember.is_member(invitation.invitee, invitation.group):
+        if GroupMember.is_member(invitation.group, invitation.invitee):
             raise ValidationError("The user is already a member of this group")
             
-        elif Invitation.object.filter(invitee = invitation.invitee, group = invitation.group).exists():
+        elif GroupInvitation.objects.filter(invitee = invitation.invitee, group = invitation.group).exists():
             raise ValidationError("The user is already invited to this group")
         
         elif not invitation.group.need_validation_to_join:
@@ -86,5 +87,5 @@ class GroupInvitationViewSet(SigmaViewSet):
             If succeeded, returns HTTP_204_NO_CONTENT.
         """
         
-        return self.basic_destroy(request, pk)
+        return self.handle_action_pk('destroy', request, pk)
         

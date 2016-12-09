@@ -1,5 +1,8 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.response import Response
+
 from sigma_core.views.sigma_viewset import SigmaViewSet
 
 from sigma_core.models.group_member import GroupMember
@@ -18,15 +21,14 @@ class GroupMemberViewSet(SigmaViewSet):
         """
             REST list action. Used to list all of a user's membership.
         """
-        qs = GroupInvitation.get_user_memberships_qs(request.user)
-        return self.serialized_response(qs)
-
+        return self.handle_action_list(request, GroupMember.get_user_memberships_qs)
+        
         
     def retrieve(self, request, pk):
         """
             REST retrieve action. Used to retrieve a membership.
         """
-        return self.basic_retrieve(request, pk)
+        return self.handle_action_pk('retrieve', request, pk)
     
     
     
@@ -48,7 +50,8 @@ class GroupMemberViewSet(SigmaViewSet):
             member.is_super_administrator = True
             member.is_administrator = True
         member.save()
-        return self.serialized_response(member)
+        serializer = GroupMemberSerializer(member)
+        return serializer.data
         
     
     @detail_route(methods=['patch'])
@@ -83,5 +86,5 @@ class GroupMemberViewSet(SigmaViewSet):
             If succeeded, returns HTTP_204_NO_CONTENT.
         """
         
-        return self.basic_destroy(request, pk)
+        return self.handle_action_pk('destroy', request, pk)
         

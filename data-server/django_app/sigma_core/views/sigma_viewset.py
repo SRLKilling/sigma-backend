@@ -1,6 +1,9 @@
 from django.db.models.query import QuerySet
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.response import Response
+
 
 from push_app.notify import notify
 
@@ -12,74 +15,71 @@ class SigmaViewSet(viewsets.ViewSet):
     #**                                    Useful methods                                       **#
     #*********************************************************************************************#
     
-    def get_or_404(self, pk):
+    def try_to_get(obj, pk):
         """
             This method can be used to get a model instance based on it's primary key.
             If the instance does not exists, it will automatically throws a 404 error.
             
+            Method version : uses the queryset provided in the subclass definition
             Static version : takes the queryset to use as its first argument.
         """
-        return SigmaViewSet.get_or_404(self.__class__.queryset, pk)
-    
-    @staticmethod
-    def get_or_404(qs, pk):
+        if isinstance(obj, SigmaViewSet):
+            return SigmaViewSet.try_to_get(obj.__class__.queryset, pk)
+        
         try:
-            instance = qs.get(pk=pk)
-        except qs.model.DoesNotExist:
+            instance = obj.get(pk=pk)
+        except obj.model.DoesNotExist:
             raise NotFound()
             
         return instance
     
-    
         
-    def get_deserialized(self, data, *args, **kwargs):
+    def get_deserialized(obj, data, *args, **kwargs):
         """
             Shortcut method to get model instance, and serializer corresponding to the request.
             
+            Method version : uses the serializer_class provided in the subclass definition
             Static version : takes the serializer to use as its first argument.
         """
-        return SigmaViewSet.get_deserialized(self.__class__.serializer_class, data, *args, **kwargs)
-        
-    @staticmethod
-    def get_deserialized(serializer_class, data, *args, **kwargs):
-        serializer = serializer_class(data=data, *args, **kwargs)
-        serializer.is_valid(raise_exceptions=True)
-        instance = serializer.validated_data
-        return serializer, instance
-        
+        if isinstance(obj, SigmaViewSet):
+            return SigmaViewSet.get_deserialized(obj.__class__.serializer_class, data, *args, **kwargs)
+            
+        serializer = obj(data=data, *args, **kwargs)
+        serializer.is_valid(raise_exception=True)
+        instance = obj.Meta.model(**serializer.validated_data)
+        return serializer, instance        
         
         
-    def serialized_response(self, data):
+    def serialized_response(obj, data):
         """
             Shortcut method to get a 200-OK response with serialized data, out of a model instance or a queryset.
             
+            Method version : uses the serializer_class provided in the subclass definition
             Static version : takes the serializer to use as its fist argument.
         """
-        return SigmaViewSet.serialized_response(self.__class__.serializer_class, data)
+        if isinstance(obj, SigmaViewSet):
+            return SigmaViewSet.serialized_response(obj.__class__.serializer_class, data)
         
-    @staticmethod
-    def serialized_response(serializer_class, data):
         many = (type(data) == QuerySet)
-        serializer = serializer_class(data, many=many)
+        serializer = obj(data, many=many)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     
-    
-    def call_if_exists(self, name, *args, **kwargs):
+        
+    def call_method_if_exists(obj, name, *args, **kwargs):
         """
             If the the method identified by the given `name` exists, execute it and returns its result.
             Otherwise, return None.
             
+            Method version : try to call the method on self
             Static version : takes the object owning the method we try to call, as its first argument.
         """
-        return SigmaViewSet.call_method_if_exists(self, name, *args, **kwargs)
-    
-    @staticmethod
-    def call_method_if_exists(obj, name, *args, **kwargs):
+        
         if hasattr(obj, name):
             f = getattr(obj, name)
-            return f(obj, *args, **kwargs)
+            return f(*args, **kwargs)
         return None
+    
         
         
         
@@ -93,75 +93,103 @@ class SigmaViewSet(viewsets.ViewSet):
         """
         if hasattr(instance, 'can_' + actionname):
             f = getattr(instance, 'can_' + actionname)
-            if not f(instance, user, *args, **kwargs):
+            if not f(user, *args, **kwargs):
                 raise PermissionDenied()
     
     #*********************************************************************************************#
     #**                           Pre-defined basic views helpers                               **#
-    #*********************************************************************************************#        
+    #*********************************************************************************************#
+      
+    def handle_action_list(self, request, qsgetter, *args, **kwargs):
+        """
+            Provide a really basic way of handling list actions.
+            It will simply serialize the queryset and response its result.
+            To obtain the queryset, this method calls 'qsgetter(request.user, *args, **kwargs)'
+        """
+        qs = qsgetter(request.user, *args, **kwargs)
+        return self.serialized_response(qs)
         
     
-    def basic_retrieve(self, request, pk, *args, **kwargs):
+    def handle_action(self, action, request, *args, **kwargs):
         """
-            Provide a basic retrieve handler.
-            It will try to get the requested object, then if it exists, apply can_retrieve to check
-            permissions, and then return the object.
-        """
-        instance = self.get_or_404(pk)
-        SigmaViewSet.check_permission(request.user, instance, 'retrieve', *args, **kwargs)        
-        return self.serialized_response(instance)
-    
-    
-    
-    def basic_create(self, request, *args, **kwargs):
-        """
-            Provide a basic handler for a create action.
-            In order, if those functions exists, it will :
+            Provide a basic handler for actions, using the following steps :
             * create model_instance `instance` using `serializer_class` and `request.data`
-            * call `instance.can_create` to check perms
-            * call `instance.create_pre_handler`, and if nothing is returned
-            * save the `instance`
-            * call `instance.create_post_handler`
+            * call `instance.can_action` to check perms.
+            * run the `action_handling_process`
+        """        
+        serializer, instance = self.get_deserialized(request.data)
+        SigmaViewSet.check_permission(request.user, instance, action, *args, **kwargs)
+        return self.action_handling_process(action, request, serializer, instance, *args, **kwargs)
+        
+        
+    def handle_action_pk(self, action, request, pk, *args, **kwargs):
         """
-        serializer, instance = self.get_deserialized(request)
-        SigmaViewSet.check_permission(request.user, instance, 'create', *args, **kwargs)
+            Provide a basic handler for pk actions, using the following steps :
+            * create model_instance `instance` using `serializer_class` and `pk`
+            * call `instance.can_action` to check perms.
+            * run the `action_handling_process`
+        """        
+        instance = self.try_to_get(pk)
+        SigmaViewSet.check_permission(request.user, instance, action, *args, **kwargs)
+        return self.action_handling_process(action, request, pk, instance, *args, **kwargs)
         
-        ret = self.call_if_exists('create_pre_handler', request, serializer, instance, *args, **kwargs)
+        
+    def action_handling_process(self, action, request, *args, **kwargs):
+        """
+            A basic handling process for actions :
+            * if it exists, call `instance.action_pre_handler`, and returns its result if there's any.
+            * call `instance.action_handler`, and save the `response` or raise 500 if there's no response.
+            * if it exists, call `instance.action_post_handler`, and returns its result if there's any
+            * return the previously saved `response`
+        """
+        
+        ret = self.call_method_if_exists(action + '_pre_handler', request, *args, **kwargs)
         if ret != None:
-            return Ret
+            return ret
         
-        serializer.save()
+        resp = self.call_method_if_exists(action + '_handler', request, *args, **kwargs)
+        if resp == None:
+            raise
         
-        ret = self.call_if_exists('create_post_handler', request, serializer, instance, *args, **kwargs)
+        ret = self.call_method_if_exists(action + '_post_handler', request, *args, **kwargs)
         if ret != None:
-            return Ret
+            return ret
             
+        return resp
+        
+      
+        
+        
+    
+        
+    
+    def retrieve_handler(self, request, pk, instance):
+        """
+            A basic retrieve handler to use with  `handle_action_pk`.
+        """      
+        return self.serialized_response(instance)
+        
+        
+    def create_handler(self, request, serializer, instance):
+        """
+            A basic create handler to use with `handle_action`.
+        """
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
         
-        
+    def update_handler(self, request, pk, instance):
+        """
+            A basic update handler to use with `handle_action_pk`.
+        """
+        # serializer.save()
+        # return Response(serializer.data, status=status.HTTP_200_OK)                                       # TODO : update / patch actions
+        return Response(status=status.HTTP_200_OK)
     
-    def basic_destroy(self, request, pk, *args, **kwargs):
+    def destroy_handler(self, request, pk, instance):
         """
-            Provide a basic handler for a destroy action.
-            It will try to get the requested object, then if it exists, apply can_destroy to check
-            permissions.
-            If it exists, destroy_handler is then called, and if it returns anything but True,
-            this value is returned. Otherwise, the requested object is destroyed
+            A basic destroy handler to use with `handle_action_pk`.
         """
-            
-        instance = self.get_or_404(pk)
-        SigmaViewSet.check_permission(request.user, instance, 'destroy', *args, **kwargs)
-            
-        ret = self.call_if_exists('destroy_pre_handler', request, serializer, instance, *args, **kwargs)
-        if ret != None:
-            return Ret
-        
         instance.delete()
-        
-        ret = self.call_if_exists('destroy_post_handler', request, serializer, instance, *args, **kwargs)
-        if ret != None:
-            return Ret
-            
         return Response(status=status.HTTP_204_NO_CONTENT)
         
         
