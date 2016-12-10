@@ -16,8 +16,8 @@ Vagrant usage
 If you want to use the vagrant setup, you don't have to install python libraries.  
 Please see the [provisioning repository](https://github.com/ProjetSigma/provisioning).
 
-Installation (standalone version)
----------------------------------
+Installation
+------------
 
 **Requirements.**  
 On Debian-based distribution, you will need the following librairies:
@@ -26,64 +26,55 @@ apt-get install python-dev libmysqlclient-dev libjpeg-dev python3.5-dev
 ```
 
 **Python 3 is required.**  
-We recommend to use a virtualenv for python. If you have python3 installed, it should had come with it.  
-After you have cloned the repository, you can execute the following commands in your shell:
-```[sh]
-cd /path/to/sigma/backend
-virtualenv --python=python3 .env
-source .env/bin/activate
-pip install -r requirements/{prod,dev}.txt
-cp sigma/settings.py.local sigma/settings.py
-./resetdb.sh
-./manage.py runserver
-```
+We recommend to use a virtualenv for python.
 
-If you don't want to use a virtualenv, follow these instructions to setup the project.
+Follow these instructions to setup the project.
 
-Install requirements  
-`pip install -r requirements/prod.txt`
-`pip install -r requirements/dev.txt`
+First, configure the manager editing the settings.py file.
+You'll need to provide the name of your python and pip programs.
+If you're on a campus, you can also add a proxy setting.
 
-If problems to install mysqlclient  
-`apt-get install python-dev libmysqlclient-dev` or `yum install python-devel mysql-devel`
+Then, install dependances  
+`manage.py install`
 
-Since you don't use the vagrant, you have to use the local settings file:  
-`cp sigma/settings.py.local sigma/settings.py`  
+Finally, initialize the database, and load static files
+`manage.py init`
 
-For a first installation, or if you have broken your database, reset it !  
-`./resetdb.sh`
+Usage
+-----
 
-If you have just made a `git pull`, onlu migrate the database with  
-`python manage.py migrate`
+The `manage.py` file provides some useful tools. Here is how to use it :
 
-You can load fixtures data with  
-`python manage.py loaddata fixtures.json`
+To start the data server, i.e. the one containing the database/django stuff
+`manage.py run-data-server`
 
-Run dev server  
-`python manage.py runserver` or `python manage.py runserver_plus` (can be useful but buggier...)
+To start the notification server, i.e. the one which clients will open websockets to, use
+`manage.py run-data-server`
 
-API is accessible at `127.0.0.1:8000` and documented at `127.0.0.1:8000/docs/` (Swagger).
-
-
-
+To use the Django manager, simply use `manage.py django [...]` followed by the parameters you want to use
+For example you could do `manage.py django migrate`
 
 Fixtures
 --------
 
-A few fixtures are loaded when `resetdb.sh` is executed. You have several users, whose credentials are (login/password):
-* admin@sigma.fr / admin
-* user@sigma.fr / user
-* and many others (see the database, the password is always the username in the email adress).
+If you'd like to test things out, fill the database with some random fixtures using
+`manage.py fixtures`
+You'll be provided with a super-user :
+```
+Email: admin@sigma.fr
+Password: admin
+```
 
 An OAuth client application is also created (see below for further information), with data:
 * `clientId`: `bJeSCIWpvjbYCuXZNxMzVz0wglX8mHR2ZTKHxaDv`
 * `clientSecret`: `XjbfZS6Apq05PDTSL4CoFHGo7NsKVAa1XMVrVElk5N1t0dOSyqxrHPff6okAi6X6Du9XxrK4dl0mLQ0YlscJsjnL5IKhQagQdGv2SgumhYRFaMi6LtHNPXicmMr8oLdy`
 
-To see all fixtures, browse the web API at `127.0.0.1:8000`.
+
 
 
 OAuth usage
 -----------
+
 ###Create an application *(temporary)*
 NB. For frontend usage only, you can skip this part.
 
