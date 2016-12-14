@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from sigma_core.views.sigma_viewset import SigmaViewSet
 
+from sigma_core.models.user_connection import UserConnection
 from sigma_core.models.group_member import GroupMember
 from sigma_core.serializers.group_member import GroupMemberSerializer
 
@@ -50,7 +51,7 @@ class GroupMemberViewSet(SigmaViewSet):
             member.is_super_administrator = True
             member.is_administrator = True
         member.save()
-        UserConnectionViewSet.create_new_connections_gr(user,group)
+        UserConnection.create_new_connections_gr(user,group)
         serializer = GroupMemberSerializer(member)
         return serializer.data
 
@@ -68,7 +69,7 @@ class GroupMemberViewSet(SigmaViewSet):
         """
         user = request.user
         member = self.get_or_404(pk)
-        rights_serializer, rights = self.get_deserialized(GroupMemberRightsSerializer, request.data)
+        rights_serializer, rights = SigmaViewSet.get_deserialized(GroupMemberRightsSerializer, request.data)
 
         if not GroupMember.can_change_rights(user, member, rights):
             raise PermissionDenied()
@@ -76,7 +77,7 @@ class GroupMemberViewSet(SigmaViewSet):
         if rights.is_super_administrator:
             pass                                                                                                # TODO : de-superadminer le gars qui file ses droits
 
-        member_serializer, member = self.get_deserialized(GroupMember, rights, member, partial=True)
+        member_serializer, member = SigmaViewSet.get_deserialized(GroupMember, rights, member, partial=True)
         member_serializer.save()
         return Response(member_serializer.data, status=status.HTTP_200_OK)
 
@@ -88,5 +89,5 @@ class GroupMemberViewSet(SigmaViewSet):
         """
 
         group_member = self.get_deserialized(GroupMemberSerializer, request.data)
-        UserConnectionViewSet.destroy_gr(group_member.user,group_member.group)
+        UserConnection.destroy_gr(group_member.user,group_member.group)
         return self.handle_action_pk('destroy', request, pk)
