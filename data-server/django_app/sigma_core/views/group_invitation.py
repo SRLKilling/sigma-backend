@@ -9,7 +9,7 @@ from sigma_core.serializers.group_invitation import GroupInvitationSerializer
 
 
 from sigma_core.models.group_member import GroupMember
-from sigma_core.views.group_member import GroupMemberViewSet
+from sigma_core.serializers.group_member import GroupMemberSerializer
 
 class GroupInvitationViewSet(SigmaViewSet):
     
@@ -71,14 +71,14 @@ class GroupInvitationViewSet(SigmaViewSet):
             Used to accept an invitation.
             If succeeded, returns HTTP_201_CREATED with the corresponding GroupMember object
         """
-        invitation = self.get_or_404(pk)
-            
-        if not invitation.can_accept(request.user):
-            raise PermissionDenied()
+        return self.handle_action_pk('accept', request, pk)
         
-        data = GroupMemberViewSet.create(invitation.invitee, invitation.group)
-        invitation.delete()
-        return Response(data, status=status.HTTP_201_CREATED)
+        
+    def accept_handler(self, request, pk, instance):
+        data = GroupMember.create(invitation.invitee, invitation.group)
+        instance.delete()
+        return SigmaViewSet.serialized_response(GroupMemberSerializer, data, status.HTTP_201_CREATED)
+        
         
         
     def destroy(self, request, pk):

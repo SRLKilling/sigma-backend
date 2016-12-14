@@ -55,6 +55,28 @@ class GroupMember(models.Model):
     
     
     #*********************************************************************************************#
+    #**                                      Setters                                            **#
+    #*********************************************************************************************#
+    
+    @staticmethod
+    def create(user, group, sa = False):
+        """
+            Create a membership based on the given user an group.
+            This static method is used by following views :
+            * InvitationView create members once an invitation is accepted
+            * GroupView create super admin right after creating a group
+        """
+        member = GroupMember(user=user, group=group)
+        if sa:
+            member.is_super_administrator = True
+            member.is_administrator = True
+        member.save()
+        
+        UserConnection.create_new_connections_gr(user, group)
+        return member
+        
+    
+    #*********************************************************************************************#
     #**                                      Getters                                            **#
     #*********************************************************************************************#
     

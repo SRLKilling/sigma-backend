@@ -6,7 +6,7 @@ from sigma_core.models.group import Group
 from sigma_core.serializers.group import GroupSerializer
 
 
-from sigma_core.views.group_member import GroupMemberViewSet
+from sigma_core.models.group_member import GroupMember
 
 class GroupViewSet(SigmaViewSet):
 
@@ -48,7 +48,7 @@ class GroupViewSet(SigmaViewSet):
 
     def create_post_handler(self, request, group_serializer, group):
         # Once a group is created, we need to create a membership for the creator (automaticly becoming the super admin)
-        GroupMemberViewSet.create(request.user, group, True)
+        GroupMember.create(request.user, group, True)
 
 
 

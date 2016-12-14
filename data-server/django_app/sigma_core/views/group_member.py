@@ -38,23 +38,6 @@ class GroupMemberViewSet(SigmaViewSet):
     #**                                  Write actions                                          **#
     #*********************************************************************************************#
 
-    @staticmethod
-    def create(user, group, sa = False):
-        """
-            Create a membership based on the given user an group.
-            This static method is not an API entry. It is used by others view :
-            * InvitationView create members once an invitation is accepted
-            * GroupView create super admin right after creating a group
-        """
-        member = GroupMember(user=user, group=group)
-        if sa:
-            member.is_super_administrator = True
-            member.is_administrator = True
-        member.save()
-        UserConnection.create_new_connections_gr(user,group)
-        serializer = GroupMemberSerializer(member)
-        return serializer.data
-
 
     @detail_route(methods=['patch'])
     def change_rights(self, request, pk):
