@@ -1,8 +1,11 @@
 from django.db import models
 
-class ChatMessage(models.Model):
+class Chat(models.Model):
     """
-        Modelize a message in a chat of a group
+        Modelize a chat
+        Can be a chat of a group or not
+        Can contain all members of a group or not (ex : just the prez,VP,trez)
+        One group for a chat but there can be many chats for one group (oneToMany)
     """
 
     #*********************************************************************************************#
