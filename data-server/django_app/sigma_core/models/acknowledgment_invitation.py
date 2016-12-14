@@ -1,6 +1,6 @@
 from django.db import models
 
-class AcknowledgementInvitation(models.Model):
+class AcknowledgmentInvitation(models.Model):
     """
         Modelize an invitation to acknowledge a group.
         Invitation can be issued both by the invitee and the inviter.
@@ -34,14 +34,14 @@ class AcknowledgementInvitation(models.Model):
     def get_group_acknowledge_invitations_qs(user):
         """ Return a queryset containing the list of invitations where `user` is the invitee
             `user` can be a model instance, or a primary key. """
-        return AcknowledgementInvitation.objects.filter(acknowledged = group)
+        return AcknowledgmentInvitation.objects.filter(acknowledged = group)
         
     @staticmethod
     def is_invited(sub, parent):
         """ Return true if the first group argument is invited to be acknowledged by the second group argument.
             False otherwise.
         """
-        return AcknowledgementInvitation.objects.filter(acknowledged = sub, acknowledged_by = parent).exists()
+        return AcknowledgmentInvitation.objects.filter(acknowledged = sub, acknowledged_by = parent).exists()
     
     
     #*********************************************************************************************#

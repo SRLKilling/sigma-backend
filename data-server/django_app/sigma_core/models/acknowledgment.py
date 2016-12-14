@@ -18,7 +18,7 @@ class Acknowledgment(models.Model):
     # delegate_admin = models.BooleanField(default=True)
 
     def __str__(self):
-        return "Group %s acknowledged by Group %s" % (self.acknowledged.__str__(), self.acknowledged_by.__str__())
+        return "'%s' acknowledged by '%s'" % (self.acknowledged.__str__(), self.acknowledged_by.__str__())
 
     
     #*********************************************************************************************#
@@ -27,12 +27,12 @@ class Acknowledgment(models.Model):
     
             
     @staticmethod
-    def get_group_acknowledged_by_qs(user, group):
+    def get_acknowledged_by_qs(user, group):
         """ Return a queryset containing the list of groups that are aknowledged by the given group. """
         return Acknowledgment.objects.filter(acknowledged_by = group).values("acknowledged")
         
     @staticmethod
-    def get_group_acknowledging_qs(user, group):
+    def get_acknowledging_qs(user, group):
         """ Return a queryset containing the list of groups that aknowledge the given group. """
         return Acknowledgment.objects.filter(acknowledged = group).values("acknowledged_by")
         

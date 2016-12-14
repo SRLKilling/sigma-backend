@@ -6,6 +6,7 @@ import sys
 USER_NUM = 500
 GROUP_NUM = 300
 MEMBER_NUM = (5, 50)
+AKNOW_NUM = 500
 
 
 #*********************************************************************************************#
@@ -127,6 +128,14 @@ def generateMember(group, user, sa):
     member['has_publish_right'] = member['is_administrator'] or randombool(0.2)
     member['has_kick_right'] = member['is_administrator'] or randombool(0.2)
     return JSONizer('sigma_core.groupmember', member)
+    
+    
+def randomAknowledgment():
+    akn = {}
+    akn['acknowledged'] = random.randint(1, GROUP_NUM)
+    akn['acknowledged_by'] = random.randint(1, GROUP_NUM)
+    akn['date'] = randomdate()
+    return JSONizer('sigma_core.acknowledgment', akn)
         
     
 #*********************************************************************************************#
@@ -146,13 +155,17 @@ def generateFixtures(filepath):
     for i in range(GROUP_NUM):                                          # Generate groups
         f.write( randomGroup() )
         
-    for i in range(1, GROUP_NUM):       
+    for i in range(1, GROUP_NUM):   
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
         for j in range(member_num):                                     # Generate members
             member = randint_norepeat(members, 1, USER_NUM)
             members.append(member)
             f.write( generateMember(i, member, (j==0)) )
+            
+            
+    for i in range(1, AKNOW_NUM):                                       # Generate aknowledgments
+        f.write( randomAknowledgment() )
         
     f.write(']')
 

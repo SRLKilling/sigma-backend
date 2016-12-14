@@ -76,7 +76,7 @@ class SigmaViewSet(viewsets.ViewSet):
         """
         
         if hasattr(obj, name):
-            f = getattr(obj, name)
+            f = getattr(obj, name)                                                                              # LE BUG VIENT DU FAIt QUE LE QUERYSET DONNE UN AKNOW QS ET PAS UN GROUP QS ;)
             return f(*args, **kwargs)
         return None
     

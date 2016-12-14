@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from sigma_core.models.acknowledgment_invitation import AcknowledgementInvitation
+from sigma_core.models.acknowledgment_invitation import AcknowledgmentInvitation
 
 class AcknowledgementInvitationSerializer(serializers.ModelSerializer):
     """
@@ -8,6 +8,6 @@ class AcknowledgementInvitationSerializer(serializers.ModelSerializer):
         Include all fields
     """
     class Meta:
-        model = AcknowledgementInvitation
+        model = AcknowledgmentInvitation
         fields = ('acknowledged', 'acknowledged_by', 'issued_by_invitee', 'date')
         required = ('acknowledged', 'acknowledged_by', 'issued_by_invitee')

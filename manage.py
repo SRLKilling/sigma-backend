@@ -45,6 +45,11 @@ def init():
     runDjango('makemigrations')
     runDjango('migrate')
     
+def reset():
+    os.remove('db.sqlite3')
+    runDjango('makemigrations')
+    runDjango('migrate')
+    fixtures()
     
 def fixtures():
     runPython([Settings.PATH['FIXTURES_GENERATOR'], Settings.PATH['FIXTURES_FILE']])
@@ -82,6 +87,9 @@ def main():
         
         elif(op == "fixtures"):
             return fixtures()
+            
+        elif(op == "reset"):
+            return reset()
             
         elif(op == "run-push-server"):
             return runPython('push-server/run-server.py')
