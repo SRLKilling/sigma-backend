@@ -62,7 +62,7 @@ class UserConnection(models.Model):
     #*********************************************************************************************#
 
 
-        @staticmethod
+    @staticmethod
     def create_new_connections_gr(user,group):
         """
             Create connections based on the given user and a group he just joined.
