@@ -27,12 +27,12 @@ class Acknowledgment(models.Model):
     
             
     @staticmethod
-    def get_group_acknowledged_by_qs(group):
+    def get_group_acknowledged_by_qs(user, group):
         """ Return a queryset containing the list of groups that are aknowledged by the given group. """
         return Acknowledgment.objects.filter(acknowledged_by = group).values("acknowledged")
         
     @staticmethod
-    def get_group_acknowledging_qs(group):
+    def get_group_acknowledging_qs(user, group):
         """ Return a queryset containing the list of groups that aknowledge the given group. """
         return Acknowledgment.objects.filter(acknowledged = group).values("acknowledged_by")
         
