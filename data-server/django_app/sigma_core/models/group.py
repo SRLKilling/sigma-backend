@@ -91,7 +91,7 @@ class Group(models.Model):
             return True
             
         elif self.group_visibility == Group.VISIBILITY_NORMAL:
-            for parent in self.get_aknowleding_groups_qs():
+            for parent in Group.get_group_acknowledged_by_qs(None, self):                                       # TODO : Stuff to do here, None is uggly
                 if GroupMember.is_member(parent, user):
                     return True
             

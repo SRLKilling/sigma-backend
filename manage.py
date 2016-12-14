@@ -1,5 +1,6 @@
 import sys
 import os
+import errno
 import argparse
 
 from settings import Settings
@@ -27,6 +28,13 @@ def runDjango(params):
     return os.system(Settings.ENV['PYTHON'] + ' ' + Settings.PATH['DJANGO_MANAGER'] + ' ' + params)
 
     
+
+def silent_remove(filename):
+    try:
+        os.remove(filename)
+    except OSError as e:
+        if e.errno != errno.ENOENT:
+            raise
     
     
 #*********************************************************************************************#
@@ -46,7 +54,7 @@ def init():
     runDjango('migrate')
     
 def reset():
-    os.remove('db.sqlite3')
+    silent_remove('db.sqlite3')
     runDjango('makemigrations')
     runDjango('migrate')
     fixtures()

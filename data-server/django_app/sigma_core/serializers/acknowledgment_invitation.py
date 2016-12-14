@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from sigma_core.models.acknowledgment_invitation import AcknowledgmentInvitation
 
-class AcknowledgementInvitationSerializer(serializers.ModelSerializer):
+class AcknowledgmentInvitationSerializer(serializers.ModelSerializer):
     """
         Basic default serializer for an Invitation to acknowledge a group
         Include all fields

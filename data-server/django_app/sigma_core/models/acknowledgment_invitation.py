@@ -1,5 +1,7 @@
 from django.db import models
 
+from sigma_core.models.group_member import GroupMember
+
 class AcknowledgmentInvitation(models.Model):
     """
         Modelize an invitation to acknowledge a group.
@@ -13,10 +15,10 @@ class AcknowledgmentInvitation(models.Model):
     #*********************************************************************************************#
 
     class Meta:
-        unique_together = (("invitee", "group"),)
+        unique_together = (("acknowledged", "acknowledged_by"),)
 
-    acknowledged = models.ForeignKey('Group', related_name='acknowledged_by')
-    acknowledged_by = models.ForeignKey('Group', related_name='acknowledged')
+    acknowledged = models.ForeignKey('Group', related_name='invitation_to_be_acknowledged')
+    acknowledged_by = models.ForeignKey('Group', related_name='invitation_to_acknowledge')
     
     """ Represents whether the invitation has been issued by the invitee or the inviter """
     issued_by_invitee = models.BooleanField(default=True)
@@ -48,13 +50,13 @@ class AcknowledgmentInvitation(models.Model):
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
     
-    def is_admin_of_invited(self, group):
-        mb = GroupMember.get_membership(user, self.acknowledged)
-        return (mb.is_admin or mb.is_super_administrator)
+    def is_admin_of_invited(self, user):
+        mb = GroupMember.get_membership(self.acknowledged, user)
+        return mb != None and (mb.is_administrator or mb.is_super_administrator)
         
-    def is_admin_of_inviter(self, group):
-        mb = GroupMember.get_membership(user, self.acknowledged_by)
-        return (mb.is_admin or mb.is_super_administrator)
+    def is_admin_of_inviter(self, user):
+        mb = GroupMember.get_membership(self.acknowledged_by, user)
+        return mb != None and (mb.is_administrator or mb.is_super_administrator)
     
     def can_retrieve(self, user):
         """ Check whether `user` can retrieve the invitation.

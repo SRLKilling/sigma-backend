@@ -10,6 +10,9 @@ class Acknowledgment(models.Model):
     #**                                       Fields                                            **#
     #*********************************************************************************************#
     
+    class Meta:
+        unique_together = (("acknowledged", "acknowledged_by"),)
+    
     acknowledged = models.ForeignKey('Group', related_name='acknowledged_by')
     acknowledged_by = models.ForeignKey('Group', related_name='acknowledged')
     

@@ -4,12 +4,11 @@ from rest_framework.exceptions import NotFound, PermissionDenied, ValidationErro
 from rest_framework.response import Response
 from sigma_core.views.sigma_viewset import SigmaViewSet
 
-from sigma_core.models.group_invitation import GroupInvitation
-from sigma_core.serializers.group_invitation import GroupInvitationSerializer
-
-
 from sigma_core.models.acknowledgment_invitation import AcknowledgmentInvitation
-from sigma_core.views.acknowledgment_invitation import AcknowledgmentInvitationSerializer
+from sigma_core.serializers.acknowledgment_invitation import AcknowledgmentInvitationSerializer
+
+
+from sigma_core.models.acknowledgment import Acknowledgment
 
 class AcknowledgmentInvitationViewSet(SigmaViewSet):
     
