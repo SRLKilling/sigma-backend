@@ -7,7 +7,7 @@ from sigma_core.models.group_member import GroupMember
 from sigma_core.models.group_field import GroupField
 from sigma_core.models.group_field_value import GroupFieldValue
 from sigma_core.models.group_invitation import GroupInvitation
-from sigma_core.models.group_acknowledgment import GroupAcknowledgment
+from sigma_core.models.acknowledgment import Acknowledgment
 # from sigma_core.models.participation import Participation
 # from sigma_core.models.publication import Publication
 # from sigma_core.models.event import Event

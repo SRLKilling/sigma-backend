@@ -50,7 +50,7 @@ class SigmaViewSet(viewsets.ViewSet):
         return serializer, instance        
         
         
-    def serialized_response(obj, data):
+    def serialized_response(obj, data, status=status.HTTP_200_OK):
         """
             Shortcut method to get a 200-OK response with serialized data, out of a model instance or a queryset.
             
@@ -62,7 +62,7 @@ class SigmaViewSet(viewsets.ViewSet):
         
         many = (type(data) == QuerySet)
         serializer = obj(data, many=many)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status)
     
     
         

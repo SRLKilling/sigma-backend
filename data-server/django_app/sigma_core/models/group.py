@@ -1,7 +1,7 @@
 from django.db import models
 
 from sigma_core.models.group_member import GroupMember
-from sigma_core.models.group_acknowledgment import GroupAcknowledgment
+from sigma_core.models.acknowledgment import Acknowledgment
 
 class Group(models.Model):
     """
@@ -62,14 +62,8 @@ class Group(models.Model):
             Returns a Queryset containing all the groups a user is member of
         """
         membersof = GroupMember.get_user_memberships_qs(user).values('group')
-        memberof_acknowledged = GroupAcknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
+        memberof_acknowledged = Acknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
         return Group.objects.all().filter( models.Q(pk__in = membersof) | models.Q(pk__in = memberof_acknowledged) | models.Q(group_visibility=Group.VISIBILITY_PUBLIC))
-    
-    def get_aknowleding_groups_qs(self):
-        """
-            Returns a Queryset containing the groups that are directly aknowleding this group
-        """
-        return self.aknowledged_by.select_related('aknowledged_by')
     
     
     #*********************************************************************************************#
