@@ -49,7 +49,7 @@ To start the data server, i.e. the one containing the database/django stuff
 `manage.py run-data-server`
 
 To start the notification server, i.e. the one which clients will open websockets to, use
-`manage.py run-data-server`
+`manage.py run-push-server`
 
 To use the Django manager, simply use `manage.py django [...]` followed by the parameters you want to use
 For example you could do `manage.py django migrate`
