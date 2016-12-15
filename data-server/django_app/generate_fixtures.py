@@ -6,7 +6,8 @@ import sys
 USER_NUM = 500
 GROUP_NUM = 300
 MEMBER_NUM = (5, 50)
-AKNOW_NUM = 500
+ACKNOW_NUM = 700
+ACKNOW_INV_NUM = 700
 
 
 #*********************************************************************************************#
@@ -129,13 +130,33 @@ def generateMember(group, user, sa):
     member['has_kick_right'] = member['is_administrator'] or randombool(0.2)
     return JSONizer('sigma_core.groupmember', member)
     
-    
+unique_akn = set()
 def randomAknowledgment():
+    global unique_akn
+    A, B = random.randint(1, GROUP_NUM), random.randint(1, GROUP_NUM)
+    while (A, B) in unique_akn:
+        A, B = random.randint(1, GROUP_NUM), random.randint(1, GROUP_NUM)
+    unique_akn.add( (A, B) )
+    
     akn = {}
-    akn['acknowledged'] = random.randint(1, GROUP_NUM)
-    akn['acknowledged_by'] = random.randint(1, GROUP_NUM)
+    akn['acknowledged'] = A
+    akn['acknowledged_by'] = B
     akn['date'] = randomdate()
     return JSONizer('sigma_core.acknowledgment', akn)
+    
+unique_akn_inv = set()
+def randomAknowledgmentInvitation():
+    global unique_akn_inv
+    A, B = random.randint(1, GROUP_NUM), random.randint(1, GROUP_NUM)
+    while (A, B) in unique_akn_inv:
+        A, B = random.randint(1, GROUP_NUM), random.randint(1, GROUP_NUM)
+    unique_akn_inv.add( (A, B) )
+    
+    akn_inv = {}
+    akn_inv['acknowledged'] = A
+    akn_inv['acknowledged_by'] = B
+    akn_inv['issued_by_invitee'] = randombool()
+    return JSONizer('sigma_core.acknowledgmentinvitation', akn_inv)
         
     
 #*********************************************************************************************#
@@ -144,17 +165,22 @@ def randomAknowledgment():
 
 
 def generateFixtures(filepath):
+    print('Generating fixtures :')
     f = open(filepath, 'w')
     f.write('[')
     
+    print('  Generating superuser... ', end='')
     f.write( superUser() )                                              # Generate admin
     
+    print('OK\n  Generating users... ', end='')
     for i in range(USER_NUM):                                           # Generate users
         f.write( randomUser() )
         
+    print('OK\n  Generating groups... ', end='')
     for i in range(GROUP_NUM):                                          # Generate groups
         f.write( randomGroup() )
         
+    print('OK\n  Generating memberships.. ', end='')
     for i in range(1, GROUP_NUM):   
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
@@ -164,9 +190,15 @@ def generateFixtures(filepath):
             f.write( generateMember(i, member, (j==0)) )
             
             
-    for i in range(1, AKNOW_NUM):                                       # Generate aknowledgments
+    print('OK\n  Generating aknowledgment... ', end='')
+    for i in range(1, ACKNOW_NUM):                                       # Generate aknowledgments
         f.write( randomAknowledgment() )
+            
+    print('OK\n  Generating aknowledgment invitations... ', end='')
+    for i in range(1, ACKNOW_INV_NUM):                                       # Generate aknowledgments invitations
+        f.write( randomAknowledgmentInvitation() )
         
+    print('OK')
     f.write(']')
 
     
