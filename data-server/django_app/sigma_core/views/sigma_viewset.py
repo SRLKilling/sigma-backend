@@ -111,7 +111,7 @@ class SigmaViewSet(viewsets.ViewSet):
         """
         
         if isinstance(obj, SigmaViewSet):
-            return SigmaViewSet.handle_action_list(obj.__class__.serializer_class, data, *args, **kwargs)
+            return SigmaViewSet.handle_action_list(obj.__class__.serializer_class, request, qsgetter, *args, **kwargs)
         
         qs = qsgetter(request.user, *args, **kwargs)
         return SigmaViewSet.serialized_response(obj, qs)

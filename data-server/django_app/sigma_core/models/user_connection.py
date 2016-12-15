@@ -10,8 +10,8 @@ class UserConnection(models.Model):
     #**                                       Fields                                            **#
     #*********************************************************************************************#
 
-    user1 = models.ForeignKey('User', related_name='connections')
-    user2 = models.ForeignKey('User', related_name='connections')
+    user1 = models.ForeignKey('User', related_name='connections2')
+    user2 = models.ForeignKey('User', related_name='connections1')
     nb_of_common_groups = 1
 
     class Meta:
@@ -46,8 +46,8 @@ class UserConnection(models.Model):
     #*********************************************************************************************#
     #**                                      Methods                                            **#
     #*********************************************************************************************#
-
-
+    
+    
     @staticmethod
     def create_new_connections_gr(user,group):
         """

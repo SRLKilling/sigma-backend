@@ -7,7 +7,7 @@ USER_NUM = 500
 GROUP_NUM = 300
 MEMBER_NUM = (5, 50)
 ACKNOW_NUM = 700
-ACKNOW_INV_NUM = 700
+ACKNOW_INV_NUM = 500
 
 
 #*********************************************************************************************#
@@ -144,6 +144,7 @@ def randomAknowledgment():
     akn['date'] = randomdate()
     return JSONizer('sigma_core.acknowledgment', akn)
     
+    
 unique_akn_inv = set()
 def randomAknowledgmentInvitation():
     global unique_akn_inv
@@ -156,6 +157,7 @@ def randomAknowledgmentInvitation():
     akn_inv['acknowledged'] = A
     akn_inv['acknowledged_by'] = B
     akn_inv['issued_by_invitee'] = randombool()
+    akn_inv['date'] = randomdate()
     return JSONizer('sigma_core.acknowledgmentinvitation', akn_inv)
         
     

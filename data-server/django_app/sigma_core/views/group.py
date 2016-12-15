@@ -42,14 +42,14 @@ class GroupViewSet(SigmaViewSet):
         """
             Used to list all the groups that are acknowledged by a group.
         """
-        return self.handle_action_list(request, Group.get_group_acknowledged_by_qs, pk)
+        return self.handle_action_list(request, Group.get_acknowledged_by_qs, pk)
         
     @detail_route(methods=['get'])
     def acknowledged_by(self, request, pk):
         """
             Used to list all the groups that are acknowledging the given group.
         """
-        return self.handle_action_list(request, Group.get_group_acknowledging_qs, pk)
+        return self.handle_action_list(request, Group.get_acknowledging_qs, pk)
 
         
     @detail_route(methods=['get'])
