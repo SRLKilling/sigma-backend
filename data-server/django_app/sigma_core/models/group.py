@@ -1,7 +1,6 @@
 from django.db import models
 
-from sigma_core.models.group_member import GroupMember
-from sigma_core.models.acknowledgment import Acknowledgment
+from sigma_core.models import group_member as GroupMember, acknowledgment as Acknowledgment
 
 class Group(models.Model):
     """
@@ -61,8 +60,8 @@ class Group(models.Model):
         """
             Returns a Queryset containing all the groups a user is member of
         """
-        membersof = GroupMember.get_user_memberships_qs(user).values('group')
-        memberof_acknowledged = Acknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
+        membersof = GroupMember.GroupMember.get_user_memberships_qs(user).values('group')
+        memberof_acknowledged = Acknowledgment.Acknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
         return Group.objects.all().filter( models.Q(pk__in = membersof) | models.Q(pk__in = memberof_acknowledged) | models.Q(group_visibility=Group.VISIBILITY_PUBLIC))
         
     @staticmethod
@@ -70,7 +69,7 @@ class Group(models.Model):
         """
             Returns a Queryset containing all the groups that a given group acknowledge
         """
-        return Group.objects.filter(pk__in = Acknowledgment.get_acknowledged_by_qs(user, group))
+        return Group.objects.filter(pk__in = Acknowledgment.Acknowledgment.get_acknowledged_by_qs(user, group))
         
     @staticmethod
     def get_acknowledging_qs(user, group):
@@ -93,12 +92,12 @@ class Group(models.Model):
             * The group visibility is set to `VISIBILITY_NORMAL` and I'm a member of an aknowledging group
         """
             
-        if self.group_visibility == Group.VISIBILITY_PUBLIC or GroupMember.is_member(self, user):
+        if self.group_visibility == Group.VISIBILITY_PUBLIC or GroupMember.GroupMember.is_member(self, user):
             return True
             
         elif self.group_visibility == Group.VISIBILITY_NORMAL:
             for parent in Group.get_group_acknowledged_by_qs(None, self):                                       # TODO : Stuff to do here, None is uggly
-                if GroupMember.is_member(parent, user):
+                if GroupMember.GroupMember.is_member(parent, user):
                     return True
             
         return False

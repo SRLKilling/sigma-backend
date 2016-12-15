@@ -28,32 +28,18 @@ class UserConnection(models.Model):
     #*********************************************************************************************#
 
     @staticmethod
-    def get_users_connected_to(user):
+    def get_user_connections_qs(user):
         """
-            Returns a list containing the users who are connected to user
+            Returns a queryset containing a user's connections
         """
-        if type(user)!=int:
-            user=user.pk
-
-        l=[]
-        for c in user.connections:
-            if c.user1!=user:
-                l.append(user1)
-            else:
-                l.append(user2)
-        return l
+        return UserConnection.objects.filter( models.Q(user1=user1) or models.Q(user2=user1) )
 
     @staticmethod
     def are_users_connected(user1,user2):
         """
             Returns True if user1 and user2 are connected
         """
-        if type(user1)!=int:
-            user1=user1.pk
-        if type(user1)!=int:
-            user2=user2.pk
-
-        return UserConnection.all().filter(user1=user1,user2=user2).exists() or UserConnection.all().filter(user1=user2,user2=user1).exists()
+        return UserConnection.objects.filter( models.Q(user1=user1,user2=user2) or models.Q(user1=user2,user2=user1) ).exists()
 
 
 

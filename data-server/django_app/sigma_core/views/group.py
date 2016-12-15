@@ -7,8 +7,10 @@ from sigma_core.serializers.group import GroupSerializer
 
 
 from sigma_core.models.group_member import GroupMember
-from sigma_core.serializers.acknowledgment_invitation import AcknowledgmentInvitationSerializer
+from sigma_core.serializers.group_member import GroupMemberSerializer
+
 from sigma_core.models.acknowledgment_invitation import AcknowledgmentInvitation
+from sigma_core.serializers.acknowledgment_invitation import AcknowledgmentInvitationSerializer
 
 class GroupViewSet(SigmaViewSet):
 
@@ -33,6 +35,8 @@ class GroupViewSet(SigmaViewSet):
         return self.handle_action_pk('retrieve', request, pk)
 
         
+        
+        
     @detail_route(methods=['get'])
     def acknowledged(self, request, pk):
         """
@@ -55,6 +59,15 @@ class GroupViewSet(SigmaViewSet):
             It can be both invited or inviter
         """
         return SigmaViewSet.handle_action_list(AcknowledgmentInvitationSerializer, request, AcknowledgmentInvitation.get_invitations_qs, pk)
+        
+    @detail_route(methods=['get'])
+    def members(self, request, pk):
+        """
+            Used to retrieve a list of acknowledgment invitation a group is part of.
+            It can be both invited or inviter
+        """
+        return self.handle_action_pk_list(GroupMemberSerializer, request, pk, GroupMember.get_scoped_group_members_qs)
+        
 
     #*********************************************************************************************#
     #**                                  Write actions                                          **#

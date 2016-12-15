@@ -76,7 +76,7 @@ class SigmaViewSet(viewsets.ViewSet):
         """
         
         if hasattr(obj, name):
-            f = getattr(obj, name)                                                                              # LE BUG VIENT DU FAIt QUE LE QUERYSET DONNE UN AKNOW QS ET PAS UN GROUP QS ;)
+            f = getattr(obj, name)
             return f(*args, **kwargs)
         return None
     
@@ -127,6 +127,27 @@ class SigmaViewSet(viewsets.ViewSet):
         serializer, instance = self.get_deserialized(request.data)
         SigmaViewSet.check_permission(request.user, instance, action, *args, **kwargs)
         return self.action_handling_process(action, request, serializer, instance, *args, **kwargs)
+        
+    
+    def handle_action_pk_list(obj, serializer, request, pk, qsgetter, *args, **kwargs):
+        """
+            Provide a really basic way of handling list actions that apply on a specific ressource.
+            It will check permissions to retrieve the specific ressource.
+            If success, it will get the instance, get the queryset, and response its result.
+            To obtain the queryset, this method calls 'qsgetter(request.user, instance, *args, **kwargs)'
+            
+            Method version : uses the queryset provided in the subclass definition.
+            Static version : uses the queryset given as the first argument.
+        """
+        
+        if isinstance(obj, SigmaViewSet):
+            return SigmaViewSet.handle_action_pk_list(obj.__class__.queryset, serializer, request, pk, qsgetter, *args, **kwargs)
+        
+        instance = SigmaViewSet.try_to_get(obj, pk)
+        SigmaViewSet.check_permission(request.user, instance, 'retrieve', *args, **kwargs)
+        
+        qs = qsgetter(request.user, instance, *args, **kwargs)
+        return SigmaViewSet.serialized_response(serializer, qs)
         
         
     def handle_action_pk(self, action, request, pk, *args, **kwargs):

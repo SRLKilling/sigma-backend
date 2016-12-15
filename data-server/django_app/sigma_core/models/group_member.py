@@ -1,5 +1,7 @@
 from django.db import models
 
+from sigma_core.models import group as Group, user as User
+
 class GroupMember(models.Model):
     """
         Modelize a membership relation between an User and a Group.
@@ -45,10 +47,7 @@ class GroupMember(models.Model):
     
     """ If True, the member can kick other members (except admins if he is not an admin) """
     has_kick_right = models.BooleanField(default=False)
-
-    # Related fields:
-    #   - field_values (model GroupFieldValue)
-
+    
     
     def __str__(self):
         return "User \"%s\" in Group \"%s\"" % (self.user.__str__(), self.group.__str__())
@@ -71,7 +70,7 @@ class GroupMember(models.Model):
             member.is_super_administrator = True
             member.is_administrator = True
         member.save()
-        
+
         UserConnection.create_new_connections_gr(user, group)
         return member
         
@@ -94,27 +93,49 @@ class GroupMember(models.Model):
     @staticmethod
     def get_membership(group, user):
         """ If `user` is a member of `group`, returns the corresponding GroupMember instance.
-            Otherwise, returns None.
-            Both `group` and `user` can be a model instance, or a primary key """
-        if type(group) != int:
-            group = group.pk
-        if type(user) != int:
-            user = user.pk
-            
+            Otherwise, returns None. """
         try:
             return GroupMember.objects.get(group=group, user=user)
         except GroupMember.DoesNotExist:
             return None
             
     @staticmethod
-    def get_user_memberships_qs(user):
-        """ Return a queryset containing all of a user memberships """
-        return GroupMember.objects.filter(user=user)
-        
-    @staticmethod
     def has_common_memberships(user1, user2):
         """ Return a queryset containing user1 memberships where user2 is also a member of the same group """
         return GroupMember.get_user_memberships_qs(user1).filter(group__in = GroupMember.get_user_memberships_qs(user2).values('group')).exists()
+        
+        
+    @staticmethod
+    def get_members_qs(group):
+        """ Returns a queryset containing all members of a group. """
+        return GroupMember.objects.filter(group = group)
+        
+    @staticmethod
+    def get_user_memberships_qs(user):
+        """ Return a queryset containing all of a user memberships """
+        return GroupMember.objects.filter(user=user)
+    
+        
+        
+    @staticmethod
+    def get_scoped_group_members_qs(user, group):
+        """
+            Returns a queryset containing all members of the given group, a user can see.
+            * If you're a member, you'll see everybody
+            * If not, and the group is public, you'll see not-hidden members
+            * If not, and the group is normal, you'll see not-hidden and connected to you members
+        """
+        if GroupMember.is_member(group, user):
+            return GroupMember.objects.filter(group = group)
+        
+        elif group.members_visibility == Group.Group.VISIBILITY_PUBLIC:
+            return GroupMember.objects.filter(group = group, hidden = False)
+            
+        elif group.members_visibility == Group.Group.VISIBILITY_NORMAL:
+            return GroupMember.objects.filter(group = group, hidden = False, user__in = User.User.get_connected_qs(user))
+            
+        return GroupMember.objects.none();
+        
     
     
     #*********************************************************************************************#
@@ -134,10 +155,10 @@ class GroupMember(models.Model):
             return True
         
         elif not self.hidden:
-            if self.group.members_visibility == VISIBILITY_PUBLIC:
+            if self.group.members_visibility == Group.Group.VISIBILITY_PUBLIC:
                 return True
-            elif self.group.members_visibility == VISIBILITY_NORMAL:
-                return True ### HERUEHRUHKJSHDFKJBHEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE THER IS SOMINGETH TDOO EERH
+            elif self.group.members_visibility == Group.Group.VISIBILITY_NORMAL:
+                return user.is_connected_to( self.user )
             
         return False
         

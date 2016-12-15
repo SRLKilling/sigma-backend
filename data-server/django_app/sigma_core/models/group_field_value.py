@@ -1,8 +1,6 @@
 from django.db import models
 
-from sigma_core.models.group_field import GroupField
-from sigma_core.models.group_member import GroupMember
-from sigma_core.models.user import User
+from sigma_core.models import group_member as GroupMember
 
 class GroupFieldValue(models.Model):
     """
@@ -45,7 +43,7 @@ class GroupFieldValue(models.Model):
         if not self.field.is_protected and self.membership.user == user:
             return True
             
-        membership = GroupMember.get_membership(self.membership.group, user)
+        membership = GroupMember.GroupMember.get_membership(self.membership.group, user)
         return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
             
     def can_update(self, user):
@@ -56,7 +54,7 @@ class GroupFieldValue(models.Model):
         if not self.field.is_protected and self.membership.user == user:
             return True
             
-        membership = GroupMember.get_membership(self.membership.group, user)
+        membership = GroupMember.GroupMember.get_membership(self.membership.group, user)
         return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
             
     def can_destroy(self, user):
@@ -67,16 +65,5 @@ class GroupFieldValue(models.Model):
         if not self.field.is_protected and self.membership.user == user:
             return True
             
-        membership = GroupMember.get_membership(self.membership.group, user)
+        membership = GroupMember.GroupMember.get_membership(self.membership.group, user)
         return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
-
-        
-        
-        
-        
-    @staticmethod
-    def has_read_permission(request):
-        return True
-    @staticmethod
-    def has_write_permission(request):
-        return True

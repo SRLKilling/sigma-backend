@@ -1,6 +1,6 @@
 from django.db import models
 
-from sigma_core.models.group_member import GroupMember
+from sigma_core.models import group_member as GroupMember
 
 class AcknowledgmentInvitation(models.Model):
     """
@@ -51,12 +51,14 @@ class AcknowledgmentInvitation(models.Model):
     #*********************************************************************************************#
     
     def is_admin_of_invited(self, user):
-        mb = GroupMember.get_membership(self.acknowledged, user)
+        mb = GroupMember.GroupMember.get_membership(self.acknowledged, user)
         return mb != None and (mb.is_administrator or mb.is_super_administrator)
         
     def is_admin_of_inviter(self, user):
-        mb = GroupMember.get_membership(self.acknowledged_by, user)
+        mb = GroupMember.GroupMember.get_membership(self.acknowledged_by, user)
         return mb != None and (mb.is_administrator or mb.is_super_administrator)
+        
+        
     
     def can_retrieve(self, user):
         """ Check whether `user` can retrieve the invitation.

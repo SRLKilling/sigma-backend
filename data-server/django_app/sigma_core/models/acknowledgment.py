@@ -14,7 +14,7 @@ class Acknowledgment(models.Model):
         unique_together = (("acknowledged", "acknowledged_by"),)
     
     acknowledged = models.ForeignKey('Group', related_name='acknowledged_by')
-    acknowledged_by = models.ForeignKey('Group', related_name='acknowledged')
+    acknowledged_by = models.ForeignKey('Group', related_name='acknowledging')
     
     date = models.DateTimeField(auto_now_add=True)
     
