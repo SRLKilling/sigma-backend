@@ -12,6 +12,9 @@ class Settings:
         
         # Tornado
         "tornado == 4.4",
+        
+        # Doc
+        "sphinx"
     ]
 
     PROXY = 'kuzh.polytechnique.fr:8080'
