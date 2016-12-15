@@ -66,11 +66,17 @@ class Group(models.Model):
         return Group.objects.all().filter( models.Q(pk__in = membersof) | models.Q(pk__in = memberof_acknowledged) | models.Q(group_visibility=Group.VISIBILITY_PUBLIC))
         
     @staticmethod
-    def get_group_acknowledged_by_qs(user, group):
+    def get_acknowledged_by_qs(user, group):
+        """
+            Returns a Queryset containing all the groups that a given group acknowledge
+        """
         return Group.objects.filter(pk__in = Acknowledgment.get_acknowledged_by_qs(user, group))
         
     @staticmethod
-    def get_group_acknowledging_qs(user, group):
+    def get_acknowledging_qs(user, group):
+        """
+            Returns a Queryset containing all the groups that acknowledge the given group
+        """
         return Group.objects.filter(pk__in = Acknowledgment.get_acknowledging_qs(user, group))
     
     

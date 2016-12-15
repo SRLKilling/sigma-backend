@@ -7,7 +7,8 @@ from sigma_core.serializers.group import GroupSerializer
 
 
 from sigma_core.models.group_member import GroupMember
-from sigma_core.models.acknowledgment import Acknowledgment
+from sigma_core.serializers.acknowledgment_invitation import AcknowledgmentInvitationSerializer
+from sigma_core.models.acknowledgment_invitation import AcknowledgmentInvitation
 
 class GroupViewSet(SigmaViewSet):
 
@@ -46,6 +47,14 @@ class GroupViewSet(SigmaViewSet):
         """
         return self.handle_action_list(request, Group.get_group_acknowledging_qs, pk)
 
+        
+    @detail_route(methods=['get'])
+    def acknowledge_invitations(self, request, pk):
+        """
+            Used to retrieve a list of acknowledgment invitation a group is part of.
+            It can be both invited or inviter
+        """
+        return SigmaViewSet.handle_action_list(AcknowledgmentInvitationSerializer, request, AcknowledgmentInvitation.get_invitations_qs, pk)
 
     #*********************************************************************************************#
     #**                                  Write actions                                          **#
@@ -70,4 +79,4 @@ class GroupViewSet(SigmaViewSet):
             REST destroy action. Used to decline or cancel an invitation.
             If succeeded, returns HTTP_204_NO_CONTENT.
         """
-        return self.handle_action_pk('destroy', request, pk)                                                                          # TODO : check that CASCADE destroy stuff are enabled ?
+        return self.handle_action_pk('destroy', request, pk)

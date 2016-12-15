@@ -100,14 +100,21 @@ class SigmaViewSet(viewsets.ViewSet):
     #**                           Pre-defined basic views helpers                               **#
     #*********************************************************************************************#
       
-    def handle_action_list(self, request, qsgetter, *args, **kwargs):
+    def handle_action_list(obj, request, qsgetter, *args, **kwargs):
         """
             Provide a really basic way of handling list actions.
             It will simply serialize the queryset and response its result.
             To obtain the queryset, this method calls 'qsgetter(request.user, *args, **kwargs)'
+            
+            Method version : uses the serializer_class provided in the subclass definition.
+            Static version : uses the serializer given as the first argument.
         """
+        
+        if isinstance(obj, SigmaViewSet):
+            return SigmaViewSet.handle_action_list(obj.__class__.serializer_class, data, *args, **kwargs)
+        
         qs = qsgetter(request.user, *args, **kwargs)
-        return self.serialized_response(qs)
+        return SigmaViewSet.serialized_response(obj, qs)
         
     
     def handle_action(self, action, request, *args, **kwargs):

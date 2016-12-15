@@ -33,10 +33,10 @@ class AcknowledgmentInvitation(models.Model):
             
             
     @staticmethod
-    def get_group_acknowledge_invitations_qs(user):
-        """ Return a queryset containing the list of invitations where `user` is the invitee
-            `user` can be a model instance, or a primary key. """
-        return AcknowledgmentInvitation.objects.filter(acknowledged = group)
+    def get_invitations_qs(user, group):
+        """ Return a queryset containing the list of invitations related to the given group.
+            The given group can be the inviter or the invitee. """
+        return AcknowledgmentInvitation.objects.filter( models.Q(acknowledged = group) | models.Q(acknowledged_by = group) )
         
     @staticmethod
     def is_invited(sub, parent):
