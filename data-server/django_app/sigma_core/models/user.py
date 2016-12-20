@@ -28,7 +28,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-        
+
 class User(AbstractBaseUser):
     """
         Modelize an sigma user.
@@ -36,25 +36,25 @@ class User(AbstractBaseUser):
         Invitation have a short life-time.
         As soon as someone accepts or declines the invitation, the instance is destroyed.
     """
-    
+
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
-    
+
     email = models.EmailField(max_length=254, unique=True) # Users are identified by their email.
     lastname = models.CharField(max_length=255)
     firstname = models.CharField(max_length=128)
-    
+
     join_date = models.DateTimeField(auto_now_add=True)
 
 
-    
+
     # Required by Django to abstract the User interface
-    
+
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['lastname', 'firstname']
     objects = UserManager()
@@ -64,36 +64,36 @@ class User(AbstractBaseUser):
 
     def get_short_name(self):
         return self.email
-    
+
     def __str__(self):
         return self.email
-        
-        
+
+
     #*********************************************************************************************#
     #**                                      Getters                                            **#
     #*********************************************************************************************#
-    
+
     def is_connected_to(self, user):
-        return UserConnection.UserConnection.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user) 
-    
+        return UserConnection.UserConnection.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
+
     def get_connected_users_qs():
         """ Returns a queryset containing all the users a user is connected to """
         return User.objects.filter(pk__in = UserConnection.UserConnection.get_user_connections_qs(user))                            # ADD shared group
-    
-        
+
+
     #*********************************************************************************************#
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
-    
-    
+
+
     def can_retrieve(self, user):
         """ Check whether `user` can retrieve information about the user
             True if you share a group with this user.
         """
-        return UserConnection.UserConnection.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user) 
-    
+
+        return UserConnection.UserConnection.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
+
     def can_update(self, user):
         """ Check wheter `user` can update the user profile.
             A user can only edit its own profile """
         return self == user
-        
