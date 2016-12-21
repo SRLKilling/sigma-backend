@@ -43,10 +43,7 @@ def silent_remove(filename):
     
 def install():
     for r in Settings.REQUIREMENTS:
-        if hasattr(Settings, 'PROXY') and Settings.PROXY != '':
-            runPip(['install', '"'+r+'"', '--proxy', Settings.PROXY])
-        else:
-            runPip(['install', '"'+r+'"'])
+        runPip(['install', '"'+r+'"'])
     
 def init():
     runDjango('collectstatic')
