@@ -49,8 +49,6 @@ class Group(models.Model):
         return 'Group %d : %s' % (self.pk, self.name)
 
 
-
-
     #*********************************************************************************************#
     #**                                      Getters                                            **#
     #*********************************************************************************************#
@@ -63,6 +61,7 @@ class Group(models.Model):
         membersof = GroupMember.GroupMember.get_user_memberships_qs(user).values('group')
         memberof_acknowledged = Acknowledgment.Acknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
         return Group.objects.all().filter( models.Q(pk__in = membersof) | models.Q(pk__in = memberof_acknowledged) | models.Q(group_visibility=Group.VISIBILITY_PUBLIC))
+
 
     @staticmethod
     def get_acknowledged_by_qs(user, group):
@@ -78,11 +77,9 @@ class Group(models.Model):
         """
         return Group.objects.filter(pk__in = Acknowledgment.get_acknowledging_qs(user, group))
 
-
     #*********************************************************************************************#
     #**                                      Methods                                            **#
     #*********************************************************************************************#    
-
     def can_retrieve(self, user):
         """
             Returns True if the given user can access the group.
