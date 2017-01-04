@@ -1,13 +1,17 @@
 from django.db import models
+from sigma_core.importer import Sigma, load_ressource
 
-from sigma_core.models.user import User
-from sigma_core.models.event import Event
+User = load_ressource("User")
+Event = load_ressource("Event")
 
 class Participation(models.Model):
+    """
+        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
+    """
 
-    ################################################################
-    # CONSTANTS                                                    #
-    ################################################################
+    #*********************************************************************************************#
+    #**                                       Fields                                            **#
+    #*********************************************************************************************#
 
     POSSIBLE_STATUS = (
         (0, 'Invited'),
@@ -15,31 +19,24 @@ class Participation(models.Model):
         (2, 'Participates'),
     )
 
-    ################################################################
-    # FIELDS                                                       #
-    ################################################################
-
-    user = models.ForeignKey(User)
-    event = models.ForeignKey(Event)
+    user = models.ForeignKey(User.model)
+    event = models.ForeignKey(Event.model)
     status = models.IntegerField(choices=POSSIBLE_STATUS)
 
-    ################################################################
-    # PERMISSIONS                                                  #
-    ################################################################
-
-    def has_object_read_permission(self, request):
-        return True
-
-    @staticmethod
-    def has_read_permission(request):
-        return True
-
-    def has_object_write_permission(self, request):
-        return True
-
-    @staticmethod
-    def has_write_permission(request):
-        return True
-
     def __str__(self):
-        return self.user.firstname
+        return self.user.email + " : " + str(self.status)
+
+    #*********************************************************************************************#
+    #**                                      Getters                                            **#
+    #*********************************************************************************************#
+
+#    @staticmethod
+#    def get_un_truc(truc):
+#	return objet
+
+    #*********************************************************************************************#
+    #**                                      Methods                                            **#
+    #*********************************************************************************************#
+
+    def can_retrieve(self, user):
+        return True

@@ -1,48 +1,46 @@
 from django.db import models
+from sigma_core.importer import Sigma, load_ressource
 
-from sigma_core.models.group import Group
-from sigma_core.models.event import Event
-from sigma_core.models.user import User
+SharedPublication = load_ressource("SharedPublication")
+Group = load_ressource("Group")
+Event = load_ressource("Event")
+User = load_ressource("User")
 
 class Publication(models.Model):
+    """
+        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
+    """
 
-    ################################################################
-    # CONSTANTS                                                    #
-    ################################################################
+    #*********************************************************************************************#
+    #**                                       Fields                                            **#
+    #*********************************************************************************************#
 
-    ################################################################
-    # FIELDS                                                       #
-    ################################################################
-
-    group = models.ForeignKey(Group, related_name='publications')
+    group = models.ForeignKey(Group.model, related_name='publications')
     date = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User.model)
 
-    name = models.CharField(max_length=1500)
+    name = models.CharField(max_length=144)
     content = models.CharField(max_length=1500)
 
-    related_event = models.ForeignKey(Event, blank=True)
+    related_event = models.ForeignKey(Event.model, blank=True)
     internal = models.BooleanField(default=True)
     approved = models.BooleanField(default=False)
     last_commented = models.DateTimeField(auto_now_add=True)
 
-    ################################################################
-    # PERMISSIONS                                                  #
-    ################################################################
-
-    def has_object_read_permission(self, request):
-        return True
-
-    @staticmethod
-    def has_read_permission(request):
-        return True
-
-    def has_object_write_permission(self, request):
-        return True
-
-    @staticmethod
-    def has_write_permission(request):
-        return True
-
     def __str__(self):
         return self.name
+
+    #*********************************************************************************************#
+    #**                                      Getters                                            **#
+    #*********************************************************************************************#
+
+    @staticmethod
+    def get_publications_group(group):
+        return Publication.model.objects.filter(group=group)
+
+    #*********************************************************************************************#
+    #**                                      Methods                                            **#
+    #*********************************************************************************************#
+
+    def can_retrieve(self, user):
+        return True
