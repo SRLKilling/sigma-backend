@@ -50,6 +50,7 @@ def main():
 
     # Run the whole loop
     signal.signal(signal.SIGINT, lambda x, y: IOLoop.current().stop())
+    IOLoop.current().add_callback(lambda: print("Server started on port " + str(LISTEN_PORT)))
     IOLoop.current().start()
 
 if __name__ == '__main__':
