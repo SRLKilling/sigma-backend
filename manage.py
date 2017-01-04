@@ -71,7 +71,10 @@ def fixtures():
 
 def usage():
     print("Incorrect parameters, use one of the following command")
-    print("  install - install deps")
+    print("  install - install dependencies")
+    print("  init - collect static and initialize database")
+    print("  fixtures - load random fixtures into the database")
+    print("  reset - drop an recreate a all new database")
     print("  django [...] - run the django manage.py using given args")
     print("  run-push-server")
     print("  run-data-server")
