@@ -11,6 +11,19 @@ Sigma - Backend
 </a>
 
 
+Quick start
+-------------
+To quickly setup a working testing version of the backend, just use the command:
+```[sh]
+manage.py install
+```
+And then to run the server :
+```[sh]
+manage.py run-data-server
+```
+
+
+
 Vagrant usage
 -------------
 If you want to use the vagrant setup, you don't have to install python libraries.  
@@ -35,7 +48,7 @@ You'll need to provide the name of your python and pip programs.
 If you're on a campus, you can also add a proxy setting.
 
 Then, install dependances  
-`manage.py install`
+`manage.py install-deps`
 
 Finally, initialize the database, and load static files
 `manage.py init`
@@ -68,37 +81,3 @@ Password: admin
 An OAuth client application is also created (see below for further information), with data:
 * `clientId`: `bJeSCIWpvjbYCuXZNxMzVz0wglX8mHR2ZTKHxaDv`
 * `clientSecret`: `XjbfZS6Apq05PDTSL4CoFHGo7NsKVAa1XMVrVElk5N1t0dOSyqxrHPff6okAi6X6Du9XxrK4dl0mLQ0YlscJsjnL5IKhQagQdGv2SgumhYRFaMi6LtHNPXicmMr8oLdy`
-
-
-
-
-OAuth usage
------------
-
-###Create an application *(temporary)*
-NB. For frontend usage only, you can skip this part.
-
-When you are logged in, you can create a trusted application at: `http://127.0.0.1:8000/o/applications/`  
-
-I still have to understand how to deal correctly with applications addition... :p
-
-For the name, put whatever you want. Choose **Client Type**: *confidential* and **Authorization Grant Type**: *Resource owner password-based*.
-
-###Get your token
-`client_id` and `client_secret` depend on the trusted application. To get token, do:  
-`curl -X POST -d "grant_type=password&username=<user_name>&password=<password>" -u"<client_id>:<client_secret>" http://127.0.0.1:8000/o/token/`
-
-The answer should be:
-```json
-{
-    "access_token": "<your_access_token>",
-    "token_type": "Bearer",
-    "expires_in": 36000,
-    "refresh_token": "<your_refresh_token>",
-    "scope": "read write groups"
-}
-```
-
-###Visit the secured API
-With your token, you can access the secured API by passing an *Authorization* token in your request:  
-`curl -H "Authorization: Bearer <your_access_token>" http://127.0.0.1:8000/user/`
