@@ -4,8 +4,6 @@ from sigma_core.importer import Sigma, load_ressource
 load_ressource("GroupMember")
 load_ressource("Acknowledgment")
 
-from sigma_core.models import group_member as GroupMember, acknowledgment as Acknowledgment
-
 class Group(models.Model):
     """
         This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
@@ -62,8 +60,8 @@ class Group(models.Model):
         """
             Returns a Queryset containing all the groups a user is member of
         """
-        membersof = GroupMember.GroupMember.get_user_memberships_qs(user).values('group')
-        memberof_acknowledged = Acknowledgment.Acknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
+        membersof = Sigma.GroupMember.model.get_user_memberships_qs(user).values('group')
+        memberof_acknowledged = Sigma.Acknowledgment.model.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
         return Group.objects.all().filter( models.Q(pk__in = membersof) | models.Q(pk__in = memberof_acknowledged) | models.Q(group_visibility=Group.VISIBILITY_PUBLIC))
 
 
@@ -72,14 +70,14 @@ class Group(models.Model):
         """
             Returns a Queryset containing all the groups that a given group acknowledge
         """
-        return Group.objects.filter(pk__in = Acknowledgment.Acknowledgment.get_acknowledged_by_qs(user, group))
+        return Group.objects.filter(pk__in = Sigma.Acknowledgment.model.get_acknowledged_by_qs(user, group))
 
     @staticmethod
     def get_acknowledging_qs(user, group):
         """
             Returns a Queryset containing all the groups that acknowledge the given group
         """
-        return Group.objects.filter(pk__in = Acknowledgment.get_acknowledging_qs(user, group))
+        return Group.objects.filter(pk__in = Sigma.Acknowledgment.model.get_acknowledging_qs(user, group))
 
     #*********************************************************************************************#
     #**                                      Methods                                            **#
@@ -93,12 +91,12 @@ class Group(models.Model):
             * The group visibility is set to `VISIBILITY_NORMAL` and I'm a member of an aknowledging group
         """
 
-        if self.group_visibility == Group.VISIBILITY_PUBLIC or GroupMember.GroupMember.is_member(self, user):
+        if self.group_visibility == Group.VISIBILITY_PUBLIC or Sigma.GroupMember.model.is_member(self, user):
             return True
 
         elif self.group_visibility == Group.VISIBILITY_NORMAL:
             for parent in Group.get_acknowledged_by_qs(None, self):                                       # TODO : Stuff to do here, None is ugly
-                if GroupMember.GroupMember.is_member(parent, user):
+                if Sigma.GroupMember.model.is_member(parent, user):
                     return True
 
         return False
