@@ -1,4 +1,7 @@
 from django.db import models
+from sigma_core.importer import load_ressource
+
+Chat = load_ressource("Chat")
 
 class ChatMessage(models.Model):
     """
@@ -22,7 +25,7 @@ class ChatMessage(models.Model):
 
     @staticmethod
     def get_group_chat_messages_qs(group):
-        c_list = Chat.objects.get(group=group)
+        c_list = Chat.model.objects.get(group=group)
         return c_list.order_by('created_date')
 
 

@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from sigma_core.importer import load_ressource
 
-from sigma_core.models.chat import Chat
+Chat = load_ressource("Chat")
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -9,5 +10,5 @@ class ChatSerializer(serializers.ModelSerializer):
         Include all fields
     """
     class Meta:
-        model = Chat
+        model = Chat.model
         exclude = ('is_full_group_chat',)

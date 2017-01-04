@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from sigma_core.importer import load_ressource
 
-from sigma_core.models.group_invitation import GroupInvitation
+GroupInvitation = load_ressource("GroupInvitation")
 
 class GroupInvitationSerializer(serializers.ModelSerializer):
     """
@@ -8,6 +9,6 @@ class GroupInvitationSerializer(serializers.ModelSerializer):
         Include all fields
     """
     class Meta:
-        model = GroupInvitation
+        model = GroupInvitation.model
         fields = ('group', 'invitee', 'issued_by_invitee', 'date')
         required = ('group', 'invitee', 'issued_by_invitee')

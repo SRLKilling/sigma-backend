@@ -1,6 +1,8 @@
 from django.db import models
+from sigma_core.importer import load_ressource
 
-from sigma_core.models import group as Group, user as User
+Group = load_ressource("Group")
+User = load_ressource("User")
 
 class GroupMember(models.Model):
     """
@@ -128,10 +130,10 @@ class GroupMember(models.Model):
         if GroupMember.is_member(group, user):
             return GroupMember.objects.filter(group = group)
 
-        elif group.members_visibility == Group.Group.VISIBILITY_PUBLIC:
+        elif group.members_visibility == Group.model.VISIBILITY_PUBLIC:
             return GroupMember.objects.filter(group = group, hidden = False)
 
-        elif group.members_visibility == Group.Group.VISIBILITY_NORMAL:
+        elif group.members_visibility == Group.model.VISIBILITY_NORMAL:
             return GroupMember.objects.filter(group = group, hidden = False, user__in = User.User.get_connected_qs(user))
 
         return GroupMember.objects.none();
@@ -155,9 +157,9 @@ class GroupMember(models.Model):
             return True
 
         elif not self.hidden:
-            if self.group.members_visibility == Group.Group.VISIBILITY_PUBLIC:
+            if self.group.members_visibility == Group.model.VISIBILITY_PUBLIC:
                 return True
-            elif self.group.members_visibility == Group.Group.VISIBILITY_NORMAL:
+            elif self.group.members_visibility == Group.model.VISIBILITY_NORMAL:
                 return user.is_connected_to( self.user )
 
         return False

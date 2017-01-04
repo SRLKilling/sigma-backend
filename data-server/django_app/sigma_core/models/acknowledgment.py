@@ -1,4 +1,5 @@
 from django.db import models
+from sigma_core.importer import load_ressource
 
 class Acknowledgment(models.Model):
     """

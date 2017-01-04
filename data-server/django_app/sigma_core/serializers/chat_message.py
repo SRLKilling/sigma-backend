@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from sigma_core.importer import load_ressource
 
-from sigma_core.models.chat_message import ChatMessage
+ChatMessage = load_ressource("ChatMessage")
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):
@@ -9,5 +10,5 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         Include all fields
     """
     class Meta:
-        model = ChatMessage
+        model = ChatMessage.model
         fields = '__all__'

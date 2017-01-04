@@ -1,15 +1,15 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route
 from sigma_core.views.sigma_viewset import SigmaViewSet
+from sigma_core.importer import load_ressource
 
-from sigma_core.models.chat_member import ChatMember
-from sigma_core.serializers.chat_member import ChatMember
+ChatMember = load_ressource("ChatMember")
 
 
 class ChatMemberViewSet(SigmaViewSet):
 
-    serializer_class = ChatMemberSerializer
-    queryset = ChatMember.objects.all()
+    serializer_class = ChatMember.serializer
+    queryset = ChatMember.model.objects.all()
 
     #*********************************************************************************************#
     #**                                   Read actions                                          **#

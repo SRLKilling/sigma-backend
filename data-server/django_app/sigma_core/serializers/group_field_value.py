@@ -1,19 +1,22 @@
 from rest_framework import serializers
+from sigma_core.importer import load_ressource
 import re
 
-from sigma_core.models.group_field_value import GroupFieldValue
-from sigma_core.models.group_member import GroupMember
-from sigma_core.models.group_field import GroupField
+GroupFieldValue = load_ressource("GroupFieldValue")
+GroupField = load_ressource("GroupField")
+
 
 class GroupFieldValueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GroupFieldValue
+        model = GroupFieldValue.model
         read_only_fields = ('membership', 'field')
         fields = ('membership', 'field', 'value')
 
-    ################################################################
-    # VALIDATORS                                                   #
-    ################################################################
+
+
+    #*********************************************************************************************#
+    #**                                       Validators                                        **#
+    #*********************************************************************************************#
     
     number_re = re.compile(r'^[+-]?[0-9]+$')
     def is_number_valid(self, accept, value):

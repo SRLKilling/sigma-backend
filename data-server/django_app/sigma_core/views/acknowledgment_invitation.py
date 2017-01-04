@@ -3,17 +3,16 @@ from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from sigma_core.views.sigma_viewset import SigmaViewSet
+from sigma_core.importer import load_ressource
 
-from sigma_core.models.acknowledgment_invitation import AcknowledgmentInvitation
-from sigma_core.serializers.acknowledgment_invitation import AcknowledgmentInvitationSerializer
+Acknowledgment = load_ressource("Acknowledgment")
+AcknowledgmentInvitation = load_ressource("AcknowledgmentInvitation")
 
-
-from sigma_core.models.acknowledgment import Acknowledgment
 
 class AcknowledgmentInvitationViewSet(SigmaViewSet):
     
-    serializer_class = AcknowledgmentInvitationSerializer
-    queryset = AcknowledgmentInvitation.objects.all()
+    serializer_class = AcknowledgmentInvitation.serializer
+    queryset = AcknowledgmentInvitation.model.objects.all()
     
     
     #*********************************************************************************************#
@@ -43,10 +42,10 @@ class AcknowledgmentInvitationViewSet(SigmaViewSet):
             
             
     def create_pre_handler(self, request, invitation_serializer, invitation):
-        if Acknowledgment.is_acknowledged_by(invitation.acknowledged, invitation.acknowledged_by):
+        if Acknowledgment.model.is_acknowledged_by(invitation.acknowledged, invitation.acknowledged_by):
             raise ValidationError("The group is already acknowledged.")
             
-        elif AcknowledgmentInvitation.is_invited(invitation.acknowledged, invitation.acknowledged_by):
+        elif AcknowledgmentInvitation.model.is_invited(invitation.acknowledged, invitation.acknowledged_by):
             raise ValidationError("The group is already invited to be acknowledged")
         
         
@@ -62,9 +61,9 @@ class AcknowledgmentInvitationViewSet(SigmaViewSet):
         
         
     def accept_handler(self, request, pk, instance):
-        data = Acknowledgment.create(instance.aknowledged, instance.acknowledged_by)
+        data = Acknowledgment.model.create(instance.aknowledged, instance.acknowledged_by)
         instance.delete()
-        return SigmaViewSet.serialized_response(AcknowledgmentSerializer, data, status.HTTP_201_CREATED)
+        return SigmaViewSet.serialized_response(Acknowledgment.model.serializer, data, status.HTTP_201_CREATED)
         
         
         

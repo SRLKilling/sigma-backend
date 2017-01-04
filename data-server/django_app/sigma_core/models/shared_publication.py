@@ -1,7 +1,5 @@
 from django.db import models
-
-from sigma_core.models.publication import Publication
-from sigma_core.models.group import Group
+from sigma_core.importer import load_ressource
 
 class SharedPublication(models.Model):
 
@@ -10,8 +8,8 @@ class SharedPublication(models.Model):
     ################################################################
 
     # Liste des champs de l'objet
-    publication = models.ForeignKey(Publication, related_name='shared')
-    group = models.ForeignKey(Group, related_name='shared_publications')
+    publication = models.ForeignKey("Publication", related_name='shared')
+    group = models.ForeignKey("Group", related_name='shared_publications')
     approved = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
 

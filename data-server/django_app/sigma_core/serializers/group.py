@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from sigma_core.importer import load_ressource
 
-from sigma_core.models.group import Group
+Group = load_ressource("Group")
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -9,5 +10,5 @@ class GroupSerializer(serializers.ModelSerializer):
         Include all fields
     """
     class Meta:
-        model = Group
-        fields = ['pk', 'name', 'description', 'is_protected', 'can_anyone_ask', 'need_validation_to_join', 'members_visibility', 'group_visibility']
+        model = Group.model
+        fields = ('pk', 'name', 'description', 'is_protected', 'can_anyone_ask', 'need_validation_to_join', 'members_visibility', 'group_visibility')

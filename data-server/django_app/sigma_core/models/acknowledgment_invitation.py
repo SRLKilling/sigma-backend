@@ -1,6 +1,7 @@
 from django.db import models
+from sigma_core.importer import load_ressource
 
-from sigma_core.models import group_member as GroupMember
+GroupMember = load_ressource("GroupMember")
 
 class AcknowledgmentInvitation(models.Model):
     """
@@ -51,11 +52,11 @@ class AcknowledgmentInvitation(models.Model):
     #*********************************************************************************************#
     
     def is_admin_of_invited(self, user):
-        mb = GroupMember.GroupMember.get_membership(self.acknowledged, user)
+        mb = GroupMember.model.get_membership(self.acknowledged, user)
         return mb != None and (mb.is_administrator or mb.is_super_administrator)
         
     def is_admin_of_inviter(self, user):
-        mb = GroupMember.GroupMember.get_membership(self.acknowledged_by, user)
+        mb = GroupMember.model.get_membership(self.acknowledged_by, user)
         return mb != None and (mb.is_administrator or mb.is_super_administrator)
         
         

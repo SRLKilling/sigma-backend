@@ -1,6 +1,7 @@
 from django.db import models
+from sigma_core.importer import load_ressource
 
-from sigma_core.models import group_member as GroupMember
+GroupMember = load_ressource("GroupMember")
 
 class GroupInvitation(models.Model):
     """
@@ -67,7 +68,7 @@ class GroupInvitation(models.Model):
             return True
         
         else:
-            user_mb = GroupMember.GroupMember.get_membership(user, self.group)
+            user_mb = GroupMember.model.get_membership(user, self.group)
             return user_mb != None and user_mb.has_invite_right
             
     
@@ -80,7 +81,7 @@ class GroupInvitation(models.Model):
             return (self.inviteee == user) and (self.group.can_anyone_ask)
             
         else:
-            inviter_mb = GroupMember.GroupMember.get_membership(user, self.group)
+            inviter_mb = GroupMember.model.get_membership(user, self.group)
             return inviter_mb != None and inviter_mb.has_invite_right
             
             
@@ -93,7 +94,7 @@ class GroupInvitation(models.Model):
             return user == self.invitee
             
         else:
-            user_mb = GroupMember.GroupMember.get_membership(user, self.group)
+            user_mb = GroupMember.model.get_membership(user, self.group)
             return user_mb != None and user_mb.has_invite_right
             
             
@@ -108,6 +109,6 @@ class GroupInvitation(models.Model):
             return True
         
         else:
-            user_mb = GroupMember.GroupMember.get_membership(user, self.group)
+            user_mb = GroupMember.model.get_membership(user, self.group)
             return user_mb != None and user_mb.has_invite_right
     

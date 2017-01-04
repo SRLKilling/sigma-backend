@@ -1,7 +1,5 @@
 from django.db import models
-
-from sigma_core.models.user import User
-from sigma_core.models.event import Event
+from sigma_core.importer import load_ressource
 
 class Participation(models.Model):
 
@@ -19,8 +17,8 @@ class Participation(models.Model):
     # FIELDS                                                       #
     ################################################################
 
-    user = models.ForeignKey(User)
-    event = models.ForeignKey(Event)
+    user = models.ForeignKey("User")
+    event = models.ForeignKey("Event")
     status = models.IntegerField(choices=POSSIBLE_STATUS)
 
     ################################################################

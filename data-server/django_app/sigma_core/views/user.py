@@ -1,9 +1,9 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route, list_route
 from sigma_core.views.sigma_viewset import SigmaViewSet
+from sigma_core.importer import Sigma, load_ressource
 
-from sigma_core.models.user import User
-from sigma_core.serializers.user import UserSerializer
+User = load_ressource("User")
 
 from django.core.mail import send_mail
 from rest_framework.permissions import AllowAny
@@ -24,8 +24,8 @@ L'équipe Sigma.
 
 class UserViewSet(SigmaViewSet):
 
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
+    serializer_class = User.serializer
+    queryset = User.model.objects.all()
     
     #*********************************************************************************************#
     #**                                   Read actions                                          **#

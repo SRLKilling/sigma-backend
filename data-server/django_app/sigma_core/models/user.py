@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from sigma_core.importer import load_ressource
+
+UserConnection = load_ressource("UserConnection")
 
 # TODO : Add unique username for frontends URLs
-
-from sigma_core.models import user_connection as UserConnection
 
 
 # Basic user manager required by Django
@@ -78,11 +79,11 @@ class User(AbstractBaseUser):
     #*********************************************************************************************#
 
     def is_connected_to(self, user):
-        return UserConnection.UserConnection.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
+        return UserConnection.model.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
 
     def get_connected_users_qs():
         """ Returns a queryset containing all the users a user is connected to """
-        return User.objects.filter(pk__in = UserConnection.UserConnection.get_user_connections_qs(user))                            # ADD shared group
+        return User.objects.filter(pk__in = UserConnection.model.get_user_connections_qs(user))                            # ADD shared group
 
 
     #*********************************************************************************************#
@@ -95,7 +96,7 @@ class User(AbstractBaseUser):
             True if you share a group with this user.
         """
 
-        return UserConnection.UserConnection.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
+        return UserConnection.model.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
 
     def can_update(self, user):
         """ Check wheter `user` can update the user profile.

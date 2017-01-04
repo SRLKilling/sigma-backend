@@ -1,6 +1,8 @@
 from django.db import models
+from sigma_core.importer import load_ressource
 
-from sigma_core.models import group_member as GroupMember
+GroupMember = load_ressource("GroupMember")
+
 
 class GroupField(models.Model):
     """
@@ -55,7 +57,7 @@ class GroupField(models.Model):
             Check whether `user` can create a group field.
             Only admins are allowed to do so.
         """
-        membership = GroupMember.GroupMember.get_membership(self.group, user)
+        membership = GroupMember.model.get_membership(self.group, user)
         return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
             
     def can_update(self, user):
@@ -63,7 +65,7 @@ class GroupField(models.Model):
             Check whether `user` can update a group field.
             Only admins are allowed to do so.
         """
-        membership = GroupMember.GroupMember.get_membership(self.group, user)
+        membership = GroupMember.model.get_membership(self.group, user)
         return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
             
     def can_destroy(self, user):
@@ -71,5 +73,5 @@ class GroupField(models.Model):
             Check whether `user` can destroy a group field.
             Only admins are allowed to do so.
         """
-        membership = GroupMember.GroupMember.get_membership(self.group, user)
+        membership = GroupMember.model.get_membership(self.group, user)
         return (membership != None) and (membership.is_administrator or membership.is_super_administrator)

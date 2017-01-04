@@ -1,6 +1,5 @@
 from django.db import models
-from sigma_core.models.group import Group
-from sigma_core.models.chat import Chat
+from sigma_core.importer import load_ressource
 
 class ChatMember(models.Model):
     """

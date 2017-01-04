@@ -1,7 +1,5 @@
 from django.db import models
-from sigma_core.models.group import Group
-from sigma_core.models.chat_message import ChatMessage
-from sigma_core.models.chat_member import ChatMember
+from sigma_core.importer import load_ressource
 
 class Chat(models.Model):
     """

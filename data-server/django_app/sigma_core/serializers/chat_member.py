@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from sigma_core.importer import load_ressource
 
-from sigma_core.models.chat_member import ChatMember
+ChatMember = load_ressource("ChatMember")
 
 
 class ChatMemberSerializer(serializers.ModelSerializer):
@@ -9,5 +10,5 @@ class ChatMemberSerializer(serializers.ModelSerializer):
         Include all fields
     """
     class Meta:
-        model = ChatMember
-        exclude = ('join_date',)
+        model = ChatMember.model
+        exclude = ('join_date', )

@@ -1,7 +1,7 @@
 from rest_framework import serializers
+from sigma_core.importer import load_ressource
 
-from sigma_core.models.group_member import GroupMember
-
+GroupMember = load_ressource("GroupMember")
 
 class GroupMemberSerializer(serializers.ModelSerializer):
     """
@@ -9,7 +9,7 @@ class GroupMemberSerializer(serializers.ModelSerializer):
         Include all fields
     """
     class Meta:
-        model = GroupMember
+        model = GroupMember.model
         fields = '__all__'
     
     
@@ -18,5 +18,5 @@ class GroupMemberRightSerializer(serializers.ModelSerializer):
         Serializer for a GroupMember including only permissions fields.
     """
     class Meta:
-        model = GroupMember
+        model = GroupMember.model
         fields = ('is_administrator', 'is_super_administrator', 'has_invite_right', 'has_contact_right', 'has_publish_right', 'has_kick_right')

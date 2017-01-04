@@ -3,18 +3,16 @@ from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from sigma_core.views.sigma_viewset import SigmaViewSet
+from sigma_core.importer import Sigma, load_ressource
 
-from sigma_core.models.group_invitation import GroupInvitation
-from sigma_core.serializers.group_invitation import GroupInvitationSerializer
+GroupInvitation = load_ressource("GroupInvitation")
+GroupMember = load_ressource("GroupMember")
 
-
-from sigma_core.models.group_member import GroupMember
-from sigma_core.serializers.group_member import GroupMemberSerializer
 
 class GroupInvitationViewSet(SigmaViewSet):
     
-    serializer_class = GroupInvitationSerializer
-    queryset = GroupInvitation.objects.all()
+    serializer_class = GroupInvitation.serializer
+    queryset = GroupInvitation.model.objects.all()
     
     
     #*********************************************************************************************#
@@ -25,7 +23,7 @@ class GroupInvitationViewSet(SigmaViewSet):
         """
             REST list action. Used to list all of a user's invitation.
         """
-        return self.handle_action_list(request,GroupInvitation.get_user_invitations_qs)
+        return self.handle_action_list(request, GroupInvitation.model.get_user_invitations_qs)
 
         
     def retrieve(self, request, pk):
@@ -52,10 +50,10 @@ class GroupInvitationViewSet(SigmaViewSet):
             
             
     def create_pre_handler(self, request, invitation_serializer, invitation):
-        if GroupMember.is_member(invitation.group, invitation.invitee):
+        if GroupMember.model.is_member(invitation.group, invitation.invitee):
             raise ValidationError("The user is already a member of this group")
             
-        elif GroupInvitation.objects.filter(invitee = invitation.invitee, group = invitation.group).exists():
+        elif GroupInvitation.model.objects.filter(invitee = invitation.invitee, group = invitation.group).exists():
             raise ValidationError("The user is already invited to this group")
         
         elif not invitation.group.need_validation_to_join:
@@ -75,9 +73,9 @@ class GroupInvitationViewSet(SigmaViewSet):
         
         
     def accept_handler(self, request, pk, instance):
-        data = GroupMember.create(invitation.invitee, invitation.group)
+        data = GroupMember.model.create(invitation.invitee, invitation.group)
         instance.delete()
-        return SigmaViewSet.serialized_response(GroupMemberSerializer, data, status.HTTP_201_CREATED)
+        return SigmaViewSet.serialized_response(GroupMember.serializer, data, status.HTTP_201_CREATED)
         
         
         

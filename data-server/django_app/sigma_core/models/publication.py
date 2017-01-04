@@ -1,8 +1,5 @@
 from django.db import models
-
-from sigma_core.models.group import Group
-from sigma_core.models.event import Event
-from sigma_core.models.user import User
+from sigma_core.importer import load_ressource
 
 class Publication(models.Model):
 
@@ -14,14 +11,14 @@ class Publication(models.Model):
     # FIELDS                                                       #
     ################################################################
 
-    group = models.ForeignKey(Group, related_name='publications')
+    group = models.ForeignKey("Group", related_name='publications')
     date = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey("User")
 
     name = models.CharField(max_length=1500)
     content = models.CharField(max_length=1500)
 
-    related_event = models.ForeignKey(Event, blank=True)
+    related_event = models.ForeignKey("Event", blank=True)
     internal = models.BooleanField(default=True)
     approved = models.BooleanField(default=False)
     last_commented = models.DateTimeField(auto_now_add=True)

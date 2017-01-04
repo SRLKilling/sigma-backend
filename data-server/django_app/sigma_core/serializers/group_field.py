@@ -1,9 +1,8 @@
 from rest_framework import serializers
-
-from sigma_core.models.group_field import GroupField
-
+from sigma_core.importer import load_ressource
 import re
 
+GroupField = load_ressource("GroupField")
 
 
 class GroupFieldSerializer(serializers.ModelSerializer):
@@ -13,7 +12,7 @@ class GroupFieldSerializer(serializers.ModelSerializer):
     """
     
     class Meta:
-        model = GroupField
+        model = GroupField.model
         read_only_fields = ('group', )
         fields = ('group', 'name', 'type', 'accept', 'protected', 'multiple_values_allowed')
     

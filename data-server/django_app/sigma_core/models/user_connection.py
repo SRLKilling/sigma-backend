@@ -1,4 +1,7 @@
 from django.db import models
+from sigma_core.importer import load_ressource
+
+User = load_ressource("User")
 
 class UserConnection(models.Model):
     """
@@ -55,7 +58,7 @@ class UserConnection(models.Model):
             This static method is not an API entry. It is used by others views :
             * GroupMember once someone joins a new group
         """
-        group_users = User.objects.filter(group=group)
+        group_users = User.model.objects.filter(group=group)
         for u in group_users:
             if not (UserConnection.objects.filter(user1=user,user2=u).exists() or UserConnection.objects.filter(user1=u,user2=user).exists()):
                 UserConnection(user1=user,user2=u).save()
@@ -73,7 +76,7 @@ class UserConnection(models.Model):
             This static method is not an API entry. It is used by others views :
             * GroupMember when someone quits a group
         """
-        group_users = User.objects.filter(group=group)
+        group_users = User.model.objects.filter(group=group)
         for u in group_users:
             connection = UserConnection.objects.get(user1=user,user2=u)
             if not connection:

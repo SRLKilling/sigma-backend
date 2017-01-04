@@ -1,15 +1,15 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route
 from sigma_core.views.sigma_viewset import SigmaViewSet
+from sigma_core.importer import Sigma, load_ressource
 
-from sigma_core.models.group_field_value import GroupFieldValue
-from sigma_core.serializers.group_field_value import GroupFieldValueSerializer
+GroupFieldValue = load_ressource("GroupFieldValue")
 
 
 class GroupFieldValueViewSet(SigmaViewSet):
     
-    serializer_class = GroupFieldValueSerializer
-    queryset = GroupFieldValue.objects.all()
+    serializer_class = GroupFieldValue.serializer
+    queryset = GroupFieldValue.model.objects.all()
     
     
     #*********************************************************************************************#
