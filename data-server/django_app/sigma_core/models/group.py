@@ -1,4 +1,8 @@
 from django.db import models
+from sigma_core.importer import Sigma, load_ressource
+
+load_ressource("GroupMember")
+load_ressource("Acknowledgment")
 
 from sigma_core.models import group_member as GroupMember, acknowledgment as Acknowledgment
 
@@ -93,7 +97,7 @@ class Group(models.Model):
             return True
 
         elif self.group_visibility == Group.VISIBILITY_NORMAL:
-            for parent in Group.get_group_acknowledged_by_qs(None, self):                                       # TODO : Stuff to do here, None is ugly
+            for parent in Group.get_acknowledged_by_qs(None, self):                                       # TODO : Stuff to do here, None is ugly
                 if GroupMember.GroupMember.is_member(parent, user):
                     return True
 

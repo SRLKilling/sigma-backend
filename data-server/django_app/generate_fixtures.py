@@ -211,10 +211,11 @@ def generateFixtures(filepath):
     for i in range(1, ACKNOW_INV_NUM):                                       # Generate aknowledgments invitations
         f.write( randomAknowledgmentInvitation() )
 
-    print('OK\n  Generation OAuth client')
+    print('OK\n  Generation OAuth client... ', end='')
     f.write(generateOAuthClient())
 
     print('OK\n')
+    f.write(']')
 
 
 if __name__ == '__main__':
