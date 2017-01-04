@@ -17,7 +17,7 @@ class Settings:
         "sphinx"
     ]
 
-    PROXY = 'kuzh.polytechnique.fr:8080'
+    PROXY = ''
 
     ENV =  {
         'PYTHON': 'python',
