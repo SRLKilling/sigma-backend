@@ -42,8 +42,6 @@ class EventAdmin(admin.ModelAdmin):
     search_fields = ['name', 'place_name']
     inlines = [ParticipationInline]
 
-
-
 admin.site.register(Event, EventAdmin)
 
 class SharedInline(admin.TabularInline):
@@ -52,13 +50,10 @@ class SharedInline(admin.TabularInline):
 
 class PublicationAdmin(admin.ModelAdmin):
     inlines = [SharedInline]
-    list_display = ['name', 'group', 'author', 'related_event', 'internal', 'approved']
-    list_filter = ['group', 'author', 'internal', 'approved']
+    list_display = ['title', 'group', 'author', 'related_event', 'internal']
+    list_filter = ['group', 'author', 'internal']
 
 admin.site.register(Publication, PublicationAdmin)
-
-
-
 
 class GroupsInline(admin.TabularInline):
     model = GroupMember
