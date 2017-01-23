@@ -37,6 +37,7 @@ class Publication(models.Model):
     def share(self, group):
         s = SharedPublication.model(publication = self, group = group)
         s.save()
+        return s
 
     def can_retrieve(self, user):
         return True

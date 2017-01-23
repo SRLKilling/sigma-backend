@@ -41,8 +41,10 @@ class SharedPublication(models.Model):
     #*********************************************************************************************#
 
     @staticmethod
-    def post_internal(user, group, title, content):
+    def post_internal(user, group, title, content, event = 0):
         pub = Publication.model(group = group, author = user, title = title, content = content)
+        if event:
+            pub.related_event = event
         pub.save()
         pub.share(group)
         return pub
