@@ -5,7 +5,7 @@ SharedPublication = load_ressource("SharedPublication")
 
 class Publication(models.Model):
     """
-        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
+        An abstract publication
     """
 
     #*********************************************************************************************#
@@ -33,6 +33,10 @@ class Publication(models.Model):
     #*********************************************************************************************#
     #**                                      Methods                                            **#
     #*********************************************************************************************#
+
+    def share(self, group):
+        s = SharedPublication.model(publication = self, group = group)
+        s.save()
 
     def can_retrieve(self, user):
         return True

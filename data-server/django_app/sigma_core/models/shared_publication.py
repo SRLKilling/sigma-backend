@@ -2,6 +2,7 @@ from django.db import models
 from sigma_core.importer import load_ressource
 
 GroupMember = load_ressource("GroupMember")
+Publication = load_ressource("Publication")
 
 class SharedPublication(models.Model):
     """
@@ -30,10 +31,21 @@ class SharedPublication(models.Model):
     def get_publications_group(group):
         return SharedPublication.objects.filter(group=group).filter(approved=True)
 
+    @staticmethod
     def get_publications_user(user):
         membersof = GroupMember.model.get_user_memberships_qs(user).values('group')
         return SharedPublication.objects.filter(group__pk__in = membersof)
 
+    #*********************************************************************************************#
+    #**                                      Setters                                            **#
+    #*********************************************************************************************#
+
+    @staticmethod
+    def post_internal(user, group, title, content):
+        pub = Publication.model(group = group, author = user, title = title, content = content)
+        pub.save()
+        pub.share(group)
+        return pub
 
     #*********************************************************************************************#
     #**                                      Methods                                            **#
