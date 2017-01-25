@@ -21,7 +21,12 @@ class GroupViewSet(SigmaViewSet):
         """
             REST list action. Used to list all groups a user can see.
         """
-        return self.handle_action_list(request, Group.model.get_user_groups_qs)
+        extra_variables = {}
+        pks = [g.pk for g in Group.model.objects.all()]
+        for pk in pks:
+            extra_variables['extra_{}_nb_users'.format(pk)] = 3
+
+        return self.handle_action_list(request, Group.model.get_user_groups_qs, **extra_variables)
 
 
     def retrieve(self, request, pk):
@@ -32,8 +37,6 @@ class GroupViewSet(SigmaViewSet):
         instance = self.try_to_get(pk)
         extra_variables['extra_{}_nb_users'.format(pk)] = 3
         return self.handle_action_pk('retrieve', request, pk, **extra_variables)
-
-
 
 
     @detail_route(methods=['get'])
