@@ -49,7 +49,7 @@ class GroupViewSet(SigmaViewSet):
     @detail_route(methods=['get'])
     def acknowledged_by(self, request, pk):
         """
-            Used to list all the groups that are acknowledging the given group.
+            Used to list all thselfe groups that are acknowledging the given group.
         """
         return self.handle_action_list(request, Group.model.get_acknowledging_qs, pk)
 
