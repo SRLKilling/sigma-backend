@@ -57,6 +57,8 @@ class SigmaViewSet(viewsets.ViewSet):
             Method version : uses the serializer_class provided in the subclass definition
             Static version : takes the serializer to use as its fist argument.
         """
+
+        #TODO : OPTIMIZE HOW THE SERIALIZERS WORK
         if isinstance(obj, SigmaViewSet):
             serializer = SigmaViewSet.serialized_response(obj.__class__.serializer_class, data)
             for key,values in kwargs.items():
@@ -66,6 +68,22 @@ class SigmaViewSet(viewsets.ViewSet):
 
         many = (type(data) == QuerySet)
         serializer = obj(data, many=many)
+
+        l = [dict()] #list of dict for the data to add according to the pk
+        # l[pk] -> all the variables to add -> l[pk]["name of the variable"]=value of the variable
+        flag=False
+        for key,value in kwargs.items():
+            if key.startswith("extra_"):
+                flag=True
+                while int(key.split('_')[1])+1>len(l):
+                    l.append(dict())
+                l[int(key.split('_')[1])][str(key.split('_')[2])]=value
+
+        if flag:
+            for d in serializer.data:
+                for key,value in l[d["pk"]].items():
+                    d[key]=value
+
         return Response(serializer.data, status=status)
 
 
@@ -117,8 +135,8 @@ class SigmaViewSet(viewsets.ViewSet):
         if isinstance(obj, SigmaViewSet):
             return SigmaViewSet.handle_action_list(obj.__class__.serializer_class, request, qsgetter, *args, **kwargs)
 
-        qs = qsgetter(request.user, *args, **kwargs)
-        return SigmaViewSet.serialized_response(obj, qs)
+        qs = qsgetter(request.user)
+        return SigmaViewSet.list_handler(obj, request, qs,*args,**kwargs)
 
 
     def handle_action(self, action, request, *args, **kwargs):
@@ -193,13 +211,17 @@ class SigmaViewSet(viewsets.ViewSet):
 
 
 
-
+    def list_handler(obj, request, qs, *args, **kwargs):
+        """
+            A basic retrieve handler to use with  `handle_action_list`.
+        """
+        return SigmaViewSet.serialized_response(obj, qs, *args, **kwargs)
 
     def retrieve_handler(self, request, pk, instance, *args, **kwargs):
         """
             A basic retrieve handler to use with  `handle_action_pk`.
         """
-        return self.serialized_response(instance)
+        return self.serialized_response(instance, **kwargs)
 
 
     def create_handler(self, request, serializer, instance):
@@ -214,7 +236,7 @@ class SigmaViewSet(viewsets.ViewSet):
             A basic update handler to use with `handle_action_pk`.
         """
         # serializer.save().
-        # return Response(serializer.data, status=status.HTTP_200_OK)                                       # TODO : update / patch actions
+        # return Response(serializer.data, status=status.HTTP_200_OK)              # TODO : update / patch actions
         return Response(status=status.HTTP_200_OK)
 
     def destroy_handler(self, request, pk, instance):
