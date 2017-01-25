@@ -13,7 +13,6 @@ class Participation(models.Model):
     POSSIBLE_STATUS = (
         (0, 'Invited'),
         (1, 'Interested'),
-        (2, 'Participates'),
     )
 
     user = models.ForeignKey("User")

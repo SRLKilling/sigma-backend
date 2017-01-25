@@ -64,8 +64,31 @@ class Event(models.Model):
         return Event.objects.filter(author=user)
 
     @staticmethod
+    def get_events(user):
+    # TODO : all visible events
+        events = Participation.model.objects.filter(user=user).values("event").all()
+        return Event.objects.filter(pk__in=events)
+
+    @staticmethod
     def events_interesting(user):
-        return Participation.model.objects.filter(user=user).values("event")
+        events = Participation.model.objects.filter(user=user).values("event").all()
+        return Event.objects.filter(pk__in=events)
+
+    @staticmethod
+    def n_events(user, n):
+        return Event.events(user).order_by('date_start').all()[n:]
+
+    @staticmethod
+    def n_events_interesting(user, n):
+        return Event.events_interesting(user).order_by('date_start').all()[n:]
+
+    @staticmethod
+    def events_date(user, start, end):
+        return Event.events(user).filter(date_start__gte=start).filter(date_end__lte=end).all()
+
+    @staticmethod
+    def events_interesting_date(user, start, end):
+        return Event.events_interesting(user).filter(date_start__gte=start).filter(date_end__lte=end).all()
 
     #*********************************************************************************************#
     #**                                      Methods                                            **#
