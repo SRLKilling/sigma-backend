@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import detail_route
+from rest_framework.decorators import list_route
 from sigma_core.views.sigma_viewset import SigmaViewSet
 from sigma_core.importer import load_ressource
 
@@ -18,46 +19,40 @@ class EventViewSet(SigmaViewSet):
         return self.handle_action_list(request, Event.model.get_events)
 
     def retrieve(self, request, pk):
-        """
-            REST retrieve action. Used to retrieve a chat.
-        """
         return self.handle_action_pk('retrieve', request, pk)
 
-    @detail_route(methods=['get'])
+    @list_route(methods=['get'])
     def events(self, request):
         n = 5
-        if (request.data.has_key('n')):
+        if 'n' in request.data:
             n = request.data.n
-        return serialized_response(Event.serializer, Event.model.n_events(request.user, n))
+        return SigmaViewSet.serialized_response(Event.serializer, Event.model.n_events(request.user, n))
 
-    @detail_route(methods=['get'])
+    @list_route(methods=['get'])
     def events_interesting(self, request):
         n = 5
-        if (request.data.has_key('n')):
+        if 'n' in request.data:
             n = request.data.n
-        return serialized_response(Event.serializer, Event.model.n_events_interesting(request.user, n))
+        return SigmaViewSet.serialized_response(Event.serializer, Event.model.n_events_interesting(request.user, n))
 
-    @detail_route(methods=['get'])
-    def date_events(self, request, start, end):
-        if (request.data.has_key('start') and request.data.has_key('end')):
+    @list_route(methods=['get'])
+    def date_events(self, request):
+        print(request.data)
+        if ('start' in request.data and 'end' in request.data):
             start = request.data.start
             end = request.data.end
-            return serialized_response(Event.serializer, Event.model.events_date(request.user, start, end))
+            return SigmaViewSet.serialized_response(Event.serializer, Event.model.events_date(request.user, start, end))
 
-    @detail_route(methods=['get'])
-    def date_events_interesting(self, request, start, end):
-        if (request.data.has_key('start') and request.data.has_key('end')):
+    @list_route(methods=['get'])
+    def date_events_interesting(self, request):
+        if ('start' in request.data and 'end' in request.data):
             start = request.data.start
             end = request.data.end
-            return serialized_response(Event.serializer, Event.model.events_interesting_date(request.user, start, end))
+            return SigmaViewSet.serialized_response(Event.serializer, Event.model.events_interesting_date(request.user, start, end))
 
     #*********************************************************************************************#
     #**                                  Write actions                                          **#
     #*********************************************************************************************#
 
     def create(self, request):
-        """
-            REST create action. Used to create a chat.
-            If succeeded, returns HTTP_201_CREATED with the corresponding Chat.
-        """
         return self.handle_action('create', request)

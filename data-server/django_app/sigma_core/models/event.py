@@ -34,6 +34,13 @@ class Event(models.Model):
         e.save()
         return e
 
+    def modify(name, description, start, end, place):
+        e.name = name
+        e.description = description
+        e.date_start = start
+        e.date_end = end
+        e.place_name = place
+
     def participation(self, user, status = 0):
         # Creates if non-existent
         P = Participation.model.objects.filter(user=user, event=self)

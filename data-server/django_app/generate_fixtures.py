@@ -9,6 +9,9 @@ MEMBER_NUM = (5, 50)
 ACKNOW_NUM = 700
 ACKNOW_INV_NUM = 500
 
+EVENT_NUM = 50
+PUBLICATION = 200
+
 
 #*********************************************************************************************#
 #**                                  Useful methods                                         **#
@@ -116,6 +119,30 @@ def randomGroup():
     return JSONizer('sigma_core.group', group)
 
 
+def randomEvent(user):
+    event = {}
+    event['name'] = randomlower(10)
+    event['description'] = randomlower(50)
+    event['date_start'] = randomdate()
+    event['date_end'] = randomdate()
+    event['place_name'] = randomlower(20)
+    event['author'] = user
+    return JSONizer('sigma_core.event', event)
+
+
+def randomPublication(user, group, event):
+    publication = {}
+    publication['group'] = group
+    publication['author'] = user
+    if event:
+        publication['related_event'] = event
+    publication['date'] = randomdate()
+    publication['title'] = randomlower(15)
+    publication['content'] = randomlower(100)
+    publication['internal'] = randombool(0.8)
+    return JSONizer('sigma_core.publication', publication)
+
+
 def generateMember(group, user, sa):
     member = {}
     member['group'] = group
@@ -202,6 +229,10 @@ def generateFixtures(filepath):
             members.append(member)
             f.write( generateMember(i, member, (j==0)) )
 
+    print('OK\n  Generating events... ', end='')
+    for i in range(1, EVENT_NUM):
+        user = random.randint(1, 10)
+        f.write(randomEvent(user))
 
     print('OK\n  Generating aknowledgment... ', end='')
     for i in range(1, ACKNOW_NUM):                                       # Generate aknowledgments
