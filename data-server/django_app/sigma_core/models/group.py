@@ -81,8 +81,8 @@ class Group(models.Model):
 
     #*********************************************************************************************#
     #**                                      Methods                                            **#
-    #*********************************************************************************************#    
-    def can_retrieve(self, user):
+    #*********************************************************************************************#
+    def can_retrieve(self, user, *args, **kwargs):
         """
             Returns True if the given user can access the group.
             This can happen in the following cases :
