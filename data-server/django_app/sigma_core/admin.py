@@ -11,8 +11,6 @@ from sigma_core.models.participation import Participation
 from sigma_core.models.publication import Publication
 from sigma_core.models.event import Event
 from sigma_core.models.shared_publication import SharedPublication
-
-
 admin.site.unregister(AuthGroup)
 
 
@@ -96,3 +94,10 @@ class GroupAdmin(admin.ModelAdmin):
 
 admin.site.register(Group, GroupAdmin)
 
+from sigma_core.models.tag import Tag
+from sigma_core.models.like import Like
+from sigma_core.models.comment import Comment
+
+admin.site.register(Tag)
+admin.site.register(Like)
+admin.site.register(Comment)

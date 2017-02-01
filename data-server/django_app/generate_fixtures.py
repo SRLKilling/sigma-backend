@@ -10,7 +10,12 @@ ACKNOW_NUM = 700
 ACKNOW_INV_NUM = 500
 
 EVENT_NUM = 50
-PUBLICATION = 200
+PUBLICATION_NUM = 200
+SHARED_NUM = 4
+PARTICIPATION_NUM = 10
+COMMENT_NUM = 10
+LIKE_NUM = 50
+TAG_NUM = 20
 
 
 #*********************************************************************************************#
@@ -75,8 +80,10 @@ def randint_norepeat(l, a, b):
     return c
 
 def randomdate():
-    return "2016-05-08T15:35:59.028Z";
-
+    s=[str(random.randint(1,9)) for i in range(12)]
+    p=[str(random.randint(0,5)) for i in range(2)]
+    d="20"+s[0]+s[1]+"-0"+s[2]+"-0"+s[3]+"T1"+s[4]+":"+p[0]+s[6]+":"+p[1]+s[8]+".008Z"
+    return d
 
 #*********************************************************************************************#
 #**                                Random model generators                                  **#
@@ -129,8 +136,14 @@ def randomEvent(user):
     event['author'] = user
     return JSONizer('sigma_core.event', event)
 
+def randomParticipation(user, event):
+    part = {}
+    part['user'] = user
+    part['event'] = event
+    part['status'] = random.randint(0, 1)
+    return JSONizer('sigma_core.participation', part)
 
-def randomPublication(user, group, event):
+def randomPublication(user, group, event = 0):
     publication = {}
     publication['group'] = group
     publication['author'] = user
@@ -140,8 +153,38 @@ def randomPublication(user, group, event):
     publication['title'] = randomlower(15)
     publication['content'] = randomlower(100)
     publication['internal'] = randombool(0.8)
+    publication['last_commented'] = randomdate()
     return JSONizer('sigma_core.publication', publication)
 
+def randomTag(user, publication):
+    tag = {}
+    tag['user'] = user
+    tag['publication'] = publication
+    tag['tagged'] = random.randint(1, USER_NUM)
+    return JSONizer('sigma_core.tag', tag)
+
+def randomLike(user, publication):
+    like = {}
+    like['user'] = user
+    like['publication'] = publication
+    return JSONizer('sigma_core.like', like)
+
+def randomComment(user, publication):
+    comment = {}
+    comment['publication'] = publication
+    comment['user'] = user
+    comment['date'] = randomdate()
+    comment['comment'] = randomlower(random.randint(50, 1000))
+    return JSONizer('sigma_core.comment', comment)
+
+
+def share(publication, group):
+    shared = {}
+    shared['group'] = group
+    shared['publication'] = publication
+    shared['date'] = randomdate()
+    date = randomdate()
+    return JSONizer('sigma_core.sharedpublication', shared)
 
 def generateMember(group, user, sa):
     member = {}
@@ -221,18 +264,52 @@ def generateFixtures(filepath):
         f.write( randomGroup() )
 
     print('OK\n  Generating memberships.. ', end='')
-    for i in range(1, GROUP_NUM):
+    for i in range(1, GROUP_NUM + 1):
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
         for j in range(member_num):                                     # Generate members
             member = randint_norepeat(members, 1, USER_NUM)
             members.append(member)
-            f.write( generateMember(i, member, (j==0)) )
+            f.write(generateMember(i, member, (j==0)) )
 
     print('OK\n  Generating events... ', end='')
-    for i in range(1, EVENT_NUM):
-        user = random.randint(1, 10)
+    for i in range(1, EVENT_NUM + 1):
+        user = random.randint(1, USER_NUM)
         f.write(randomEvent(user))
+        users = [user]
+        for k in range(PARTICIPATION_NUM):
+            if random.random() < 0.3:
+                user = randint_norepeat(users, 1, PARTICIPATION_NUM)
+                f.write(randomParticipation(user, i))
+
+
+    print('OK\n  Generating publications... ', end='')
+    for i in range(1, PUBLICATION_NUM + 1):
+        user = random.randint(1, USER_NUM)
+        group = random.randint(1, GROUP_NUM)
+        if random.random() < 0.2:
+            event = random.randint(1, EVENT_NUM)
+            f.write(randomPublication(user, group, event))
+        else:
+            f.write(randomPublication(user, group))
+        f.write(share(i, group))
+        groups = [group]
+        for k in range(SHARED_NUM):
+            if random.random() < 0.1:
+                group = randint_norepeat(groups, 1, GROUP_NUM)
+                f.write(share(i, group))
+        for k in range(COMMENT_NUM):
+            if random.random() < 0.3:
+                user = random.randint(1, USER_NUM)
+                f.write(randomComment(user, i))
+        for k in range(LIKE_NUM):
+            if random.random() < 0.5:
+                user = random.randint(1, USER_NUM)
+                f.write(randomLike(user, i))
+        for k in range(TAG_NUM):
+            if random.random() < 0.3:
+                user = random.randint(1, USER_NUM)
+                f.write(randomTag(user, i))
 
     print('OK\n  Generating aknowledgment... ', end='')
     for i in range(1, ACKNOW_NUM):                                       # Generate aknowledgments
