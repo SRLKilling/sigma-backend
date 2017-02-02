@@ -14,6 +14,8 @@ class Response(Exception):
         self.code = code
         self.content = content
         
+#*********************************************************************************************#
+        
 UnauthenticatedException = Response(Unauthenticated)
 UnauthorizedException = Response(Unauthorized)
 InvalidLocationException = Response(InvalidLocation)

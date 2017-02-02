@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from sigma_api import response
 
 def get_or_raise(queryset, value, field="pk"):
@@ -17,7 +18,7 @@ def get_or_raise(queryset, value, field="pk"):
         
         return queryset.get(**dict)
         
-    except models.DoesNotExists:
+    except ObjectDoesNotExist:
         raise response.InvalidLocationException
         
 

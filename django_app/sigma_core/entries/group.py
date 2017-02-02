@@ -1,4 +1,4 @@
-from sigma_api import entries
+from sigma_api import entries, response
 from sigma_api.importer import load_ressource
 
 Group = load_ressource("Group")
