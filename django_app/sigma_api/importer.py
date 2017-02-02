@@ -36,7 +36,7 @@ class Ressource:
         
     @property
     def objects(self):
-        return self.get(Ressource.MODEL).objects.all()
+        return self.get(Ressource.MODEL).objects
         
     @property
     def serializers(self):
