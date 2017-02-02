@@ -30,6 +30,10 @@ def set(cls):
         name = sub.__name__
         bases = ((cls, ) + sub.__bases__) if (not cls in sub.__bases__) else (sub.__bases__)
         attribs = dict(sub.__dict__)
+        
+        if "__dict__" in attribs:
+            del attribs["__dict__"]
+            
         inherit_meta(attribs)
                 
         return type(name, bases, attribs)

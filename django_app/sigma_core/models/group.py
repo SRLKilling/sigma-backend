@@ -4,11 +4,37 @@ from sigma_api.importer import load_ressource
 GroupMember = load_ressource("GroupMember")
 Acknowledgment = load_ressource("Acknowledgment")
 
+
+class GroupQuerySet(models.QuerySet):
+    
+    def is_member_of(self, user):
+        """ Filter to get all group a user is a member of """
+        membersof = GroupMember.objects.for_user(user).values('group')
+        memberof_acknowledged = Acknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
+        
+        return self.filter(
+            models.Q(pk__in = membersof) |
+            models.Q(pk__in = memberof_acknowledged) |
+            models.Q(group_visibility=Group.VISIBILITY_PUBLIC)
+        )
+
+    def acknowledged_by(self, group):
+        """ Filter all groups that are aknowledged by a given one """
+        return self.filter(pk__in = Acknowledgment.objects.acknowledged_by(group))
+
+    def acknowledging(self, group):
+        """ Filter all groups that are aknowledged by a given one """
+        return self.filter(pk__in = Acknowledgment.objects.acknowledging(group))
+
+
+
 class Group(models.Model):
     """
         This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
     """
-
+    
+    objects = GroupQuerySet.as_manager()
+    
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
@@ -50,35 +76,11 @@ class Group(models.Model):
     def __str__(self):
         return 'Group %d : %s' % (self.pk, self.name)
 
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    @staticmethod
-    def get_user_groups_qs(user):
-        """
-            Returns a Queryset containing all the groups a user is member of
-        """
-        membersof = GroupMember.model.get_user_memberships_qs(user).values('group')
-        memberof_acknowledged = Acknowledgment.model.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
-        return Group.objects.all().filter( models.Q(pk__in = membersof) | models.Q(pk__in = memberof_acknowledged) | models.Q(group_visibility=Group.VISIBILITY_PUBLIC))
-
-
-    @staticmethod
-    def get_acknowledged_by_qs(user, group):
-        """
-            Returns a Queryset containing all the groups that a given group acknowledge
-        """
-        return Group.objects.filter(pk__in = Acknowledgment.model.get_acknowledged_by_qs(user, group))
-
-    @staticmethod
-    def get_acknowledging_qs(user, group):
-        """
-            Returns a Queryset containing all the groups that acknowledge the given group
-        """
-        return Group.objects.filter(pk__in = Acknowledgment.model.get_acknowledging_qs(user, group))
-
+        
+        
+        
+        
+        
     #*********************************************************************************************#
     #**                                      Methods                                            **#
     #*********************************************************************************************#    

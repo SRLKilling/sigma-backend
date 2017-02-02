@@ -15,6 +15,6 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
 #*********************************************************************************************#
         
     @serializers.sub
-    class list():
+    class list:
         class Meta:
-            fields = ('pk', 'name', 'description', 'fields')
+            fields = ('pk', )
