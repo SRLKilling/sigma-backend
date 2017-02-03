@@ -1,7 +1,8 @@
 from tornado import gen
 
 from websocket import message, errors
-from sigma_core.actions.authenticate import authenticate as django_authenticate
+from sigma_api.authenticate import authenticate as django_authenticate
+from sigma_api import entries, response
 
 class Transaction:
     
@@ -15,11 +16,6 @@ class Transaction:
             "AUTH" : self.authenticate,
             "REST_API" : self.rest_action,
         }
-        
-        self.rest_locations = (
-            "group",
-            "test",
-        )
         
     @gen.coroutine
     def handle_message(self, msg):
@@ -54,23 +50,33 @@ class Transaction:
         
     @gen.coroutine
     def rest_action(self, msg):
-        rest_action = msg.get("REST_action")
         rest_location = msg.get("REST_location")
+        rest_action = msg.get("REST_action")
+        rest_data = msg.get("REST_data", {})
+        rest_pk = msg.get("REST_pk", None)
         
         if rest_action == None:
             raise errors.ProtocolMissingRESTActionException()
         if rest_location == None:
             raise errors.ProtocolMissingRESTLocationException()
-            
-        from sigma_core.actions.test import GroupActionSet
-        r = GroupActionSet.getAvailableGroups(self.env['user'], None)
         
-        raise message.Message(message.SUCCESS, response = r)
+        entry = entries.route_to_entry(rest_location, rest_action)
+        user = self.env.get('user', None)
         
-        # if not rest_location in self.rest_locations:
-            # raise errors.ProtocolInvalidRESTActionException()
+        try:
+            if rest_pk != None:
+                resp = entry(user, rest_data, rest_pk)
+            else:
+                resp = entry(user, rest_data)
+                
+            raise message.Message(message.SUCCESS, response = {"code": resp.code, "content": resp.content})
             
-        # action_mod = importlib.import_module("sigma_core.actions." + rest_location)
+        except entries.InvalidLocEntryException:
+            raise errors.ProtocolInvalidRESTLocationException;
+        except entries.InvalidActionEntryException:
+            raise errors.ProtocolInvalidRESTActionException;
+        except response.Response as resp:
+            raise message.Message(message.SUCCESS, response = {"code": resp.code, "content": resp.content})
         
     @gen.coroutine
     def post_message(self, msg):

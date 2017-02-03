@@ -31,7 +31,7 @@ def get_deserialized(serializer_class, data, *args, **kwargs):
         
     serializer = serializer_class(data=data, *args, **kwargs)
     if not serializer.is_valid():
-        raise response.InvalidRequestException
+        raise response.InvalidRequestException(serializer.errors)
         
     instance = serializer_class.Meta.model(**serializer.validated_data)
     return serializer, instance   

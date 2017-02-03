@@ -1,11 +1,12 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from sigma_core.models.user import User
-from sigma_core.models.group import Group
-from sigma_core.models.group_member import GroupMember
-from sigma_core.models.group_field import GroupField
-from sigma_core.serializers.group_field import GroupFieldSerializer
+from sigma_api.importer import load_ressource
+
+Group = load_ressource("Group")
+User = load_ressource("User")
+GroupMember = load_ressource("GroupMember")
+GroupField = load_ressource("GroupField")
 
 
 class GroupTests(APITestCase):
@@ -18,9 +19,9 @@ class GroupTests(APITestCase):
         self.member = User.objects.create(email='member@sigma.fr', lastname='Membre', firstname='Remmeb');
         self.admin = User.objects.create(email='admin@sigma.fr', lastname='Admin', firstname='Nimad');
 
-        self.secretGroup = Group.objects.create(name="Groupe Secret", description="", visibility=Group.CONF_SECRET)
-        self.normalGroup = Group.objects.create(name="Groupe Normal", description="", visibility=Group.CONF_NORMAL)
-        self.publicGroup = Group.objects.create(name="Groupe Public", description="", visibility=Group.CONF_PUBLIC)
+        self.secretGroup = Group.objects.create(name="Groupe Secret", description="", group_visibility=Group.model.VISIBILITY_PRIVATE)
+        self.normalGroup = Group.objects.create(name="Groupe Normal", description="", group_visibility=Group.model.VISIBILITY_NORMAL)
+        self.publicGroup = Group.objects.create(name="Groupe Public", description="", group_visibility=Group.model.VISIBILITY_PUBLIC)
 
         GroupMember.objects.create(user=self.member, group=self.secretGroup)
         GroupMember.objects.create(user=self.member, group=self.normalGroup)
@@ -30,9 +31,9 @@ class GroupTests(APITestCase):
         GroupMember.objects.create(user=self.admin, group=self.normalGroup, is_super_administrator=True)
         GroupMember.objects.create(user=self.admin, group=self.publicGroup, is_super_administrator=True)
 
-        self.secretGroupField = GroupField.objects.create(group=self.secretGroup, name="Champ dans groupe secret", type=GroupField.TYPE_STRING)
-        self.normalGroupField = GroupField.objects.create(group=self.normalGroup, name="Champ dans groupe normal", type=GroupField.TYPE_STRING)
-        self.publicGroupField = GroupField.objects.create(group=self.publicGroup, name="Champ dans groupe public", type=GroupField.TYPE_STRING)
+        self.secretGroupField = GroupField.objects.create(group=self.secretGroup, name="Champ dans groupe secret", type=GroupField.model.TYPE_STRING)
+        self.normalGroupField = GroupField.objects.create(group=self.normalGroup, name="Champ dans groupe normal", type=GroupField.model.TYPE_STRING)
+        self.publicGroupField = GroupField.objects.create(group=self.publicGroup, name="Champ dans groupe public", type=GroupField.model.TYPE_STRING)
 
 
     ###############################################################################################
@@ -41,7 +42,7 @@ class GroupTests(APITestCase):
 
     def try_create(self, u, g, s):
         self.client.force_authenticate(user=u)
-        r = self.client.post(self.group_field_url, {'group': g.id, 'name': 'Test', 'type': GroupField.TYPE_STRING, 'accept':''}, format='json')
+        r = self.client.post(self.group_url, {'group': g.id, 'name': 'Test', 'type': GroupField.model.TYPE_STRING, 'accept':''}, format='json')
         self.assertEqual(r.status_code, s)
 
     def test_create_nomember_in_secretgr(self):
@@ -70,15 +71,15 @@ class GroupTests(APITestCase):
     ###############################################################################################
 
     def try_update(self, u, f, s):
-        uf = GroupFieldSerializer(f).data
+        uf = GroupField.serializers.default(f).data
         uf['name'] = "Autre nom"
 
         self.client.force_authenticate(user=u)
-        r = self.client.put(self.group_field_url + str(f.id) + '/', uf, format='json')
+        r = self.client.put(self.group_url + str(f.id) + '/', uf, format='json')
 
         self.assertEqual(r.status_code, s)
         if s == status.HTTP_200_OK:
-            self.assertEqual(GroupFieldSerializer(GroupField.objects.all().get(id=f.id)).data, uf)
+            self.assertEqual(GroupField.serializers.default(GroupField.objects.all().get(id=f.id)).data, uf)
 
     def test_update_nomember_in_secretgr(self):
         self.try_update(self.nomember, self.secretGroupField, status.HTTP_403_FORBIDDEN)
@@ -107,7 +108,7 @@ class GroupTests(APITestCase):
 
     def try_destroy(self, u, f, s):
         self.client.force_authenticate(user=u)
-        r = self.client.delete(self.group_field_url + str(f.id) + '/', format='json')
+        r = self.client.delete(self.group_url + str(f.id) + '/', format='json')
         self.assertEqual(r.status_code, s)
 
     def test_destroy_nomember_in_secretgr(self):
@@ -138,7 +139,7 @@ class GroupTests(APITestCase):
 
     def try_delete(self, u, f, s):
         self.client.force_authenticate(user=u)
-        r = self.client.post(self.group_field_url + str(f.id) + '/destroy', format='json')
+        r = self.client.post(self.group_url + str(f.id) + '/destroy', format='json')
         self.assertEqual(r.status_code, s)
 
     def test_delete_nomember_in_secretgr(self):
@@ -170,11 +171,11 @@ class GroupTests(APITestCase):
 
     def try_retrieve(self, u, f, s):
         self.client.force_authenticate(user=u)
-        r = self.client.get(self.group_field_url + str(f.id) + '/', format='json')
+        r = self.client.get(self.group_url + str(f.id) + '/', format='json')
         self.assertEqual(r.status_code, s)
 
         if r.status_code == status.HTTP_200_OK:
-            self.assertEqual( r.data, GroupFieldSerializer(f).data )
+            self.assertEqual( r.data, GroupField.serializers.default(f).data )
 
 
     def test_retrieve_nomember_in_secretgr(self):
@@ -208,7 +209,7 @@ class GroupTests(APITestCase):
 
     def try_validation(self, t, v, p):
         self.client.force_authenticate(user=self.admin)
-        r = self.client.post(self.group_field_url, {'group': self.secretGroup.id, 'name': 'Test', 'type': t, 'accept': v}, format='json')
+        r = self.client.post(self.group_url, {'group': self.secretGroup.id, 'name': 'Test', 'type': t, 'accept': v}, format='json')
         if p:
             self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         else:
@@ -216,33 +217,33 @@ class GroupTests(APITestCase):
 
 
     def test_validation_number(self):
-        self.try_validation(GroupField.TYPE_NUMBER, '', True)
-        self.try_validation(GroupField.TYPE_NUMBER, '_', True)
-        self.try_validation(GroupField.TYPE_NUMBER, '12_', True)
-        self.try_validation(GroupField.TYPE_NUMBER, '_43', True)
-        self.try_validation(GroupField.TYPE_NUMBER, '12_-43', True)
-        self.try_validation(GroupField.TYPE_NUMBER, '12_42', True)
-        self.try_validation(GroupField.TYPE_NUMBER, '-43_12', True)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '', True)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '_', True)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '12_', True)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '_43', True)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '12_-43', True)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '12_42', True)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '-43_12', True)
 
-        self.try_validation(GroupField.TYPE_NUMBER, '43_12-10', False)
-        self.try_validation(GroupField.TYPE_NUMBER, '43__12', False)
-        self.try_validation(GroupField.TYPE_NUMBER, '4.3_', False)
-        self.try_validation(GroupField.TYPE_NUMBER, '12', False)
-        self.try_validation(GroupField.TYPE_NUMBER, '_10_', False)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '43_12-10', False)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '43__12', False)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '4.3_', False)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '12', False)
+        self.try_validation(GroupField.model.TYPE_NUMBER, '_10_', False)
 
 
     def test_validation_email(self):
-        self.try_validation(GroupField.TYPE_EMAIL, '', True)
-        self.try_validation(GroupField.TYPE_EMAIL, 'toto', True)
-        self.try_validation(GroupField.TYPE_EMAIL, '.toto', True)
-        self.try_validation(GroupField.TYPE_EMAIL, 'test.toto', True)
-        self.try_validation(GroupField.TYPE_EMAIL, '.test.toto', True)
-        self.try_validation(GroupField.TYPE_EMAIL, '@test.toto', True)
-        self.try_validation(GroupField.TYPE_EMAIL, '@test.toto .test.tata', True)
-        self.try_validation(GroupField.TYPE_EMAIL, '@test.toto      .test.tata', True)
-        self.try_validation(GroupField.TYPE_EMAIL, '.test.toto      @test.tata .toto .tata @tata.toto .toto.tata', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, '', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, 'toto', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, '.toto', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, 'test.toto', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, '.test.toto', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, '@test.toto', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, '@test.toto .test.tata', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, '@test.toto      .test.tata', True)
+        self.try_validation(GroupField.model.TYPE_EMAIL, '.test.toto      @test.tata .toto .tata @tata.toto .toto.tata', True)
 
-        self.try_validation(GroupField.TYPE_EMAIL, 'test.', False)
-        self.try_validation(GroupField.TYPE_EMAIL, 'maieuh@', False)
-        self.try_validation(GroupField.TYPE_EMAIL, 'maieuh@test.toto', False)
-        self.try_validation(GroupField.TYPE_EMAIL, '@test.toto, test.tata', False)
+        self.try_validation(GroupField.model.TYPE_EMAIL, 'test.', False)
+        self.try_validation(GroupField.model.TYPE_EMAIL, 'maieuh@', False)
+        self.try_validation(GroupField.model.TYPE_EMAIL, 'maieuh@test.toto', False)
+        self.try_validation(GroupField.model.TYPE_EMAIL, '@test.toto, test.tata', False)

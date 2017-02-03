@@ -8,7 +8,7 @@ import django_importer
 import settings
 
 from websocket.client import WebSocketClient
-from sigma_core.notifier import notifier
+from sigma_api.notifier import notifier
 
 
 if __name__ == "__main__":

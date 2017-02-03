@@ -1,5 +1,4 @@
 function SigmaWS(url) {
-	this.ws = new WebSocket(url);
 	this.transactions = {}
 	this.nextTransactionId = 0
 	
@@ -16,7 +15,7 @@ function SigmaWS(url) {
 		this.ws.send(msg);
 	}
 	
-	this.ws.onmessage = (function(self){
+	this.ws_onmessage = (function(self){
 			return function(msg_event){
 				msg = JSON.parse(msg_event.data);
 			
@@ -29,8 +28,28 @@ function SigmaWS(url) {
 			}
 		})(this);
 	
+	this.ws_onclose = (function(self){
+		return function(){
+			setTimeout(self.reconnect, 2000);
+		}
+	})(this);
+	
+	this.ws_onerror = (function(self){
+		return function() {
+			setTimeout(self.reconnect, 2000);
+		}
+	})(this);
+	
+	this.reconnect = function() {
+		this.ws = new WebSocket(url);
+		this.ws.onmessage = this.ws_onmessage;
+		this.ws.onclose = this.ws_onclose;
+		this.ws.onerror = this.ws_onerror;
+	};
+	
 	this.onevent = function(msg) {}
 	
+	this.reconnect();
 	return this;
 }
 
@@ -52,7 +71,7 @@ function AuthenticationTransaction(ws, token) {
 	return this;
 }
 
-function RESTTransaction(ws, loc, action) {
+function RESTTransaction(ws, loc, action, data="", pk=null) {
 	this.ws = ws;
 	this.ws.registerTransaction(this);
 	
@@ -61,9 +80,12 @@ function RESTTransaction(ws, loc, action) {
 			id : this.id,
 			protocol: "SIGMA.0.1",
 			action: "REST_API",
-			REST_action: "",
-			REST_location: "test",
+			REST_action: action,
+			REST_location: loc,
+			REST_data: data,
 		}
+		if(pk != null) message.REST_pk = pk
+		
 		this.ws.send(message);
 	}
 	

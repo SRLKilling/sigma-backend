@@ -7,8 +7,6 @@ from websocket import message, errors, transaction
 import settings
 
 json = importlib.import_module( getattr(settings, "JSON_LIB", "json") )
-from sigma_core.notifier import notifier
-
 
 
 class WebSocketClient(WebSocketHandler):

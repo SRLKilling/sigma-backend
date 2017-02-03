@@ -52,3 +52,6 @@ ProtocolInvalidRESTActionException = createWSException(PROTOCOL_INVALID_REST_ACT
 
 PROTOCOL_MISSING_REST_LOCATION = 123
 ProtocolMissingRESTLocationException = createWSException(PROTOCOL_MISSING_REST_LOCATION)
+
+PROTOCOL_INVALID_REST_LOCATION = 124
+ProtocolInvalidRESTLocationException = createWSException(PROTOCOL_INVALID_REST_LOCATION)

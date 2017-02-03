@@ -3,6 +3,34 @@ from sigma_api import response, shortcuts
 #*********************************************************************************************#
     
 entries = {}
+
+class EntryException(Exception):
+    pass
+    
+class InvalidLocEntryException(EntryException):
+    pass
+    
+class InvalidActionEntryException(EntryException):
+    pass
+
+def route_to_entry(loc, action):
+    if not route_to_entry.__registered:
+        import register_list
+        route_to_entry.__registered = True
+    
+    if not loc in entries:
+        raise InvalidLocEntryException()
+        
+    entryset = entries[loc]
+    if not hasattr(entryset, action):
+        raise InvalidActionEntryException()
+        
+    return getattr(entryset, action)
+    
+route_to_entry.__registered = False
+    
+#*********************************************************************************************#
+    
     
 class EntrySet():
     """ This class wraps a set of entries and provide a way to turn it to a DRF Viewset """ 
@@ -30,7 +58,7 @@ class Entry():
         self.kwargs = kwargs
 
     def __call__(self, *args, **kwargs):
-        self.func(*args, **kwargs)
+        return self.func(*args, **kwargs)
         
         
 #*********************************************************************************************#

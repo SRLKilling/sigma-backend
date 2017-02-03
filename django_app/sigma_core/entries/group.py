@@ -19,6 +19,10 @@ class GroupEntrySet(entries.EntrySet):
         Group.serializers.default
     )
     
+    create = entries.create(
+        Group.serializers.default
+    )
+    
     update_right = entries.update(
         Group.serializers.default,
         'update_right'

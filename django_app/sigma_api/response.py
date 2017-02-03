@@ -14,6 +14,10 @@ class Response(Exception):
         self.code = code
         self.content = content
         
+    def __call__(self, content):
+        self.content = content
+        return self
+        
 #*********************************************************************************************#
         
 UnauthenticatedException = Response(Unauthenticated)
