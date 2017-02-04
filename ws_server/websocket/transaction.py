@@ -64,7 +64,7 @@ class Transaction:
         user = self.env.get('user', None)
         
         try:
-            if rest_pk != None:
+            if entry.detailed and rest_pk != None:
                 resp = entry(user, rest_data, rest_pk)
             else:
                 resp = entry(user, rest_data)

@@ -3,15 +3,15 @@ from sigma_api.importer import load_ressource
 
 class AcknowledgmentQuerySet(models.QuerySet):
     
-    def acknowledged_by(group):
+    def acknowledged_by(self, group):
         """ Filter acknowledgment relation, where the given group(s) is the acknowledging one """
         return self.filter(acknowledged_by = group)
         
-    def acknowledging(group):
+    def acknowledging(self, group):
         """ Filter acknowledgment relation, where the given group(s) is the acknowledged one """
         return self.filter(acknowledged__in = group) if isinstance(group, models.QuerySet) else self.filter(acknowledged = group)
         
-    def is_acknowledged_by(parent_group, group):
+    def is_acknowledged_by(self, parent_group, group):
         """ Returns true if group is acknowledged by parent_group """
         return self.acknowledged_by(parent_group).acknowledging(group).exists()
 

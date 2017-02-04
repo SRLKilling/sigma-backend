@@ -82,14 +82,14 @@ def detailed_entry(name = None, **kwargs):
 #*********************************************************************************************#
 
 
-def retrieve(queryset_class, serializer_class, action_name="retrieve"):
+def retrieve(queryset_gen, serializer_class, action_name="retrieve"):
     """
         This method returns an entry used to retrieve a ressource.
         It tries to get the pk-ed element, and returns its serialized data
     """
     @detailed_entry(name=action_name)
     def entry(user, data, pk):
-        qs = queryset_class(user, data)
+        qs = shortcuts.get_queryset(queryset_gen, user, data)
         instance = shortcuts.get_or_raise(qs, pk)
         
         shortcuts.check_permission(user, instance, action_name)
@@ -98,7 +98,7 @@ def retrieve(queryset_class, serializer_class, action_name="retrieve"):
         
     return entry
 
-def list(queryset_class, serializer_class, filter_class = None, action_name="list"):
+def list(queryset_gen, serializer_class, filter_class = None, action_name="list"):
     """
         This method returns an entry that is used to list a queryset.
         It first get the queryset giving user and data to the given queryset constructor.
@@ -107,7 +107,7 @@ def list(queryset_class, serializer_class, filter_class = None, action_name="lis
     """
     @global_entry(name=action_name)
     def entry(user, data):
-        queryset = queryset_class(user, data)
+        queryset = shortcuts.get_queryset(queryset_gen, user, data)
         if filter_class != None:
             filter = filter_class(queryset=queryset, data=data.uri_param)
             queryset = filter.qs()
@@ -153,16 +153,15 @@ def update(serializer_class, action_name="update"):
     
     return entry
     
-def destroy(queryset_class, serializer_class, action_name="destroy"):
+def destroy(queryset_gen, action_name="destroy"):
     """
         This method is an entry that create a new ressource.
-        It deserialize the data using the provided serializer_class,
         Then check for permissions, and save the object in the database
     """
-    @global_entry(name=action_name, methods=["post"])
-    def entry(user, data):
-        queryset = queryset_class(user, data)
-        instance = shortcuts.get_or_raise(queryset_class, pk)
+    @detailed_entry(name=action_name, methods=["post"])
+    def entry(user, data, pk):
+        queryset = shortcuts.get_queryset(queryset_gen, user, data)
+        instance = shortcuts.get_or_raise(queryset, pk)
         shortcuts.check_permission(user, instance, action_name)
         instance.delete()
         return response.Response(response.Success_Deleted)

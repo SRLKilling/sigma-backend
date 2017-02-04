@@ -19,7 +19,7 @@ function Ressource(fields) {
 	};
 	
 	this.create_form = function() {
-		this.form_node = document.createElement("form");
+		this.node = document.createElement("div");
 		this.inputs = {};
 		for(i in this.fields) {
 			f = this.fields[i];
@@ -34,9 +34,9 @@ function Ressource(fields) {
 			input.value = f.def;
 			this.inputs[f.apiname] = input;
 			
-			this.form_node.appendChild(label);
-			this.form_node.appendChild(input);
-			this.form_node.appendChild(document.createElement("br"));
+			this.node.appendChild(label);
+			this.node.appendChild(input);
+			this.node.appendChild(document.createElement("br"));
 		};
 	};
 	
@@ -44,7 +44,7 @@ function Ressource(fields) {
 		d = document.getElementById("form_container");
 		if(d.firstChild != null)
 			d.removeChild( d.firstChild );
-		d.appendChild( this.form_node );
+		d.appendChild( this.node );
 	}
 	
 	this.content = function() {
@@ -107,7 +107,9 @@ ressources = new RessourceList();
 function send() {
 	loc = document.getElementById("action_location").value;
 	action = document.getElementById("action_name").value;
-	data = ressources.currentRes.content();
+	data = ""
+	if(ressources.currentRes != undefined && ressources.currentRes != null)
+		data = ressources.currentRes.content();
 	pk = document.getElementById("action_pk").value;
 	if(pk == "") pk = null;
 	

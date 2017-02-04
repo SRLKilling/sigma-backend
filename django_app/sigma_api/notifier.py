@@ -22,18 +22,20 @@ class DispatcherThread(threading.Thread):
         self.subscribers = {}
         self.receive_callbacks = []
         
-        self.reconnect()
+        self.connected = False
         
     def reconnect(self):
         """ This function is used to connect or reconnect to the central dispatch server """
-        connected = False
-        while not connected:
+        while not self.connected:
             try:
                 self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.sock.connect((self.address, self.port))
                 self.sock.setblocking(0)
                 self._buffer = b''
-                connected = True
+                self.connected = True
+                
+                for chan in self.subscribed_to:
+                    self.send_subscribe(chan)
                 
             except ConnectionError as e:
                 print("Connection failed, trying again in 5s")
@@ -67,6 +69,8 @@ class DispatcherThread(threading.Thread):
         
         
     def run(self):
+        self.reconnect()
+        
         while True:
             should_wait = True
             
@@ -98,6 +102,7 @@ class DispatcherThread(threading.Thread):
                 pass
             except socket.error as e:
                 if e.errno in (errno.ECONNRESET, errno.ECONNABORTED):
+                    self.connected = False
                     self.reconnect()
                 elif e.errno == errno.EAGAIN:
                     pass
@@ -129,10 +134,11 @@ class DispatcherThread(threading.Thread):
     #*********************************************************************************************#
     
     def subscribe(self, chan, cb):
-        """ Used to subscribe to a channel, and specify a callback when a message is read """
+        """ Subscribe to a channel, and specify a callback when a message is read """
         if not chan in self.subscribed_to:
             self.subscribed_to.append(chan)
-            self.send_subscribe(chan)
+            if self.connected:
+                self.send_subscribe(chan)
             
         if not chan in self.subscribers:
             self.subscribers[chan] = []

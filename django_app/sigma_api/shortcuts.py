@@ -42,9 +42,6 @@ def call_method_if_exists(obj, name, *args, **kwargs):
     """
         If the the method identified by the given `name` exists, execute it and returns its result.
         Otherwise, return None.
-        
-        Method version : try to call the method on self
-        Static version : takes the object owning the method we try to call, as its first argument.
     """
     
     if hasattr(obj, name):
@@ -57,10 +54,22 @@ def check_permission(user, instance, actionname, *args, **kwargs):
     """
         Given action `actionname`, try to call `instance.can_actionname(user, *args, **kwargs)`
         If it exists and returns False, then a PermissionDenied exception is raised.
-        
-        Static version : takes the model containing the `can_actionname` function, as its first argument.
     """
     if hasattr(instance, 'can_' + actionname):
         f = getattr(instance, 'can_' + actionname)
         if not f(user, *args, **kwargs):
             raise response.UnauthorizedException
+            
+            
+def get_queryset(queryset_gen, user, data):
+    """
+        Return a queryset from any valid queryset generator.
+        It can be a queryset, a manager, or a function returning a queryset, given the user
+    """
+        
+    if isinstance(queryset_gen, models.QuerySet):
+        return queryset_gen
+    elif isinstance(queryset_gen, models.Manager):
+        return queryset_gen.all()
+    else:
+        return queryset_gen(user)
