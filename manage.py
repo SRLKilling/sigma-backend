@@ -115,7 +115,7 @@ def main():
             return runPython('ws_server/run-server.py')
             
         elif(op == "run-data-server"):
-            return runDjango('runserver')
+            return runDjango('runserver 127.0.0.1:8080')
          
         elif(op == "django"):
             return runDjango(argv[2:])
