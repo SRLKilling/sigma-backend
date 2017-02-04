@@ -9,7 +9,7 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     class Meta:
         model = Group.model
         fields = ('pk', 'name', 'description', 'is_protected', 'can_anyone_ask', 'need_validation_to_join', 'members_visibility', 'group_visibility', 'fields')
-        
+    
     fields = GroupField.serializers.default(many=True, read_only=True)
     
 #*********************************************************************************************#
@@ -17,4 +17,5 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     @serializers.sub
     class list:
         class Meta:
-            fields = ('pk', )
+            fields = None
+            exclude = ('fields', )

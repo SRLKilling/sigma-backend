@@ -7,8 +7,8 @@ Acknowledgment = load_ressource("Acknowledgment")
 
 class GroupQuerySet(models.QuerySet):
     
-    def is_member_of(self, user):
-        """ Filter to get all group a user is a member of """
+    def user_can_see(self, user):
+        """ Filter to get all group a user can see (member, or member of acknowledging group, or public) """
         membersof = GroupMember.objects.for_user(user).values('group')
         memberof_acknowledged = Acknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
         
@@ -93,7 +93,7 @@ class Group(models.Model):
             * The group visibility is set to `VISIBILITY_NORMAL` and I'm a member of an aknowledging group
         """
 
-        if self.group_visibility == Group.VISIBILITY_PUBLIC or GroupMember.model.is_member(self, user):
+        if self.group_visibility == Group.VISIBILITY_PUBLIC or GroupMember.objects.is_member(self, user):
             return True
 
         elif self.group_visibility == Group.VISIBILITY_NORMAL:

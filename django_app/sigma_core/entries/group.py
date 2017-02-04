@@ -6,13 +6,9 @@ Group = load_ressource("Group")
 class GroupEntrySet(entries.EntrySet):
     
     list = entries.list(
-        lambda user, data: Group.objects,
+        Group.objects.user_can_see,
         Group.serializers.list
     )
-    
-    # members = entries.colist(
-        # GroupMembers.objects
-    # )
     
     retrieve = entries.retrieve(
         Group.objects,
@@ -23,10 +19,10 @@ class GroupEntrySet(entries.EntrySet):
         Group.serializers.default
     )
     
-    update_right = entries.update(
-        Group.serializers.default,
-        'update_right'
-    )
+    # update_right = entries.update(
+        # Group.serializers.default,
+        # 'update_right'
+    # )
     
     destroy = entries.destroy(
         Group.objects

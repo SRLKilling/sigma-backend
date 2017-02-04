@@ -4,11 +4,61 @@ from sigma_api.importer import load_ressource
 Group = load_ressource("Group")
 User = load_ressource("User")
 
+class GroupMemberQuerySet(models.QuerySet):
+
+    def for_user(self, user):
+        """ Return a queryset containing all of a user memberships """
+        return self.filter(user=user)
+        
+    def for_group(self, group):
+        """ Returns a queryset containing all members of a group. """
+        return self.filter(group=group)
+        
+    def user_can_see(self, group, user):
+        """
+            Returns a queryset containing all members of the given group, a user can see.
+            * If you're a member, you'll see everybody
+            * If not, and the group is public, you'll see not-hidden members
+            * If not, and the group is normal, you'll see not-hidden and connected to you members
+        """
+        if self.is_member(group, user):
+            return self
+
+        elif group.members_visibility == Group.model.VISIBILITY_PUBLIC:
+            return self.filter(group = group, hidden = False)
+
+        elif group.members_visibility == Group.model.VISIBILITY_NORMAL:
+            # return self.filter(group = group, hidden = False, user__in = User.User.get_connected_qs(user))                                        # TODO !!
+            pass
+
+        return self.none()
+        
+        
+    def get_membership(self, group, user):
+        """ Tries to get the membership corresponding to the given `user` and `group` """
+        return self.get(group=group, user=user)
+    
+    
+    def is_member(self, group, user):
+        """ Returns True if and only if `user` is a member of the given `group`. """
+        return self.filter(group=group, user=user).exists()
+
+    def are_related(self, user1, user2):
+        """ Return a queryset containing user1 memberships where user2 is also a member of the same group """                                        # TODO !!
+        # groups_user2 = self.member
+        # return GroupMember.get_user_memberships_qs(user1).filter(group__in = GroupMember.get_user_memberships_qs(user2).values('group')).exists()
+        return self
+
+
+
+
 class GroupMember(models.Model):
     """
         Modelize a membership relation between an User and a Group.
         A user is a member of a group if and only if the corresponding GroupMember object exists
     """
+    
+    objects = GroupMemberQuerySet.as_manager()
 
     #*********************************************************************************************#
     #**                                       Fields                                            **#
@@ -75,70 +125,7 @@ class GroupMember(models.Model):
 
         UserConnection.create_new_connections_gr(user, group)
         return member
-
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    @staticmethod
-    def is_member(group, user):
-        """ Returns True if and only if `user` is a member of the given `group`.
-            Both `group` and `user` can be a model instance, or a primary key """
-        if type(group) != int:
-            group = group.pk
-        if type(user) != int:
-            user = user.pk
-
-        return GroupMember.objects.filter(group=group, user=user).exists()
-
-    @staticmethod
-    def get_membership(group, user):
-        """ If `user` is a member of `group`, returns the corresponding GroupMember instance.
-            Otherwise, returns None. """
-        try:
-            return GroupMember.objects.get(group=group, user=user)
-        except GroupMember.DoesNotExist:
-            return None
-
-    @staticmethod
-    def has_common_memberships(user1, user2):
-        """ Return a queryset containing user1 memberships where user2 is also a member of the same group """
-        return GroupMember.get_user_memberships_qs(user1).filter(group__in = GroupMember.get_user_memberships_qs(user2).values('group')).exists()
-
-
-    @staticmethod
-    def get_members_qs(group):
-        """ Returns a queryset containing all members of a group. """
-        return GroupMember.objects.filter(group = group)
-
-    @staticmethod
-    def get_user_memberships_qs(user):
-        """ Return a queryset containing all of a user memberships """
-        return GroupMember.objects.filter(user=user)
-
-
-
-    @staticmethod
-    def get_scoped_group_members_qs(user, group):
-        """
-            Returns a queryset containing all members of the given group, a user can see.
-            * If you're a member, you'll see everybody
-            * If not, and the group is public, you'll see not-hidden members
-            * If not, and the group is normal, you'll see not-hidden and connected to you members
-        """
-        if GroupMember.is_member(group, user):
-            return GroupMember.objects.filter(group = group)
-
-        elif group.members_visibility == Group.model.VISIBILITY_PUBLIC:
-            return GroupMember.objects.filter(group = group, hidden = False)
-
-        elif group.members_visibility == Group.model.VISIBILITY_NORMAL:
-            return GroupMember.objects.filter(group = group, hidden = False, user__in = User.User.get_connected_qs(user))
-
-        return GroupMember.objects.none();
-
-
+        
 
     #*********************************************************************************************#
     #**                                    Permissions                                          **#
