@@ -4,21 +4,23 @@ from sigma_api.serializers import SerializerSet
 
 User = load_ressource("User")
 
-class UserSerializerSet(SerializerSet):
+@serializers.set
+class UserSerializerSet(serializers.drf.ModelSerializer):
 
-    class default(serializers.ModelSerializer):
-        """
-            Basic default serializer for a User.
-            Exclude useless fields : password, su, is_active
-        """
+    class Meta:
+        model = User.model
+        exclude = ('password', 'is_superuser', 'is_staff')
+        read_only_fields = ('is_active', 'photo', )
+        extra_kwargs = {'password': {'write_only': True, 'required': False}}
+
+    @serializers.sub
+    class list:
         class Meta:
-            model = User.model
-            exclude = ('password', 'is_superuser', 'is_staff')
-            read_only_fields = ('is_active', 'photo', )
-            extra_kwargs = {'password': {'write_only': True, 'required': False}}
+            fields = None
+            #exclude = ('fields', )
 
-        
-        
+
+
     # class MinimalUserSerializer(serializers.ModelSerializer):
         # """
         # Serialize an User with minimal data.

@@ -1,6 +1,15 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
+
+class ChatQuerySet(models.QuerySet):
+
+    def user_can_see(self, user):
+        """ QS of all the chats a user can see"""
+        return self.filter(user=user)
+
+
+
 class Chat(models.Model):
     """
         Modelize a chat
@@ -10,6 +19,7 @@ class Chat(models.Model):
         Each group has a chat, even if it's empty
     """
 
+    objects = ChatQuerySet.as_manager()
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
@@ -30,7 +40,7 @@ class Chat(models.Model):
     #*********************************************************************************************#
 
     def get_chat_messages_qs(self):
-        return self.my_chat_messages.order_by('created_date')
+
 
     def get_members_qs(self):
         return self.members.order_by('join_date')

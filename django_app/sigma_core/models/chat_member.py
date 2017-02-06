@@ -1,6 +1,12 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
+class ChatMemberQuerySet(models.QuerySet):
+
+    def get_members_of_chat(self, chat):
+        return self.filter(chat=chat).order_by(join_date)
+
+
 class ChatMember(models.Model):
     """
         Modelize the relation bewteen a chat and a user
@@ -9,7 +15,8 @@ class ChatMember(models.Model):
     class Meta:
         unique_together = (("user", "chat"),)
 
-
+    objects = ChatMemberQuerySet.as_manager()
+    
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#

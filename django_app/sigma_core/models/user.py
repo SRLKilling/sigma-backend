@@ -12,6 +12,9 @@ class UserManager(BaseUserManager):
     def get_queryset(self):
         return super().get_queryset()
 
+    def get_visible_users(self):
+        return self.get_queryset()
+
     def create_user(self, email, lastname, firstname, password=None):
         if not email:
             raise ValueError('Users must have an email address')
@@ -28,6 +31,15 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
+        
+
+class UserQuerySet(models.QuerySet):
+
+    def get_visible_users(self):
+        return self.get_queryset()
+
+
+
 class User(AbstractBaseUser):
     """
         Modelize an sigma user.
@@ -36,6 +48,7 @@ class User(AbstractBaseUser):
         As soon as someone accepts or declines the invitation, the instance is destroyed.
     """
 
+    objects = BaseUserManager.from_queryset(UserQuerySet)
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
