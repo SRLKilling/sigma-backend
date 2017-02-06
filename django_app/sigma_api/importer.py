@@ -43,6 +43,10 @@ class Ressource:
         return self.get(Ressource.SERIALIZERS)
         
     @property
+    def serializer(self):
+        return self.get(Ressource.SERIALIZERS).default
+        
+    @property
     def entries(self):
         return self.get(Ressource.ENTRIES)
     

@@ -23,18 +23,32 @@ def get_or_raise(queryset, value, field="pk"):
         
 
         
-def get_deserialized(serializer_class, data, *args, **kwargs):
+def get_validated_serializer(serializer_class, *args, **kwargs):
     """
-        Return a serializer and a model instance given the serialized data.
-        If validation failed, it raises an InvalidRequest error.
+        Return a serializer after checking for validation.
+        If validation failed, an InvalidRequestException is raised
     """
         
-    serializer = serializer_class(data=data, *args, **kwargs)
+    serializer = serializer_class(*args, **kwargs)
     if not serializer.is_valid():
         raise response.InvalidRequestException(serializer.errors)
-        
-    instance = serializer_class.Meta.model(**serializer.validated_data)
-    return serializer, instance   
+    return serializer
+    
+# def get_instance_from_serializer(serializer):
+    # """
+        # Return a model instance out of a serializer.
+        # Either create a new one, or update the one given to serializer constructor.
+        # The object is not save to the database.
+        # This can only be used without nested objects.                                               # TODO : pretty sure we could write some code to deal with relations
+    # """
+    # ModelClass = serializer.__class__.Meta.model
+    # if hasattr(serializer, "instance"):
+        # instance = ModelClass(serializer.instance)
+        # for attr, value in serializer.validated_data.items():
+            # setattr(instance, attr, value)
+        # return instance
+    # else:
+        # return ModelClass(**serializer.validated_data)
     
     
     

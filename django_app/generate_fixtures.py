@@ -6,9 +6,11 @@ import sys
 USER_NUM = 500
 GROUP_NUM = 300
 MEMBER_NUM = (5, 50)
+
 ACKNOW_NUM = 700
 ACKNOW_INV_NUM = 500
 
+GROUP_FIELD_NUM = (1, 5)
 
 #*********************************************************************************************#
 #**                                  Useful methods                                         **#
@@ -103,6 +105,7 @@ def randomUser():
     user["is_staff"] = False
     return JSONizer('sigma_core.user', user)
 
+    
 
 def randomGroup():
     group = {}
@@ -115,6 +118,17 @@ def randomGroup():
     group['group_visibility'] = random.randint(0, 2)
     return JSONizer('sigma_core.group', group)
 
+def randomGroupField(group):
+    group_field = {}
+    group_field['group'] = group
+    group_field['name'] = randomlower(8)
+    group_field['type'] = random.randint(0, 3)
+    group_field['accept'] = ""
+    group_field['protected'] = randombool(0.5)
+    group_field['multiple_values_allowed'] = randombool(0.2)
+    return JSONizer('sigma_core.groupfield', group_field)
+    
+    
 
 def generateMember(group, user, sa):
     member = {}
@@ -160,6 +174,7 @@ def randomAknowledgmentInvitation():
     akn_inv['date'] = randomdate()
     return JSONizer('sigma_core.acknowledgmentinvitation', akn_inv)
 
+
 def generateOAuthClient():
     client = {}
     client['client_id'] = "bJeSCIWpvjbYCuXZNxMzVz0wglX8mHR2ZTKHxaDv"
@@ -193,6 +208,12 @@ def generateFixtures(filepath):
     for i in range(GROUP_NUM):                                          # Generate groups
         f.write( randomGroup() )
 
+    print('OK\n  Generating group fields.. ', end='')
+    for i in range(1, GROUP_NUM):
+        group_fields_num = random.randint(GROUP_FIELD_NUM[0], GROUP_FIELD_NUM[1])
+        for j in range(group_fields_num):                                     # Generate group_fields
+            f.write( randomGroupField(i) )
+
     print('OK\n  Generating memberships.. ', end='')
     for i in range(1, GROUP_NUM):
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
@@ -201,7 +222,6 @@ def generateFixtures(filepath):
             member = randint_norepeat(members, 1, USER_NUM)
             members.append(member)
             f.write( generateMember(i, member, (j==0)) )
-
 
     print('OK\n  Generating aknowledgment... ', end='')
     for i in range(1, ACKNOW_NUM):                                       # Generate aknowledgments

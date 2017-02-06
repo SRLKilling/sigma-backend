@@ -125,7 +125,8 @@ def create(serializer_class, action_name="create"):
     """
     @global_entry(name=action_name, methods=["post"])
     def entry(user, data):
-        serializer, instance = shortcuts.get_deserialized(serializer_class, data)
+        serializer = shortcuts.get_validated_serializer(serializer_class, data=data)
+        instance = serializer_class.Meta.model(**serializer.validated_data)
         shortcuts.check_permission(user, instance, action_name)
         instance.save()
         return response.Response(response.Success_Created, serializer_class(instance).data)
@@ -143,13 +144,11 @@ def update(serializer_class, action_name="update"):
     """
     @detailed_entry(name=action_name, methods=["post"])
     def entry(user, data, pk):
-        serializer, instance = shortcuts.get_deserialized(serializer_class, data)
-        real_instance = shortcuts.get_or_raise(serializer_class.Meta.model.objects.all(), pk)
-        shortcuts.check_permission(user, real_instance, action_name, instance)
-        
-        resp_serializer, new_instance = shortcuts.get_deserialized(serializer_class, real_instance, instance)
-        resp_serializer.save()
-        return response.Response(response.Success_Updated, resp_serializer.data)
+        instance = shortcuts.get_or_raise(serializer_class.Meta.model.objects.all(), pk)
+        shortcuts.check_permission(user, instance, action_name, data)
+        new_ser = shortcuts.get_validated_serializer(serializer_class, instance, data=data, partial=True)
+        new_ser.save()
+        return response.Response(response.Success_Updated, new_ser.data)
     
     return entry
     

@@ -51,27 +51,23 @@ class GroupField(models.Model):
         """
         return self.group.can_retrieve(user)
             
+            
+    def can_write(self, user):
+        """
+            Check whether `user` have write rights on a group field.
+            -> Only admins are allowed to do so.
+        """
+        try:
+            membership = GroupMember.objects.get_membership(self.group, user)
+            return membership.is_administrator or membership.is_super_administrator
+        except GroupMember.model.DoesNotExist:
+            return False
     
     def can_create(self, user):
-        """
-            Check whether `user` can create a group field.
-            Only admins are allowed to do so.
-        """
-        membership = GroupMember.model.get_membership(self.group, user)
-        return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
+        return self.can_write(user)
             
-    def can_update(self, user):
-        """
-            Check whether `user` can update a group field.
-            Only admins are allowed to do so.
-        """
-        membership = GroupMember.model.get_membership(self.group, user)
-        return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
+    def can_update(self, user, newvalues):
+        return self.can_write(user)
             
     def can_destroy(self, user):
-        """
-            Check whether `user` can destroy a group field.
-            Only admins are allowed to do so.
-        """
-        membership = GroupMember.model.get_membership(self.group, user)
-        return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
+        return self.can_write(user)
