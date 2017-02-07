@@ -4,13 +4,16 @@ from sigma_api.serializers import SerializerSet
 
 Chat = load_ressource("Chat")
 
-class ChatSerializerSet(SerializerSet):
+@serializers.set
+class ChatSerializerSet(serializers.drf.ModelSerializer):
 
-    class default(serializers.ModelSerializer):
-        """
-            Basic default serializer for a Chat.
-            Include all fields
-        """
+    class Meta:
+        model = Chat.model
+        exclude = ('is_full_group_chat',)
+
+
+    @serializers.sub
+    class list:
         class Meta:
-            model = Chat.model
-            exclude = ('is_full_group_chat',)
+            fields = None
+            #exclude = ('fields', )

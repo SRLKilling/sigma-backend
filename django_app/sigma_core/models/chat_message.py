@@ -3,11 +3,18 @@ from sigma_api.importer import load_ressource
 
 Chat = load_ressource("Chat")
 
+class ChatMessageQuerySet(models.QuerySet):
+
+    def get_messages_of_chat(self, chat):
+        return self.filter(chat=chat).order_by(created_date)
+
 class ChatMessage(models.Model):
     """
         Modelize a message in a chat of a group
     """
 
+    objects = ChatMessageQuerySet.as_manager()
+    
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#

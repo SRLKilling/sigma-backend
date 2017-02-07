@@ -4,13 +4,9 @@ from sigma_api.serializers import SerializerSet
 
 ChatMessage = load_ressource("ChatMessage")
 
-class ChatMessageSerializerSet(SerializerSet):
+@serializers.set
+class ChatMessageSerializerSet(serializers.drf.ModelSerializer):
 
-    class ChatMessageSerializer(serializers.ModelSerializer):
-        """
-            Basic default serializer for a ChatMessage.
-            Include all fields
-        """
-        class Meta:
-            model = ChatMessage.model
-            fields = '__all__'
+    class Meta:
+        model = ChatMessage.model
+        fields = '__all__'

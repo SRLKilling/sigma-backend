@@ -3,11 +3,16 @@ from sigma_api.importer import load_ressource
 
 User = load_ressource("User")
 
+class UserConnectionQuerySet(models.QuerySet):
+    pass
+
 class UserConnection(models.Model):
     """
         This model is used to represent connections between users.
         Two users are connected when they share a group in common
     """
+
+    objects = UserConnectionQuerySet.as_manager()
 
     #*********************************************************************************************#
     #**                                       Fields                                            **#
@@ -49,8 +54,8 @@ class UserConnection(models.Model):
     #*********************************************************************************************#
     #**                                      Methods                                            **#
     #*********************************************************************************************#
-    
-    
+
+
     @staticmethod
     def create_new_connections_gr(user,group):
         """
