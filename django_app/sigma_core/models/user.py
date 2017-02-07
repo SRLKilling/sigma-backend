@@ -9,12 +9,6 @@ UserConnection = load_ressource("UserConnection")
 
 # Basic user manager required by Django
 class UserManager(BaseUserManager):
-    def get_queryset(self):
-        return super().get_queryset()
-
-    def get_visible_users(self):
-        return self.get_queryset()
-
     def create_user(self, email, lastname, firstname, password=None):
         if not email:
             raise ValueError('Users must have an email address')
@@ -36,7 +30,7 @@ class UserManager(BaseUserManager):
 class UserQuerySet(models.QuerySet):
 
     def get_visible_users(self):
-        return self.get_queryset()
+        return self
 
 
 
@@ -49,6 +43,7 @@ class User(AbstractBaseUser):
     """
 
     objects = BaseUserManager.from_queryset(UserQuerySet)
+    
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
