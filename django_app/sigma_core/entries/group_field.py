@@ -5,19 +5,10 @@ GroupField = load_ressource("GroupField")
 
 class GroupFieldEntrySet(entries.EntrySet):
     
-    create = entries.create(
-        GroupField.serializer
-    )
+    create = entries.create()
     
-    retrieve = entries.retrieve(
-        GroupField.objects,
-        GroupField.serializer
-    )
+    retrieve = entries.retrieve()
     
-    update = entries.update(
-        GroupField.serializer
-    )
+    update = entries.update()
     
-    destroy = entries.destroy(
-        GroupField.objects
-    )
+    destroy = entries.destroy()

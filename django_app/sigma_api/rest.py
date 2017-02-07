@@ -18,11 +18,10 @@ toRestStatus[response.InvalidRequest] = status.HTTP_400_BAD_REQUEST
 #*********************************************************************************************#
 
 def entry_to_view(entry):
-    func = entry.func
     def view(self, request, *args, **kwargs):
         resp = None
         try:
-            resp = func(request.user, request.data, *args, **kwargs)
+            resp = entry(request.user, request.data, *args, **kwargs)
         except response.Response as r:
             resp = r
             
