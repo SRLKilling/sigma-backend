@@ -106,8 +106,6 @@ class GroupMember(models.Model):
 
 
     #*********************************************************************************************#
-    #**                                      Setters                                            **#
-    #*********************************************************************************************#
 
     @staticmethod
     def create(user, group, sa = False):
@@ -125,7 +123,6 @@ class GroupMember(models.Model):
 
         UserConnection.create_new_connections_gr(user, group)
         return member
-        
 
     #*********************************************************************************************#
     #**                                    Permissions                                          **#
@@ -140,7 +137,7 @@ class GroupMember(models.Model):
             * The member is not hidden, and the group is not public
             * The member is not hidden, and I'm connected to the member
         """
-        if user == self.user or GroupMember.is_member(self.group, user):
+        if user == self.user or GroupMember.objects.is_member(self.group, user):
             return True
 
         elif not self.hidden:

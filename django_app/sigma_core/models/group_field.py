@@ -3,7 +3,6 @@ from sigma_api.importer import load_ressource
 
 GroupMember = load_ressource("GroupMember")
 
-
 class GroupField(models.Model):
     """
         Modelize a group specific field.

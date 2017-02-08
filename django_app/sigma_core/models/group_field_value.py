@@ -35,36 +35,28 @@ class GroupFieldValue(models.Model):
         """
         return self.membership.can_retrieve(user)
             
+            
+    def can_write(self, user):
+        """
+            Checke whether `user` can write a field value.
+            The user must be the member himself, or an admin if the field is protected
+        """
+        try:
+            if not self.field.is_protected and self.membership.user == user:
+                return True
+                
+            membership = GroupMember.objects.get_membership(self.membership.group, user)
+            return (membership.is_administrator or membership.is_super_administrator)
+            
+        except GroupMember.model.DoesNotExist:
+            return False
+        
     
     def can_create(self, user):
-        """
-            Check whether `user` can create a group field.
-            Only admins are allowed to do so.
-        """
-        if not self.field.is_protected and self.membership.user == user:
-            return True
-            
-        membership = GroupMember.model.get_membership(self.membership.group, user)
-        return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
+        return self.can_write(user)
             
     def can_update(self, user):
-        """
-            Check whether `user` can update a group field.
-            Only admins are allowed to do so.
-        """
-        if not self.field.is_protected and self.membership.user == user:
-            return True
-            
-        membership = GroupMember.model.get_membership(self.membership.group, user)
-        return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
+        return self.can_write(user)
             
     def can_destroy(self, user):
-        """
-            Check whether `user` can destroy a group field.
-            Only admins are allowed to do so.
-        """
-        if not self.field.is_protected and self.membership.user == user:
-            return True
-            
-        membership = GroupMember.model.get_membership(self.membership.group, user)
-        return (membership != None) and (membership.is_administrator or membership.is_super_administrator)
+        return self.can_write(user)

@@ -10,7 +10,7 @@ MEMBER_NUM = (5, 50)
 ACKNOW_NUM = 700
 ACKNOW_INV_NUM = 500
 
-GROUP_FIELD_NUM = (1, 5)
+GROUP_FIELD_NUM = (1, 6)
 
 #*********************************************************************************************#
 #**                                  Useful methods                                         **#
@@ -143,7 +143,16 @@ def generateMember(group, user, sa):
     member['has_publish_right'] = member['is_administrator'] or randombool(0.2)
     member['has_kick_right'] = member['is_administrator'] or randombool(0.2)
     return JSONizer('sigma_core.groupmember', member)
+    
+def randomGroupFieldValue(member, field):
+    group_field_value = {}
+    group_field_value['membership'] = member
+    group_field_value['field'] = field
+    group_field_value['value'] = randomlower(8)
+    return JSONizer('sigma_core.groupfieldvalue', group_field_value)
 
+    
+    
 unique_akn = set()
 def randomAknowledgment():
     global unique_akn
@@ -186,13 +195,15 @@ def generateOAuthClient():
     client['name'] = "frontend"
     client['skip_authorization'] = False
 
-    return JSONizer('oauth2_provider.application',client)
+    return JSONizer('oauth2_provider.application', client)
 
 #*********************************************************************************************#
 #**                                          Main                                           **#
 #*********************************************************************************************#
 
 def generateFixtures(filepath):
+    global primary_keys
+    
     print('Generating fixtures :')
     f = open(filepath, 'w')
     f.write('[')
@@ -209,12 +220,15 @@ def generateFixtures(filepath):
         f.write( randomGroup() )
 
     print('OK\n  Generating group fields.. ', end='')
+    group_fields = {}
     for i in range(1, GROUP_NUM):
         group_fields_num = random.randint(GROUP_FIELD_NUM[0], GROUP_FIELD_NUM[1])
+        group_fields[i] = []
         for j in range(group_fields_num):                                     # Generate group_fields
             f.write( randomGroupField(i) )
+            group_fields[i].append(primary_keys["sigma_core.groupfield"])
 
-    print('OK\n  Generating memberships.. ', end='')
+    print('OK\n  Generating memberships and field values.. ', end='')
     for i in range(1, GROUP_NUM):
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
@@ -222,6 +236,19 @@ def generateFixtures(filepath):
             member = randint_norepeat(members, 1, USER_NUM)
             members.append(member)
             f.write( generateMember(i, member, (j==0)) )
+            
+            group_fields_value_num = random.randint(1, len(group_fields[i]))    # Generate group field values
+            already_selected_fields = []
+            for k in range(0, group_fields_value_num):
+                while True:
+                    field = random.choice(group_fields[i])
+                    if not field in already_selected_fields:
+                        break
+                already_selected_fields.append(field)
+                f.write( randomGroupFieldValue(member, field) )
+        
+        
+        
 
     print('OK\n  Generating aknowledgment... ', end='')
     for i in range(1, ACKNOW_NUM):                                       # Generate aknowledgments

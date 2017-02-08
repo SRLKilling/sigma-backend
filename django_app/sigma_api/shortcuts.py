@@ -34,6 +34,13 @@ def get_validated_serializer(serializer_class, *args, **kwargs):
         raise response.InvalidRequestException(serializer.errors)
     return serializer
     
+def get_deserialized_instance(serializer_class, *args, **kwargs):
+    """
+        Create a new model instance from the deserialized data
+    """
+    serializer = get_validated_serializer(serializer_class, *args, **kwargs)
+    instance = serializer_class.Meta.model(**serializer.validated_data)
+    return instance
     
 def call_method_if_exists(obj, name, *args, **kwargs):
     """
@@ -70,6 +77,7 @@ def get_queryset(queryset_gen, user, data):
         return queryset_gen.all()
     else:
         return queryset_gen(user)
+        
         
 
 #*********************************************************************************************#
@@ -109,8 +117,7 @@ def create(user, data, serializer_class, action_name):
         It deserialize the data using the provided serializer_class,
         Then check for permissions, and save the object in the database
     """
-    serializer = get_validated_serializer(serializer_class, data=data)
-    instance = serializer_class.Meta.model(**serializer.validated_data)
+    instance = get_deserialized_instance(serializer_class, data=data)
     check_permission(user, instance, action_name)
     instance.save()
     return response.Response(response.Success_Created, serializer_class(instance).data)    

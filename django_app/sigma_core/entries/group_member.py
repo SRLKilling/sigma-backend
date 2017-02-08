@@ -5,24 +5,14 @@ GroupMember = load_ressource("GroupMember")
 
 class GroupMemberEntrySet(entries.EntrySet):
     
-    create = entries.create(
-        GroupMember.serializers.default
-    )
-    
     list = entries.list(
-        GroupMember.objects.for_user,
-        GroupMember.serializers.default
+        queryset = GroupMember.objects.for_user
     )
     
     retrieve = entries.retrieve(
-        GroupMember.objects,
-        GroupMember.serializers.default
+        serializer = GroupMember.serializers.retrieve
     )
     
-    update = entries.update(
-        GroupMember.serializers.default
-    )
+    update = entries.update()
     
-    destroy = entries.destroy(
-        GroupMember.objects
-    )
+    destroy = entries.destroy()

@@ -126,7 +126,7 @@ class EntrySet():
         entries[name] = cls
         
     @classmethod
-    def get_queryset(cls, qs):
+    def get_queryset(cls, qs = None):
         if qs != None:
             return qs
         if hasattr(cls, "default_queryset"):
@@ -137,7 +137,7 @@ class EntrySet():
             raise ValueError("Cannot automatically retrieve entryset queryset, must specify 'default_queryset', or 'ressource' class attribute")
     
     @classmethod
-    def get_serializer(cls, ser):
+    def get_serializer(cls, ser = None):
         if ser != None:
             return ser
         if hasattr(cls, "default_serializer"):
