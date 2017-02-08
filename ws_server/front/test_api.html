@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<title>Sigma WS test</title>
+		<style>
+			div {
+				border: 1px solid black;
+				padding: 7px;
+				margin: 4px;
+			}
+		</style>
+		
+		<script src="websocket_front.js"></script>
+		<script src="test_api.js"></script>
+		<script>
+			ressources = new RessourceList();
+			ressources.add("Group", [
+				["number", "Cle primaire", "pk", ""],
+				["text", "Nom", "name", ""],
+			]);
+			ressources.add("GroupField", [
+				["number", "Group", "group", ""],
+				["text", "Nom", "name", ""],
+				["number", "Type", "type", ""],
+				["text", "Accept regex", "accept", ""],
+				["text", "Protected", "protected", ""],
+				["text", "Multiple values allowed", "multiple_values_allowed", ""]
+			]);
+		</script>
+	</head>
+	<body onload="onload();">
+	
+		<div>
+			<label for="token">Token :</label>
+			<input type="text" name="token" id="token" value="Test"/>
+			<button onclick="sendAuth()">S'authentifier</button>
+			<div id="authresp"></div>
+		</div>
+		
+		<div id="form_chooser"></div>
+		<div id="form_container"></div>
+		<div id="actions">
+			<span>Will send to <b>/loc/?pk/action</b> or <b>/loc/?pk</b> for standard actions</span><br />
+			<input id="action_location" name="action_location" placeholder="loc"/>
+			<input id="action_name" name="action_name" placeholder="action"/>
+			<input id="action_pk" name="action_pk" placeholder="pk"/>
+			<button onclick="send();return false;">Send</button>
+		</div>
+		<div id="response"></div>
+	</body>
+</html>

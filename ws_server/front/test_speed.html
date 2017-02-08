@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<title>Sigma WS test</title>
+		<style>
+			div {
+				border: 1px solid black;
+				padding: 7px;
+				margin: 4px;
+			}
+		</style>
+		
+		<script src="websocket_front.js"></script>
+		<script>
+			WS = new SigmaWS("ws://localhost:80/ws");
+			
+			function sendAuth() {
+				token = document.getElementById("token").value;
+				transaction = new AuthenticationTransaction(WS, token);
+				transaction.onmessage = function(resp) {
+					if(resp.code == 0) document.getElementById("authresp").innerHTML = "Successfully identified";
+					else if(resp.code == 112) document.getElementById("authresp").innerHTML = "Identification error";
+				}
+				transaction.sendOriginalMessage();
+			}
+			
+			function testREST() {
+				N = document.getElementById("ws_mess_num").value;
+				sendREST(N)
+			}
+			function sendREST(N) {
+				if(N <= 0) return;
+				
+				transaction = new RESTTransaction(WS, "", "");
+				transaction.onmessage = function(resp) {
+					d = performance.now() - this.s;
+					addRESTVal(d);
+					sendREST(N-1);
+				}
+				transaction.s = performance.now();
+				transaction.sendOriginalMessage();
+			}
+			ws_rest_count = 0
+			ws_rest_sum = 0
+			function addRESTVal(v) {
+				ws_rest_sum += v;
+				ws_rest_count += 1;
+				document.getElementById("RESTtime").innerHTML = (ws_rest_sum / ws_rest_count) + "ms";
+			}
+			
+			
+			
+			function testRESThttp() {
+				N = document.getElementById("http_mess_num").value;
+				sendRESThttp(N)
+			}
+			function sendRESThttp(N) {
+				if(N <= 0) return;
+				
+				var xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						d = performance.now() - this.starttime;
+						addRESThttpVal(d);
+						sendRESThttp(N-1)
+					}
+				};
+				xhttp.starttime = performance.now();
+				xhttp.open("GET", "http://localhost:8000/group/", true);
+				xhttp.setRequestHeader("Authorization", "Bearer Test");
+				xhttp.send();
+			}
+			http_rest_count = 0
+			http_rest_sum = 0
+			function addRESThttpVal(v) {
+				http_rest_sum += v;
+				http_rest_count += 1;
+				document.getElementById("RESTtimehttp").innerHTML = (http_rest_sum / http_rest_count) + "ms";
+			}
+		</script>
+		
+	</head>
+	<body>
+	
+		<div>
+			<label for="token">Token :</label>
+			<input type="text" name="token" id="token" value="Test"/>
+			<button onclick="sendAuth()">S'authentifier</button>
+			<div id="authresp"></div>
+		</div>
+		
+		<div>
+			<button onclick="testREST()">Tester l'api REST par WS</button> <input name="ws_mess_num" id="ws_mess_num" value="500"/>
+			<span id="RESTtime"></span>
+		</div>
+		<div>
+			<button onclick="testRESThttp()">Tester l'api REST par http</button> <input name="http_mess_num" id="http_mess_num" value="500"/>
+			<span id="RESTtimehttp"></span>
+		</div>
+		
+		<!--<div>
+			<label for="room">Room : </label><input type="text" name="room" id="room"/><br />
+			<label for="message">Message : </label><br />
+			<textarea name="message" id="message"/></textarea><br />
+			<button onclick="sendMessage()">Envoyer le message</button>
+		</div>-->
+
+	</body>
+</html>

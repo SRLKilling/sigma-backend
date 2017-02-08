@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<title>Sigma WS test</title>
+		<style>
+			div {
+				border: 1px solid black;
+				padding: 7px;
+				margin: 4px;
+			}
+		</style>
+		
+		<script src="websocket_front.js"></script>
+		<script>
+			var WS;
+			
+			function sendAuth() {
+				transaction = new AuthenticationTransaction(WS, "Test");
+				transaction.onmessage = function(resp) {
+					sendREST();
+				}
+				transaction.sendOriginalMessage();
+			}
+			
+			function sendREST() {
+				transaction = new RESTTransaction(WS, "", "");
+				transaction.onmessage = function(resp) {}
+				transaction.sendOriginalMessage();
+			}
+			
+			function onload() {
+				WS = new SigmaWS("ws://localhost:80/ws");
+				WS.onevent = function(msg) {
+					document.getElementById("resp").innerHTML += JSON.stringify(msg) + "<br />";
+				}
+				WS.ws.onopen = function() {
+					sendAuth();
+				}
+			}
+		</script>
+		
+	</head>
+	<body onload="onload();">
+		<!--<div>
+			<label for="room">Room : </label><input type="text" name="room" id="room"/><br />
+			<label for="message">Message : </label><br />
+			<textarea name="message" id="message"/></textarea><br />
+			<button onclick="sendMessage()">Envoyer le message</button>
+		</div>-->
+		
+		<div id="resp"></div>
+
+	</body>
+</html>
