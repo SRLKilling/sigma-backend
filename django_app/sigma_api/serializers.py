@@ -42,8 +42,10 @@ def set(cls):
         sub = cls.__dict__[n]
         if isinstance(sub, type) and hasattr(sub, "__sub_serializer"):
             setattr(cls, n, inherited_sub(sub))
-            
-    setattr(cls, "default", cls)
+       
+    if not hasattr(cls, "default"):
+        setattr(cls, "default", cls)
+        
     return cls
     
     
