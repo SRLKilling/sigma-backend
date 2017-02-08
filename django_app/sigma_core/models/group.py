@@ -6,12 +6,12 @@ Acknowledgment = load_ressource("Acknowledgment")
 
 
 class GroupQuerySet(models.QuerySet):
-    
+
     def user_can_see(self, user):
         """ Filter to get all group a user can see (member, or member of acknowledging group, or public) """
         membersof = GroupMember.objects.for_user(user).values('group')
         memberof_acknowledged = Acknowledgment.objects.filter(acknowledged_by__in=membersof).values('acknowledged')
-        
+
         return self.filter(
             models.Q(pk__in = membersof) |
             models.Q(pk__in = memberof_acknowledged) |
@@ -32,9 +32,9 @@ class Group(models.Model):
     """
         This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
     """
-    
+
     objects = GroupQuerySet.as_manager()
-    
+
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
@@ -76,11 +76,9 @@ class Group(models.Model):
     def __str__(self):
         return 'Group %d : %s' % (self.pk, self.name)
 
-        
-        
-        
-        
-        
+
+
+
     #*********************************************************************************************#
     #**                                      Methods                                            **#
     #*********************************************************************************************#

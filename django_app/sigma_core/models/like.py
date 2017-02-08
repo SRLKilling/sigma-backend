@@ -1,5 +1,5 @@
 from django.db import models
-from sigma_core.importer import load_ressource
+from sigma_api.importer import load_ressource
 
 class Like(models.Model):
     """
