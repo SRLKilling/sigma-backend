@@ -14,7 +14,7 @@ class ChatMessage(models.Model):
     """
 
     objects = ChatMessageQuerySet.as_manager()
-    
+
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
@@ -23,18 +23,6 @@ class ChatMessage(models.Model):
     chat = models.ForeignKey('Chat', related_name='messages')
     created_date = models.DateTimeField(auto_now_add=True)
     message = models.TextFIeld(Defaul="")
-
-
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    @staticmethod
-    def get_group_chat_messages_qs(group):
-        c_list = Chat.model.objects.get(group=group)
-        return c_list.order_by('created_date')
-
 
 
     #*********************************************************************************************#

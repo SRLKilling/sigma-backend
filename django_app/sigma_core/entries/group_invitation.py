@@ -1,5 +1,6 @@
-from sigma_api import entries, response
+from sigma_api import entries, response,shortcuts
 from sigma_api.importer import load_ressource
+
 
 GroupInvitation = load_ressource("GroupInvitation")
 GroupMember = load_ressource("GroupMember")
@@ -13,7 +14,7 @@ class GroupInvitationEntrySet(entries.EntrySet):
 
     @entries.detailed_entry(bind_set=True, methods=["post"]))
     def create(self, user, data):
-        serializer = get_validated_serializer(GroupInvitation.serializer, data=data)
+        serializer = shortcuts.get_validated_serializer(GroupInvitation.serializer, data=data)
         instance = GroupInvitation.model(**serializer.validated_data)
         check_permission(user, instance, action_name)
         if instance.user==user:

@@ -16,7 +16,7 @@ class ChatMember(models.Model):
         unique_together = (("user", "chat"),)
 
     objects = ChatMemberQuerySet.as_manager()
-    
+
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
@@ -24,11 +24,6 @@ class ChatMember(models.Model):
     user = models.ForeignKey('User', related_name='chats')
     chat = models.ForeignKey('Chat', related_name='members')
     join_date = models.DateTimeField(auto_now_add=True)
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
 
     #*********************************************************************************************#
     #**                                    Permissions                                          **#
