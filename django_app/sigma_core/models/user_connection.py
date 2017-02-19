@@ -2,9 +2,26 @@ from django.db import models
 from sigma_api.importer import load_ressource
 
 User = load_ressource("User")
+Group = load_ressource("Group")
 
 class UserConnectionQuerySet(models.QuerySet):
-    pass
+
+    def connections_to(self,user):
+        return self.filter(models.Q(user1=user) | models.Q(user2=user))
+
+    def are_connected(self,user1,user2):
+        return self.get(models.Q(user1=user1) && models.Q(user2=user2)).exists()
+            or self.get(models.Q(user1=user2) && models.Q(user2=user1)).exists()
+
+    def get_connection(self,user1,user2):
+        if not are_connected(user1,user2):
+            return None
+        else:
+            if self.get(models.Q(user1=user1) && models.Q(user2=user2)).exists():
+                return self.get(models.Q(user1=user1) && models.Q(user2=user2))
+            else:
+                return self.get(models.Q(user1=user2) && models.Q(user2=user1))
+
 
 class UserConnection(models.Model):
     """
@@ -29,28 +46,6 @@ class UserConnection(models.Model):
         return 'Connection %d between %s and %s' % (self.pk, self.user1,self.user2)
 
 
-
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    @staticmethod
-    def get_user_connections_qs(user):
-        """
-            Returns a queryset containing a user's connections
-        """
-        return UserConnection.objects.filter( models.Q(user1=user1) or models.Q(user2=user1) )
-
-    @staticmethod
-    def are_users_connected(user1,user2):
-        """
-            Returns True if user1 and user2 are connected
-        """
-        return UserConnection.objects.filter( models.Q(user1=user1,user2=user2) or models.Q(user1=user2,user2=user1) ).exists()
-
-
-
     #*********************************************************************************************#
     #**                                      Methods                                            **#
     #*********************************************************************************************#
@@ -63,29 +58,25 @@ class UserConnection(models.Model):
             This static method is not an API entry. It is used by others views :
             * GroupMember once someone joins a new group
         """
-        group_users = User.model.objects.filter(group=group)
+        group_users = User.objects.filter(group=group)
         for u in group_users:
-            if not (UserConnection.objects.filter(user1=user,user2=u).exists() or UserConnection.objects.filter(user1=u,user2=user).exists()):
+            uc = UserConnection.objects.get_connection(user,u)
+            if not uc:
                 UserConnection(user1=user,user2=u).save()
             else:
-                if UserConnection.objects.filter(user1=user,user2=u).exists():
-                    UserConnection.objects.filter(user1=user,user2=u).nb_of_common_groups+=1
-                else:
-                    UserConnection.objects.filter(user1=u,user2=user).nb_of_common_groups+=1
-
+                uc.nb_of_common_groups+=1
 
 
     @staticmethod
     def destroy_gr(user, group):
         """
-            This static method is not an API entry. It is used by others views :
+            This static method is not an API entry. It is used by others entries :
             * GroupMember when someone quits a group
         """
-        group_users = User.model.objects.filter(group=group)
+        group_users = User.objects.filter(group=group)
         for u in group_users:
-            connection = UserConnection.objects.get(user1=user,user2=u)
-            if not connection:
-                connection = UserConnection.objects.get(user1=u,user2=user)
-            connection.nb_of_common_groups-=1
-            if connection.nb_of_common_groups<=0:
-                connection.destroy()
+            uc = UserConnection.objects.get_connection(user,u)
+            if uc:
+                uc.nb_of_common_groups-=1
+            if uc.nb_of_common_groups<=0:
+                uc.destroy()

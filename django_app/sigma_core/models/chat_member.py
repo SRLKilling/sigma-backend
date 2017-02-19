@@ -6,6 +6,9 @@ class ChatMemberQuerySet(models.QuerySet):
     def get_members_of_chat(self, chat):
         return self.filter(chat=chat).order_by(join_date)
 
+    def is_chat_member(self, user, chat):
+        return self.get(user=user, chat=chat).exists()
+
 
 class ChatMember(models.Model):
     """
@@ -32,11 +35,11 @@ class ChatMember(models.Model):
     #can't destroy if it's the chat of a whole group -> chat.is_full_group_chat
 
     def can_retrieve(self, user):
-        return user in self.chat.get_members_qs()
+        return ChatMember.objects.is_chat_member(user, self.chat)
 
     def can_destroy(self, user):
-        return user in self.chat.get_members_qs() and (not self.chat.is_full_group_chat or not self.chat.group)
+        return ChatMember.objects.is_chat_member(user, self.chat) and (not self.chat.is_full_group_chat or not self.chat.group)
 
     def can_create(self, user):
         # with the unique_together we're sure that you can't add someone that's already in the group
-        return user in self.chat.get_members_qs() and (not self.chat.is_full_group_chat or not self.chat.group)
+        return ChatMember.objects.is_chat_member(user, self.chat) and (not self.chat.is_full_group_chat or not self.chat.group)

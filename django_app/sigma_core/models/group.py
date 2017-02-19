@@ -23,7 +23,7 @@ class GroupQuerySet(models.QuerySet):
         return self.filter(pk__in = Acknowledgment.objects.acknowledged_by(group))
 
     def acknowledging(self, group):
-        """ Filter all groups that are aknowledged by a given one """
+        """ Filter all groups that are aknowledging by a given one """
         return self.filter(pk__in = Acknowledgment.objects.acknowledging(group))
 
 

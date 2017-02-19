@@ -6,7 +6,7 @@ User = load_ressource("User")
 class UserEntrySet(entries.EntrySet):
 
     list = entries.list(
-        User.objects.user_can_see,
+        User.objects.get_visible_users,
         User.serializers.list
     )
 

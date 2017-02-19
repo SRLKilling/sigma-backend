@@ -25,14 +25,18 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-        
+
 
 class UserQuerySet(models.QuerySet):
 
-    def get_visible_users(self):
-        return self
+    def get_visible_users(self, user):
 
+        #without user_connection
+        #groups_qs = Group.user_can_see(user)
+        #return User.filter(groupMember__group__in = group_qs)
 
+        user_connections_qs = UserConnection.objects.connections_to(user)
+        return self.filter(userconnection__in = user_connections_qs)
 
 class User(AbstractBaseUser):
     """
@@ -43,7 +47,7 @@ class User(AbstractBaseUser):
     """
 
     objects = BaseUserManager.from_queryset(UserQuerySet)
-    
+
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
@@ -81,17 +85,6 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    def is_connected_to(self, user):
-        return UserConnection.model.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
-
-    def get_connected_users_qs():
-        """ Returns a queryset containing all the users a user is connected to """
-        return User.objects.filter(pk__in = UserConnection.model.get_user_connections_qs(user))                            # ADD shared group
 
 
     #*********************************************************************************************#
