@@ -21,7 +21,9 @@ class GroupEntrySet(entries.EntrySet):
         #Can we access easily data.group without deserializing?
         serializer = shortcuts.get_validated_serializer(Group.serializer, data=data)
         group = Group.model(**serializer.validated_data)
-        GroupMember.create_admin(user, group)
+        GroupMember.models.create_admin(user, group)
+        Chat.models.create_chat(user,group)
+        ChatMember.models.add_new_member(user,group)
         return shortcuts.create(user, data, self.get_serializer(None), "create")
 
     # update_right = entries.update(
