@@ -33,27 +33,7 @@ class Chat(models.Model):
     # Accessible qs from ForeignKeys
     # "messages" from chat_message
     # "members" from chat_member
-    # Use the methods below instead -> sorted
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    def get_chat_messages_qs(self):
-
-
-    def get_members_qs(self):
-        return self.members.order_by('join_date')
-
-
-    @staticmethod
-    def get_group_chats_qs(group):
-        return Chat.objects.filter(group=group)
-
-    @staticmethod
-    def get_user_chats(user):
-        cm_list=ChatMember.objects.filter(user=user)
-        return [cm.chat for cm in cm_list]
+    
 
     #*********************************************************************************************#
     #**                                    Permissions                                          **#

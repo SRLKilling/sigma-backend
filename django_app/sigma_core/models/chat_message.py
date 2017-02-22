@@ -2,6 +2,7 @@ from django.db import models
 from sigma_api.importer import load_ressource
 
 Chat = load_ressource("Chat")
+ChatMember = load_ressource("ChatMember")
 
 class ChatMessageQuerySet(models.QuerySet):
 
@@ -14,7 +15,7 @@ class ChatMessage(models.Model):
     """
 
     objects = ChatMessageQuerySet.as_manager()
-    
+
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
@@ -22,19 +23,7 @@ class ChatMessage(models.Model):
     user = models.ForeignKey('User', related_name='my_chat_messages')
     chat = models.ForeignKey('Chat', related_name='messages')
     created_date = models.DateTimeField(auto_now_add=True)
-    message = models.TextFIeld(Defaul="")
-
-
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    @staticmethod
-    def get_group_chat_messages_qs(group):
-        c_list = Chat.model.objects.get(group=group)
-        return c_list.order_by('created_date')
-
+    message = models.TextFIeld(Default="")
 
 
     #*********************************************************************************************#
@@ -42,4 +31,4 @@ class ChatMessage(models.Model):
     #*********************************************************************************************#
 
     def can_create(self, user):
-        return user in self.chat.get_members_qs()
+        return ChatMember.objects.is_chat_member(user, self.chat)

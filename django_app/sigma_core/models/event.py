@@ -1,12 +1,40 @@
 from django.db import models
 from sigma_api.importer import load_ressource
+import datetime
 
 Participation = load_ressource("Participation")
 
+class EventQuerySet(models.QuerySet):
+
+    def sort(self):
+        return self.order_by('date_start')
+
+    def created_by(self, user):
+        return self.filter(author=user)
+
+    def visible(self, user):
+        # TODO
+        return self
+
+    def interesting(self, user):
+        events = Participation.model.objects.filter(user=user).values("event")
+        return self.filter(pk__in=events).order_by('date_start')
+
+    def past(self):
+        return self.filter(date_end__lte=datetime.datetime.now())
+
+    def future(self):
+        return self.filter(date_end__gte=datetime.datetime.now())
+
+    def between(self, start, end):
+        r1 = self.filter(date_start__gt=start, date_start__lt=end)
+        r2 = self.filter(date_end__gt=start, date_end__lt=end)
+        r3 = self.filter(date_start__lte=start, date_end__gte=end)
+        return r1 | r2 | r3
+
 class Event(models.Model):
-    """
-        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
-    """
+
+    objects = EventQuerySet.as_manager()
 
     #*********************************************************************************************#
     #**                                       Fields                                            **#
@@ -61,41 +89,6 @@ class Event(models.Model):
     # Remove the event
     def remove(self):
         self.delete()
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    @staticmethod
-    def events_created(user):
-        return Event.objects.filter(author=user)
-
-    @staticmethod
-    def get_events(user):
-    # TODO : all visible events
-        events = Participation.model.objects.filter(user=user).values("event").all()
-        return Event.objects.filter(pk__in=events)
-
-    @staticmethod
-    def events_interesting(user):
-        events = Participation.model.objects.filter(user=user).values("event").all()
-        return Event.objects.filter(pk__in=events)
-
-    @staticmethod
-    def n_events(user, n):
-        return Event.events(user).order_by('date_start').all()[n:]
-
-    @staticmethod
-    def n_events_interesting(user, n):
-        return Event.events_interesting(user).order_by('date_start').all()[n:]
-
-    @staticmethod
-    def events_date(user, start, end):
-        return Event.events(user).filter(date_start__gte=start).filter(date_end__lte=end).all()
-
-    @staticmethod
-    def events_interesting_date(user, start, end):
-        return Event.events_interesting(user).filter(date_start__gte=start).filter(date_end__lte=end).all()
 
     #*********************************************************************************************#
     #**                                      Methods                                            **#

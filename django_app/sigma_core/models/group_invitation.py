@@ -3,6 +3,18 @@ from sigma_api.importer import load_ressource
 
 GroupMember = load_ressource("GroupMember")
 
+class GroupInvitationQuerySet(models.QuerySet):
+
+    def get_user_invitations(self,user):
+        """ Return a queryset containing the list of invitations where `user` is the invitee
+            `user` can be a model instance, or a primary key """
+        return self.filter(invitee = user).order_by(date)
+
+    def get_group_invitations_qs(self,group):
+        """ Return a queryset containing the list of invitations where `group` is the inviter group
+            `group` can be a model instance, or a primary key """
+        return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=False))
+
 class GroupInvitation(models.Model):
     """
         Modelize an invitation to a group.
@@ -10,7 +22,7 @@ class GroupInvitation(models.Model):
         Invitation have a short life-time.
         As soon as someone accepts or declines the invitation, the instance is destroyed.
     """
-    
+
     #*********************************************************************************************#
     #**                                       Fields                                            **#
     #*********************************************************************************************#
@@ -20,44 +32,19 @@ class GroupInvitation(models.Model):
 
     group = models.ForeignKey('Group', related_name='invitations')
     invitee = models.ForeignKey('User', related_name='invitations')
-    
+
     """ Represents whether the invitation has been issued by the invitee or the inviter """
     issued_by_invitee = models.BooleanField(default=True)
-    
+
     """ The date the invitation has been issued """
     date = models.DateTimeField(auto_now_add=True)
-    
-    
-    
-    
-    #*********************************************************************************************#
-    #**                                       Getters                                           **#
-    #*********************************************************************************************#
-            
-            
-    @staticmethod
-    def get_user_invitations_qs(user):
-        """ Return a queryset containing the list of invitations where `user` is the invitee
-            `user` can be a model instance, or a primary key """
-        if type(user) != int:
-            user = user.pk
-        return GroupInvitation.objects.filter(invitee = user)
-            
-    @staticmethod
-    def get_group_invitations_qs(group):
-        """ Return a queryset containing the list of invitations where `group` is the inviter group
-            `group` can be a model instance, or a primary key """
-        if type(group) != int:
-            group = group.pk
-        return GroupInvitation.objects.filter(group = group)
-        
-    
-    
+
+
     #*********************************************************************************************#
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
-    
-    
+
+
     def can_retrieve(self, user):
         """ Check whether `user` can retrieve the invitation.
             True in the following cases
@@ -66,25 +53,25 @@ class GroupInvitation(models.Model):
         """
         if user == self.invitee:
             return True
-        
+
         else:
-            user_mb = GroupMember.model.get_membership(user, self.group)
+            user_mb = GroupMember.objects.get_membership(user, self.group)
             return user_mb != None and user_mb.has_invite_right
-            
-    
+
+
     def can_create(self, user):
         """ Check whether `user` can create the invitation.
             * If the invitation is issued by the invitee, the group must allow users to ask for invitations.
             * Otherwise, the inviter must have the corresponding right.
-        """            
+        """
         if self.issued_by_invitee:
-            return (self.inviteee == user) and (self.group.can_anyone_ask)
-            
+            return (self.invitee == user) and (self.group.can_anyone_ask)
+
         else:
-            inviter_mb = GroupMember.model.get_membership(user, self.group)
+            inviter_mb = GroupMember.objects.get_membership(user, self.group)
             return inviter_mb != None and inviter_mb.has_invite_right
-            
-            
+
+
     def can_accept(self, user):
         """ Check wheter `user` can accept the invitation.
             * If the invition is issued by invitee, `user` must be a member with invite right
@@ -92,12 +79,12 @@ class GroupInvitation(models.Model):
         """
         if not self.issued_by_invitee:
             return user == self.invitee
-            
+
         else:
-            user_mb = GroupMember.model.get_membership(user, self.group)
+            user_mb = GroupMember.objetcs.get_membership(user, self.group)
             return user_mb != None and user_mb.has_invite_right
-            
-            
+
+
     def can_destroy(self, user):
         """ Check whether `user` can destroy, i.e. decline, the invitation.
             Same as can_retrieve
@@ -107,8 +94,7 @@ class GroupInvitation(models.Model):
         """
         if user == self.invitee:
             return True
-        
+
         else:
-            user_mb = GroupMember.model.get_membership(user, self.group)
+            user_mb = GroupMember.objects.get_membership(user, self.group)
             return user_mb != None and user_mb.has_invite_right
-    

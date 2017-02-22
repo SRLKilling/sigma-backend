@@ -9,11 +9,11 @@ class ChatSerializerSet(serializers.drf.ModelSerializer):
 
     class Meta:
         model = Chat.model
-        exclude = ('is_full_group_chat',)
+        #exclude = ('is_full_group_chat',)
 
 
     @serializers.sub
     class list:
         class Meta:
             fields = None
-            #exclude = ('fields', )
+            exclude = ('is_full_group_chat', 'group')

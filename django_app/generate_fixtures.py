@@ -10,7 +10,15 @@ MEMBER_NUM = (5, 50)
 ACKNOW_NUM = 700
 ACKNOW_INV_NUM = 500
 
-GROUP_FIELD_NUM = (1, 6)
+EVENT_NUM = 50
+PUBLICATION_NUM = 200
+SHARED_NUM = 4
+PARTICIPATION_NUM = 10
+COMMENT_NUM = 10
+LIKE_NUM = 50
+TAG_NUM = 20
+
+GROUP_FIELD_NUM = (1, 5)
 
 #*********************************************************************************************#
 #**                                  Useful methods                                         **#
@@ -74,8 +82,10 @@ def randint_norepeat(l, a, b):
     return c
 
 def randomdate():
-    return "2016-05-08T15:35:59.028Z";
-
+    s=[str(random.randint(1,9)) for i in range(12)]
+    p=[str(random.randint(0,5)) for i in range(2)]
+    d="20"+s[0]+s[1]+"-0"+s[2]+"-0"+s[3]+"T1"+s[4]+":"+p[0]+s[6]+":"+p[1]+s[8]+".008Z"
+    return d
 
 #*********************************************************************************************#
 #**                                Random model generators                                  **#
@@ -105,7 +115,7 @@ def randomUser():
     user["is_staff"] = False
     return JSONizer('sigma_core.user', user)
 
-    
+
 
 def randomGroup():
     group = {}
@@ -118,6 +128,66 @@ def randomGroup():
     group['group_visibility'] = random.randint(0, 2)
     return JSONizer('sigma_core.group', group)
 
+def randomEvent(user):
+    event = {}
+    event['name'] = randomlower(10)
+    event['description'] = randomlower(50)
+    event['date_start'] = randomdate()
+    event['date_end'] = randomdate()
+    event['place_name'] = randomlower(20)
+    event['author'] = user
+    return JSONizer('sigma_core.event', event)
+
+def randomParticipation(user, event):
+    part = {}
+    part['user'] = user
+    part['event'] = event
+    part['status'] = random.randint(0, 1)
+    return JSONizer('sigma_core.participation', part)
+
+def randomPublication(user, group, event = 0):
+    publication = {}
+    publication['group'] = group
+    publication['author'] = user
+    if event:
+        publication['related_event'] = event
+    publication['date'] = randomdate()
+    publication['title'] = randomlower(15)
+    publication['content'] = randomlower(100)
+    publication['internal'] = randombool(0.8)
+    publication['last_commented'] = randomdate()
+    return JSONizer('sigma_core.publication', publication)
+
+def randomTag(user, publication):
+    tag = {}
+    tag['user'] = user
+    tag['publication'] = publication
+    tag['tagged'] = random.randint(1, USER_NUM)
+    return JSONizer('sigma_core.tag', tag)
+
+def randomLike(user, publication):
+    like = {}
+    like['user'] = user
+    like['publication'] = publication
+    return JSONizer('sigma_core.like', like)
+
+def randomComment(user, publication):
+    comment = {}
+    comment['publication'] = publication
+    comment['user'] = user
+    comment['date'] = randomdate()
+    comment['comment'] = randomlower(random.randint(50, 1000))
+    return JSONizer('sigma_core.comment', comment)
+
+
+def share(publication, group):
+    shared = {}
+    shared['group'] = group
+    shared['publication'] = publication
+    shared['date'] = randomdate()
+    date = randomdate()
+    return JSONizer('sigma_core.sharedpublication', shared)
+
 def randomGroupField(group):
     group_field = {}
     group_field['group'] = group
@@ -127,8 +197,6 @@ def randomGroupField(group):
     group_field['protected'] = randombool(0.5)
     group_field['multiple_values_allowed'] = randombool(0.2)
     return JSONizer('sigma_core.groupfield', group_field)
-    
-    
 
 def generateMember(group, user, sa):
     member = {}
@@ -143,7 +211,7 @@ def generateMember(group, user, sa):
     member['has_publish_right'] = member['is_administrator'] or randombool(0.2)
     member['has_kick_right'] = member['is_administrator'] or randombool(0.2)
     return JSONizer('sigma_core.groupmember', member)
-    
+
 def randomGroupFieldValue(member, field):
     group_field_value = {}
     group_field_value['membership'] = member
@@ -151,8 +219,8 @@ def randomGroupFieldValue(member, field):
     group_field_value['value'] = randomlower(8)
     return JSONizer('sigma_core.groupfieldvalue', group_field_value)
 
-    
-    
+
+
 unique_akn = set()
 def randomAknowledgment():
     global unique_akn
@@ -203,7 +271,7 @@ def generateOAuthClient():
 
 def generateFixtures(filepath):
     global primary_keys
-    
+
     print('Generating fixtures :')
     f = open(filepath, 'w')
     f.write('[')
@@ -228,15 +296,21 @@ def generateFixtures(filepath):
             f.write( randomGroupField(i) )
             group_fields[i].append(primary_keys["sigma_core.groupfield"])
 
+<<<<<<< HEAD
     print('OK\n  Generating memberships and field values.. ', end='')
     for i in range(1, GROUP_NUM):
+=======
+    print('OK\n  Generating memberships.. ', end='')
+    for i in range(1, GROUP_NUM + 1):
+>>>>>>> refs/remotes/origin/newarchi
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
         for j in range(member_num):                                     # Generate members
             member = randint_norepeat(members, 1, USER_NUM)
             members.append(member)
+<<<<<<< HEAD
             f.write( generateMember(i, member, (j==0)) )
-            
+
             group_fields_value_num = random.randint(1, len(group_fields[i]))    # Generate group field values
             already_selected_fields = []
             for k in range(0, group_fields_value_num):
@@ -246,9 +320,51 @@ def generateFixtures(filepath):
                         break
                 already_selected_fields.append(field)
                 f.write( randomGroupFieldValue(member, field) )
-        
-        
-        
+
+
+
+=======
+            f.write(generateMember(i, member, (j==0)) )
+
+    print('OK\n  Generating events... ', end='')
+    for i in range(1, EVENT_NUM + 1):
+        user = random.randint(1, USER_NUM)
+        f.write(randomEvent(user))
+        users = [user]
+        for k in range(PARTICIPATION_NUM):
+            if random.random() < 0.3:
+                user = randint_norepeat(users, 1, PARTICIPATION_NUM)
+                f.write(randomParticipation(user, i))
+
+
+    print('OK\n  Generating publications... ', end='')
+    for i in range(1, PUBLICATION_NUM + 1):
+        user = random.randint(1, USER_NUM)
+        group = random.randint(1, GROUP_NUM)
+        if random.random() < 0.2:
+            event = random.randint(1, EVENT_NUM)
+            f.write(randomPublication(user, group, event))
+        else:
+            f.write(randomPublication(user, group))
+        f.write(share(i, group))
+        groups = [group]
+        for k in range(SHARED_NUM):
+            if random.random() < 0.1:
+                group = randint_norepeat(groups, 1, GROUP_NUM)
+                f.write(share(i, group))
+        for k in range(COMMENT_NUM):
+            if random.random() < 0.3:
+                user = random.randint(1, USER_NUM)
+                f.write(randomComment(user, i))
+        for k in range(LIKE_NUM):
+            if random.random() < 0.5:
+                user = random.randint(1, USER_NUM)
+                f.write(randomLike(user, i))
+        for k in range(TAG_NUM):
+            if random.random() < 0.3:
+                user = random.randint(1, USER_NUM)
+                f.write(randomTag(user, i))
+>>>>>>> refs/remotes/origin/newarchi
 
     print('OK\n  Generating aknowledgment... ', end='')
     for i in range(1, ACKNOW_NUM):                                       # Generate aknowledgments

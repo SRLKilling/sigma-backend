@@ -37,18 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'rest_framework',
-    
+
     'oauth2_provider', # OAuth authentication protocol provider
     'corsheaders',  # Add headers to allow XmlHttpRequest from browsers
-    
+
     'sigma_core.apps.SigmaCoreConfig',
 ]
 
 MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
-    
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,7 +57,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
 ]
 
@@ -113,22 +113,22 @@ CACHES = {
 REST_FRAMEWORK = {
     'DEFAULT_MODEL_SERIALIZER_CLASS':
         'rest_framework.serializers.HyperlinkedModelSerializer',
-        
+
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.ext.rest_framework.OAuth2Authentication',
         'rest_framework.authentication.SessionAuthentication',  # TODO: remove
         # 'rest_framework.authentication.BasicAuthentication',  # TODO: remove
     ),
-    
+
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter'
     ),
-    
+
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 

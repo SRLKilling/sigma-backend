@@ -9,11 +9,11 @@ class GroupMemberQuerySet(models.QuerySet):
     def for_user(self, user):
         """ Return a queryset containing all of a user memberships """
         return self.filter(user=user)
-        
+
     def for_group(self, group):
         """ Returns a queryset containing all members of a group. """
         return self.filter(group=group)
-        
+
     def user_can_see(self, group, user):
         """
             Returns a queryset containing all members of the given group, a user can see.
@@ -32,13 +32,13 @@ class GroupMemberQuerySet(models.QuerySet):
             pass
 
         return self.none()
-        
-        
+
+
     def get_membership(self, group, user):
         """ Tries to get the membership corresponding to the given `user` and `group` """
         return self.get(group=group, user=user)
-    
-    
+
+
     def is_member(self, group, user):
         """ Returns True if and only if `user` is a member of the given `group`. """
         return self.filter(group=group, user=user).exists()
@@ -57,7 +57,7 @@ class GroupMember(models.Model):
         Modelize a membership relation between an User and a Group.
         A user is a member of a group if and only if the corresponding GroupMember object exists
     """
-    
+
     objects = GroupMemberQuerySet.as_manager()
 
     #*********************************************************************************************#
@@ -108,11 +108,10 @@ class GroupMember(models.Model):
     #*********************************************************************************************#
 
     @staticmethod
-    def create(user, group, sa = False):
+    def create_admin(user, group, sa = False):
         """
             Create a membership based on the given user an group.
             This static method is used by following views :
-            * InvitationView create members once an invitation is accepted
             * GroupView create super admin right after creating a group
         """
         member = GroupMember(user=user, group=group)
@@ -121,7 +120,6 @@ class GroupMember(models.Model):
             member.is_administrator = True
         member.save()
 
-        UserConnection.create_new_connections_gr(user, group)
         return member
 
     #*********************************************************************************************#

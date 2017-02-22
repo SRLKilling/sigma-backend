@@ -2,7 +2,6 @@
 **/fixtures.json
 data-server/django_app/static/
 data-server/django_app/sigma_core/migrations/*
-data-server/django_app/sigma_core/models/empty.py
 
 .env/
 
