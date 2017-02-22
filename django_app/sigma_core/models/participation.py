@@ -29,7 +29,7 @@ class Participation(models.Model):
     status = models.IntegerField(choices=POSSIBLE_STATUS)
 
     def __str__(self):
-        return "Participation(" + ", ".join([self.user.__str__(), self.event.__str__(), self.status]) + ")"
+        return "Participation(" + ", ".join([self.user.__str__(), self.event.__str__(), str(self.status)]) + ")"
 
     def can_retrieve(self, user):
         return True
