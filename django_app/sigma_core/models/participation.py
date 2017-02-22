@@ -9,7 +9,7 @@ class ParticipationQuerySet(models.QuerySet):
     def interested(self):
         return self.filter(POSSIBLE_STATUS = 1)
 
-   def for_user(self, user):
+    def for_user(self, user):
        return self.filter(user = user)
 
     def for_event(self, event):
@@ -31,5 +31,5 @@ class Participation(models.Model):
     def __str__(self):
         return "Participation(" + ", ".join([self.user.__str__(), self.event.__str__(), self.status]) + ")"
 
-   def can_retrieve(self, user):
+    def can_retrieve(self, user):
         return True

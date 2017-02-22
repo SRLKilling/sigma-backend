@@ -30,6 +30,7 @@ class Publication(models.Model):
 
     group = models.ForeignKey("Group", related_name='publications')
     author = models.ForeignKey("User")
+    date = models.DateTimeField(auto_now_add=True)
 
     title = models.CharField(max_length=144, blank=True)
     content = models.CharField(max_length=1500)

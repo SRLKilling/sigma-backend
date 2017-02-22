@@ -23,8 +23,8 @@ admin.site.register(AcknowledgmentInvitation)
 
 admin.site.register(GroupMember)
 #admin.site.register(GroupInvitation)
-#admin.site.register(SharedPublication)
-#admin.site.register(Participation)
+admin.site.register(SharedPublication)
+admin.site.register(Participation)
 
 admin.site.register(GroupField)
 admin.site.register(GroupFieldValue)
@@ -40,8 +40,6 @@ class EventAdmin(admin.ModelAdmin):
     search_fields = ['name', 'place_name']
     inlines = [ParticipationInline]
 
-
-
 admin.site.register(Event, EventAdmin)
 
 # class SharedInline(admin.TabularInline):
@@ -53,7 +51,7 @@ admin.site.register(Event, EventAdmin)
     # list_display = ['name', 'group', 'author', 'related_event', 'internal', 'approved']
     # list_filter = ['group', 'author', 'internal', 'approved']
 
-# admin.site.register(Publication, PublicationAdmin)
+admin.site.register(Publication)
 
 
 

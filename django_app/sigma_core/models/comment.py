@@ -22,7 +22,7 @@ class Comment(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "Comment(" + ", ".join([self.user.__str__(), self.publication.__str()__, self.date.__str__()]) + ")"
+        return "Comment(" + ", ".join([self.user.__str__(), self.publication.__str__(), self.date.__str__()]) + ")"
 
     def can_retrieve(self, user):
         return True

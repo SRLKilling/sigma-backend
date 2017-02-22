@@ -1,7 +1,7 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
-class LikeQuerySet(models.Model):
+class LikeQuerySet(models.QuerySet):
 
     def by_user(self, user):
         return self.filter(user = user)

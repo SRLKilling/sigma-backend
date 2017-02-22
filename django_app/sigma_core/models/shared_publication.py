@@ -36,7 +36,7 @@ class SharedPublication(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "SharedPublication(" + ", ".join[(self.publication.__str__(), self.group.__str__(), self.approved, self.date.__str__()]) + ")"
+        return "SharedPublication(" + ", ".join([self.publication.__str__(), self.group.__str__(), self.approved, self.date.__str__()]) + ")"
         return self.publication.title
 
     @staticmethod
