@@ -50,6 +50,8 @@ class ChatMember(models.Model):
 
     #can't destroy if it's the chat of a whole group -> chat.is_full_group_chat
 
+    #LIST VIA CHAT
+
     def can_retrieve(self, user):
         return ChatMember.objects.is_chat_member(user, self.chat)
 

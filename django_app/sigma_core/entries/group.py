@@ -3,8 +3,10 @@ from sigma_api.importer import load_ressource
 
 Group = load_ressource("Group")
 GroupMember = load_ressource("GroupMember")
+GroupInvitation = load_ressource("GroupInvitation")
 
 class GroupEntrySet(entries.EntrySet):
+
 
     list = entries.list(
         Group.objects.user_can_see,
@@ -13,7 +15,10 @@ class GroupEntrySet(entries.EntrySet):
 
     retrieve = entries.retrieve()
 
-    create = entries.create()
+    @entries.detailed_entry(methods=["post"])
+    def print_invitations(user, data, pk):
+        return shortcuts.list(user, data, GroupInvitation.objects.get_group_invitations_pending, GroupInvitation.serializer)
+
 
     @entries.global_entry(bind_set=True, methods=["post"])
     def create(self, user, data):

@@ -24,8 +24,6 @@ class GroupMemberEntrySet(entries.EntrySet):
 
     update = entries.update()
 
-    destroy = entries.destroy()
-
     @entries.detailed_entry(bind_set=True, methods=["post"])
     def destroy(self, user, data, pk):
         '''modified to handle UserConnection'''

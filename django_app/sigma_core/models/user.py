@@ -38,6 +38,7 @@ class UserQuerySet(models.QuerySet):
         user_connections_qs = UserConnection.objects.connections_to(user)
         return self.filter(userconnection__in = user_connections_qs)
 
+
 class User(AbstractBaseUser):
     """
         Modelize an sigma user.
@@ -58,12 +59,14 @@ class User(AbstractBaseUser):
 
     join_date = models.DateTimeField(auto_now_add=True)
 
+    school = models.ForeignKey('Group', related_name='school')
+
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
 
 
     # Required by Django to abstract the User interface
 
-    is_active = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
@@ -96,8 +99,8 @@ class User(AbstractBaseUser):
         """ Check whether `user` can retrieve information about the user
             True if you share a group with this user.
         """
-
-        return UserConnection.model.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
+        return True
+        #return UserConnection.model.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
 
     def can_update(self, user):
         """ Check wheter `user` can update the user profile.

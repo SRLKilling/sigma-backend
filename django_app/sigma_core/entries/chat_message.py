@@ -8,5 +8,3 @@ class ChatMessageEntrySet(entries.EntrySet):
     create = entries.create()
 
     retrieve = entries.retrieve()
-
-    list = entries.list()

@@ -14,7 +14,7 @@ class GroupQuerySet(models.QuerySet):
 
         return self.filter(
             models.Q(pk__in = membersof) |
-            models.Q(pk__in = memberof_acknowledged) |
+            (models.Q(pk__in = memberof_acknowledged) & models.Q(group_visibility=Group.VISIBILITY_NORMAL)) |
             models.Q(group_visibility=Group.VISIBILITY_PUBLIC)
         )
 
@@ -100,3 +100,6 @@ class Group(models.Model):
                     return True
 
         return False
+
+    def can_print_invitations(self, user):
+        return GroupMember.objects.is_member(group, user)
