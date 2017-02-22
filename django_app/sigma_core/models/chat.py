@@ -47,8 +47,6 @@ class Chat(models.Model):
     def number_of_members(self):
         return ChatMember.objects.filter(chat=self).count()
 
-    
-
 
     #*********************************************************************************************#
     #**                                    Permissions                                          **#

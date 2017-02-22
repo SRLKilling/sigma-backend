@@ -59,7 +59,7 @@ class User(AbstractBaseUser):
 
     join_date = models.DateTimeField(auto_now_add=True)
 
-    school = models.ForeignKey('Group', related_name='school')
+    school = models.ForeignKey('Group', related_name='school', null=True)
 
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
