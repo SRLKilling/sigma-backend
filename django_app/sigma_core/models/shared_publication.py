@@ -4,16 +4,31 @@ from sigma_api.importer import load_ressource
 GroupMember = load_ressource("GroupMember")
 Publication = load_ressource("Publication")
 
+class SharedPublicationQuerySet(models.QuerySet):
+
+    def sort(self):
+        return self.order_by('-date')
+
+    def in_group(self, group):
+        return self.filter(group=group).filter(approved=True)
+
+    def visible_by_user(self, user):
+        membersof = GroupMember.objects.for_user(user).values('group')
+        return self.approved().filter(group__pk__in = membersof)
+
+    def approved(self):
+        return self.filter(approved = True)
+
+    def to_approve(self):
+        return self.filter(approved = False)
+
+    def publication_which_group(self, publication):
+        return self.filter(publication = publication)
+
 class SharedPublication(models.Model):
-    """
-        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
-    """
 
-    #*********************************************************************************************#
-    #**                                       Fields                                            **#
-    #*********************************************************************************************#
+    objects = SharedPublicationQuerySet.as_manager()
 
-    # Liste des champs de l'objet
     publication = models.ForeignKey("Publication", related_name='shared')
 
     group = models.ForeignKey("Group", related_name='shared_publications')
@@ -21,24 +36,8 @@ class SharedPublication(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+        return "SharedPublication(" + ", ".join[(self.publication.__str__(), self.group.__str__(), self.approved, self.date.__str__()]) + ")"
         return self.publication.title
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-    @staticmethod
-    def get_publications_group(group):
-        return SharedPublication.objects.filter(group=group).filter(approved=True)
-
-    @staticmethod
-    def get_publications_user(user):
-        membersof = GroupMember.model.get_user_memberships_qs(user).values('group')
-        return SharedPublication.objects.filter(group__pk__in = membersof)
-
-    #*********************************************************************************************#
-    #**                                      Setters                                            **#
-    #*********************************************************************************************#
 
     @staticmethod
     def post_internal(user, group, title, content, event = 0):
@@ -48,10 +47,6 @@ class SharedPublication(models.Model):
         pub.save()
         pub.share(group)
         return pub
-
-    #*********************************************************************************************#
-    #**                                      Methods                                            **#
-    #*********************************************************************************************#
 
     def can_retrieve(self, user):
         return True

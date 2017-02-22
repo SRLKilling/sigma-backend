@@ -1,33 +1,27 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
-class Tag(models.Model):
-    """
-        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
-    """
+class TagQuerySet(models.QuerySet):
 
-    #*********************************************************************************************#
-    #**                                       Fields                                            **#
-    #*********************************************************************************************#
+    def tag_by(self, user):
+        return self.filter(user = user)
+
+    def tag_of(self, user):
+        return self.filter(tagged = user)
+
+    def on_publication(self, publication):
+        return self.filter(publication = publication)
+
+class Tag(models.Model):
+
+    objects = TagQuerySet.as_manager()
 
     user = models.ForeignKey("User", related_name="user")
     publication = models.ForeignKey("Publication")
     tagged = models.ForeignKey("User", related_name="tagged")
 
     def __str__(self):
-        return self.user.email + " tagged " + self.tagged.email + " on " + self.publication.title
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-#    @staticmethod
-#    def get_un_truc(truc):
-#	return objet
-
-    #*********************************************************************************************#
-    #**                                      Methods                                            **#
-    #*********************************************************************************************#
+        return "Tag(" + ", ".join([self.user.__str__()  +  self.tagged.__str__() + self.publication.__str__()]) + ")"
 
     def can_retrieve(self, user):
         return True

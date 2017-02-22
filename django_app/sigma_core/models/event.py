@@ -3,6 +3,7 @@ from sigma_api.importer import load_ressource
 import datetime
 
 Participation = load_ressource("Participation")
+Publication = load_ressource("Publication")
 
 class EventQuerySet(models.QuerySet):
 
@@ -12,13 +13,13 @@ class EventQuerySet(models.QuerySet):
     def created_by(self, user):
         return self.filter(author=user)
 
-    def visible(self, user):
-        # TODO
-        return self
+    def visible_by_user(self, user):
+        ids = Publication.objects.visible_by_user(user).with_event().values("related_event").distinct()
+        return self.filter(pk__in = ids)
 
     def interesting(self, user):
-        events = Participation.model.objects.filter(user=user).values("event")
-        return self.filter(pk__in=events).order_by('date_start')
+        events = Participation.objects.for_user(user).values("event")
+        return self.filter(pk__in=events)
 
     def past(self):
         return self.filter(date_end__lte=datetime.datetime.now())
@@ -36,10 +37,6 @@ class Event(models.Model):
 
     objects = EventQuerySet.as_manager()
 
-    #*********************************************************************************************#
-    #**                                       Fields                                            **#
-    #*********************************************************************************************#
-
     author = models.ForeignKey("User", related_name='created')
 
     name = models.CharField(max_length=255)
@@ -50,11 +47,7 @@ class Event(models.Model):
     place_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
-
-    #*********************************************************************************************#
-    #**                                      Setters                                            **#
-    #*********************************************************************************************#
+        return "Event(" + ", ".join([self.author.__str__(), self.name, self.date_start.__str__(), self.date_end.__str__(), self.place_name]) + ")"
 
     @staticmethod
     def create(author, name, description, start, end, place):
@@ -89,10 +82,6 @@ class Event(models.Model):
     # Remove the event
     def remove(self):
         self.delete()
-
-    #*********************************************************************************************#
-    #**                                      Methods                                            **#
-    #*********************************************************************************************#
 
     def can_retrieve(self, user):
         return True
