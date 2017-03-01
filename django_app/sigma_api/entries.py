@@ -85,7 +85,7 @@ def list(queryset=None, serializer=None, filter_class = None, action_name="list"
         return shortcuts.list(user, data, entryset.get_queryset(queryset), entryset.get_serializer(serializer))
     return entry
 
-def sub_list(action_name, res_queryset=None, sub_queryset=None, serializer=None, filter_class = None):
+def sub_list(action_name = None, res_queryset=None, sub_queryset=None, serializer=None, filter_class = None):
     @detailed_entry(name=action_name, bind_set=True)
     def entry(entryset, user, data, pk):
         return shortcuts.sub_list(user, data, pk, entryset.get_queryset(res_queryset), entryset.get_queryset(sub_queryset), entryset.get_serializer(serializer))

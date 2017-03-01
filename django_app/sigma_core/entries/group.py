@@ -13,16 +13,14 @@ class GroupEntrySet(entries.EntrySet):
         Group.serializers.list
     )
 
+    retrieve = entries.retrieve()
+
     members = entries.sub_list(
-        action_name = "members",
         sub_queryset = GroupMember.objects.user_can_see,
         serializer = GroupMember.serializer
     )
 
-    retrieve = entries.retrieve()
-
     invitations = entries.sub_list(
-        action_name = "invitations",
         sub_queryset = GroupInvitation.objects.get_group_invitations_pending,
         serializer = GroupInvitation.serializer
     )
