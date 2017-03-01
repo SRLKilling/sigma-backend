@@ -113,6 +113,7 @@ def randomUser():
     user["is_active"] = True
     user["is_superuser"] = False
     user["is_staff"] = False
+    user['school'] = "1"
     return JSONizer('sigma_core.user', user)
 
 
@@ -126,6 +127,17 @@ def randomGroup():
     group['need_validation_to_join'] = randombool()
     group['members_visibility'] = random.randint(0, 2)
     group['group_visibility'] = random.randint(0, 2)
+    return JSONizer('sigma_core.group', group)
+
+def polytechnique():
+    group = {}
+    group['name'] = "polytechnique"
+    group['description'] = "l'ecole de denis merigoux"
+    group['is_protected'] = True
+    group['can_anyone_ask'] = False
+    group['need_validation_to_join'] = True
+    group['members_visibility'] = 0
+    group['group_visibility'] = 0
     return JSONizer('sigma_core.group', group)
 
 def randomEvent(user):
@@ -210,6 +222,7 @@ def generateMember(group, user, sa):
     member['has_contact_right'] = member['is_administrator'] or randombool(0.2)
     member['has_publish_right'] = member['is_administrator'] or randombool(0.2)
     member['has_kick_right'] = member['is_administrator'] or randombool(0.2)
+
     return JSONizer('sigma_core.groupmember', member)
 
 def randomGroupFieldValue(member, field):
@@ -279,13 +292,16 @@ def generateFixtures(filepath):
     print('  Generating superuser... ', end='')
     f.write( superUser() )                                              # Generate admin
 
+    f.write(polytechnique())
+
     print('OK\n  Generating users... ', end='')
     for i in range(USER_NUM):                                           # Generate users
         f.write( randomUser() )
 
     print('OK\n  Generating groups... ', end='')
-    for i in range(GROUP_NUM):                                          # Generate groups
+    for i in range(GROUP_NUM-1):                                          # Generate groups
         f.write( randomGroup() )
+
 
     print('OK\n  Generating group fields.. ', end='')
     group_fields = {}

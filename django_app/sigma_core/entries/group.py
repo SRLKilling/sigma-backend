@@ -21,9 +21,11 @@ class GroupEntrySet(entries.EntrySet):
 
     retrieve = entries.retrieve()
 
-    @entries.detailed_entry(methods=["post"])
-    def print_invitations(user, data, pk):
-        return shortcuts.list(user, data, GroupInvitation.objects.get_group_invitations_pending, GroupInvitation.serializer)
+    invitations = entries.sub_list(
+        action_name = "invitations",
+        sub_queryset = GroupInvitation.objects.get_group_invitations_pending,
+        serializer = GroupInvitation.serializer
+    )
 
 
     @entries.global_entry(bind_set=True, methods=["post"])

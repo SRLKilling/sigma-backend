@@ -15,10 +15,10 @@ class GroupInvitationQuerySet(models.QuerySet):
             `group` can be a model instance, or a primary key """
         return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=False))
 
-    def get_group_invitations_pending(self,group):
+    def get_group_invitations_pending(self, user, group):
         """ Return a queryset containing the list of invitations where the user in the asker
             `group` can be a model instance, or a primary key """
-        return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=True))    
+        return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=True))
 
 class GroupInvitation(models.Model):
     """
@@ -27,6 +27,8 @@ class GroupInvitation(models.Model):
         Invitation have a short life-time.
         As soon as someone accepts or declines the invitation, the instance is destroyed.
     """
+
+    objects = GroupInvitationQuerySet.as_manager()
 
     #*********************************************************************************************#
     #**                                       Fields                                            **#
