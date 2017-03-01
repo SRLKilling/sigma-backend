@@ -1,15 +1,15 @@
 from sigma_api import response, shortcuts
 
 #*********************************************************************************************#
-    
+
 entries = {}
 
 class EntryException(Exception):
     pass
-    
+
 class InvalidLocEntryException(EntryException):
     pass
-    
+
 class InvalidActionEntryException(EntryException):
     pass
 
@@ -17,30 +17,30 @@ def route_to_entry(loc, action):
     if not route_to_entry.__registered:
         import register_list
         route_to_entry.__registered = True
-    
+
     if not loc in entries:
         raise InvalidLocEntryException()
-        
+
     entryset = entries[loc]
     if not hasattr(entryset, action):
         raise InvalidActionEntryException()
-        
+
     return getattr(entryset, action)
-    
+
 route_to_entry.__registered = False
-    
-#*********************************************************************************************#      
+
+#*********************************************************************************************#
 
 class Entry(object):
-    """ This class wraps an entry function """  
-    
+    """ This class wraps an entry function """
+
     def __init__(self, name, func, detailed, bind_set = False, **kwargs):
         self.name = name
         self.func = func
         self.detailed = detailed
         self.bind_set = bind_set
         self.kwargs = kwargs
-        
+
     def __get__(self, obj, klass=None):
         if klass is None:
             klass = type(obj)
@@ -70,7 +70,7 @@ def detailed_entry(name = None, **kwargs):
         n = (name) if (name != None) else (func.__name__)
         return Entry(n, func, True, **kwargs)
     return decorator
-    
+
 #*********************************************************************************************#
 
 def retrieve(queryset=None, serializer=None, action_name="retrieve"):
@@ -84,19 +84,27 @@ def list(queryset=None, serializer=None, filter_class = None, action_name="list"
     def entry(entryset, user, data):
         return shortcuts.list(user, data, entryset.get_queryset(queryset), entryset.get_serializer(serializer))
     return entry
-    
+
+def sub_list(action_name, res_queryset=None, sub_queryset=None, serializer=None, filter_class = None):
+    @detailed_entry(name=action_name, bind_set=True)
+    def entry(entryset, user, data, pk):
+        return shortcuts.sub_list(user, data, pk, entryset.get_queryset(res_queryset), entryset.get_queryset(sub_queryset), entryset.get_serializer(serializer))
+    return entry
+
+lambda pk: Group.objets.for_group(pk).for_user
+
 def create(serializer=None, action_name="create"):
     @global_entry(name=action_name, bind_set=True, methods=["post"])
     def entry(cls, user, data):
         return shortcuts.create(user, data, cls.get_serializer(serializer), action_name)
     return entry
-    
+
 def update(serializer=None, action_name="update"):
     @detailed_entry(name=action_name, bind_set=True, methods=["post"])
     def entry(cls, user, data, pk):
         return shortcuts.update(user, data, pk, cls.get_serializer(serializer), action_name)
     return entry
-    
+
 def destroy(queryset=None, action_name="destroy"):
     @detailed_entry(name=action_name, bind_set=True, methods=["post"])
     def entry(cls, user, data, pk):
@@ -106,8 +114,8 @@ def destroy(queryset=None, action_name="destroy"):
 #*********************************************************************************************#
 
 class EntrySet():
-    """ This class wraps a set of entries and provide a way to turn it to a DRF Viewset """ 
-    
+    """ This class wraps a set of entries and provide a way to turn it to a DRF Viewset """
+
     @classmethod
     def entries(cls):
         if not hasattr(cls, "_entries"):
@@ -118,13 +126,13 @@ class EntrySet():
                 f = getattr(cls, fn)
                 if isinstance(f, Entry):
                     cls._entries.append((fn, f))
-                    
+
         return cls._entries
-                
+
     @classmethod
     def register(cls, name):
         entries[name] = cls
-        
+
     @classmethod
     def get_queryset(cls, qs = None):
         if qs != None:
@@ -135,7 +143,7 @@ class EntrySet():
             return cls.ressource.model.objects
         else:
             raise ValueError("Cannot automatically retrieve entryset queryset, must specify 'default_queryset', or 'ressource' class attribute")
-    
+
     @classmethod
     def get_serializer(cls, ser = None):
         if ser != None:

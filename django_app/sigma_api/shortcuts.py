@@ -67,7 +67,7 @@ def check_permission(user, instance, actionname, *args, **kwargs):
             raise response.UnauthorizedException
 
 
-def get_queryset(queryset_gen, user, data):
+def get_queryset(queryset_gen, *args, **kwargs):
     """
         Return a queryset from any valid queryset generator.
         It can be a queryset, a manager, or a function returning a queryset, given the user
@@ -78,7 +78,7 @@ def get_queryset(queryset_gen, user, data):
     elif isinstance(queryset_gen, models.Manager):
         return queryset_gen.all()
     else:
-        return queryset_gen(user)
+        return queryset_gen(*args, **kwargs)
 
 
 
@@ -90,7 +90,7 @@ def retrieve(user, data, pk, queryset_gen, serializer_class, action_name):
         This method returns an entry used to retrieve a ressource.
         It tries to get the pk-ed element, and returns its serialized data
     """
-    qs = get_queryset(queryset_gen, user, data)
+    qs = get_queryset(queryset_gen, user)
     instance = get_or_raise(qs, pk)
 
     check_permission(user, instance, action_name)
@@ -105,12 +105,26 @@ def list(user, data, queryset_gen, serializer_class):
         It then eventualy filters the queryset using the provided filter_class, and data.uri_param
         Finally, returns the serialized data using serializer_class
     """
-    queryset = get_queryset(queryset_gen, user, data)
+    queryset = get_queryset(queryset_gen, user)
     # if filter_class != None:                                                                                          # TODO : filtering
         # filter = filter_class(queryset=queryset, data=data.uri_param)
         # queryset = filter.qs()
     serializer = serializer_class(queryset, many=True)
     return response.Response(response.Success_Retrieved, serializer.data)
+
+def sub_list(user, data, pk, queryset_gen_original, queryset_gen_sub, serializer_class):
+        """
+            This method returns an entry that is used to list a queryset.
+            The queryset is get depending on the user, and the pk of the group
+            the sublist depends on.
+        """
+        instance = get_or_raise(queryset_gen_original, pk)
+        queryset = get_queryset(queryset_gen_sub, user, instance)
+        # if filter_class != None:                                                                                          # TODO : filtering
+            # filter = filter_class(queryset=queryset, data=data.uri_param)
+            # queryset = filter.qs()
+        serializer = serializer_class(queryset, many=True)
+        return response.Response(response.Success_Retrieved, serializer.data)
 
 
 def create(user, data, serializer_class, action_name):
@@ -143,7 +157,7 @@ def destroy(user, data, queryset_gen, action_name):
         This method is an entry that destroy a ressource.
         Check for permissions, and save the object in the database
     """
-    queryset = get_queryset(queryset_gen, user, data)
+    queryset = get_queryset(queryset_gen, user)
     instance = get_or_raise(queryset, pk)
     check_permission(user, instance, action_name)
     instance.delete()

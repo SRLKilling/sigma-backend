@@ -296,19 +296,13 @@ def generateFixtures(filepath):
             f.write( randomGroupField(i) )
             group_fields[i].append(primary_keys["sigma_core.groupfield"])
 
-<<<<<<< HEAD
     print('OK\n  Generating memberships and field values.. ', end='')
     for i in range(1, GROUP_NUM):
-=======
-    print('OK\n  Generating memberships.. ', end='')
-    for i in range(1, GROUP_NUM + 1):
->>>>>>> refs/remotes/origin/newarchi
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
         for j in range(member_num):                                     # Generate members
             member = randint_norepeat(members, 1, USER_NUM)
             members.append(member)
-<<<<<<< HEAD
             f.write( generateMember(i, member, (j==0)) )
 
             group_fields_value_num = random.randint(1, len(group_fields[i]))    # Generate group field values
@@ -320,11 +314,6 @@ def generateFixtures(filepath):
                         break
                 already_selected_fields.append(field)
                 f.write( randomGroupFieldValue(member, field) )
-
-
-
-=======
-            f.write(generateMember(i, member, (j==0)) )
 
     print('OK\n  Generating events... ', end='')
     for i in range(1, EVENT_NUM + 1):
@@ -364,7 +353,6 @@ def generateFixtures(filepath):
             if random.random() < 0.3:
                 user = random.randint(1, USER_NUM)
                 f.write(randomTag(user, i))
->>>>>>> refs/remotes/origin/newarchi
 
     print('OK\n  Generating aknowledgment... ', end='')
     for i in range(1, ACKNOW_NUM):                                       # Generate aknowledgments

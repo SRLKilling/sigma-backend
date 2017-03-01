@@ -13,6 +13,12 @@ class GroupEntrySet(entries.EntrySet):
         Group.serializers.list
     )
 
+    members = entries.sub_list(
+        action_name = "members",
+        sub_queryset = GroupMember.objects.user_can_see,
+        serializer = GroupMember.serializer
+    )
+
     retrieve = entries.retrieve()
 
     @entries.detailed_entry(methods=["post"])

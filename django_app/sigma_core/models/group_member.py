@@ -14,7 +14,7 @@ class GroupMemberQuerySet(models.QuerySet):
         """ Returns a queryset containing all members of a group. """
         return self.filter(group=group)
 
-    def user_can_see(self, group, user):
+    def user_can_see(self, user, group):
         """
             Returns a queryset containing all members of the given group, a user can see.
             * If you're a member, you'll see everybody
@@ -22,7 +22,7 @@ class GroupMemberQuerySet(models.QuerySet):
             * If not, and the group is normal, you'll see not-hidden and connected to you members
         """
         if self.is_member(group, user):
-            return self
+            return self.filter(group = group)
 
         elif group.members_visibility == Group.model.VISIBILITY_PUBLIC:
             return self.filter(group = group, hidden = False)
