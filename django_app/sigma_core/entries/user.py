@@ -11,7 +11,7 @@ class UserEntrySet(entries.EntrySet):
         User.serializers.list
     )
 
-    @entries.detailed_entry(methods=["post"]))
+    @entries.detailed_entry(methods=["post"])
     def retrieve(user, data, pk):
         u2 = User.objects.get(user=pk)
 

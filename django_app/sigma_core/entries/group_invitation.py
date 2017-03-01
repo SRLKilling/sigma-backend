@@ -8,7 +8,7 @@ class GroupInvitationEntrySet(entries.EntrySet):
 
     retrieve = entries.retrieve()
 
-    @entries.global_entry(methods=["post"]))
+    @entries.global_entry(methods=["post"])
     def create(user, data):
         serializer = shortcuts.get_validated_serializer(GroupInvitation.serializer, data=data)
         instance = GroupInvitation.model(**serializer.validated_data)
@@ -21,11 +21,11 @@ class GroupInvitationEntrySet(entries.EntrySet):
         instance.save()
         return response.Response(response.Success_Created, GroupInvitation.serializer(instance).data)
 
-    list = entries.list(GroupInvitation.objects.get_user_invitations,GroupInvitation.serializer.default)
+    list = entries.list(GroupInvitation.objects.get_user_invitations,GroupInvitation.serializer)
 
     destroy = entries.destroy()
 
-    @entries.global_entry(methods=["post"]))
+    @entries.global_entry(methods=["post"])
     def accept(user, data, pk):
         new_instance=GroupMember.model(user=user,group=instance.group)
         new_instance.save()
