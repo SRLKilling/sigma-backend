@@ -1,14 +1,23 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
-class Participation(models.Model):
-    """
-        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
-    """
+class ParticipationQuerySet(models.QuerySet):
 
-    #*********************************************************************************************#
-    #**                                       Fields                                            **#
-    #*********************************************************************************************#
+    def invited(self):
+        return self.filter(POSSIBLE_STATUS = 0)
+
+    def interested(self):
+        return self.filter(POSSIBLE_STATUS = 1)
+
+    def for_user(self, user):
+       return self.filter(user = user)
+
+    def for_event(self, event):
+        return self.filter(event = event)
+
+class Participation(models.Model):
+
+    objects = ParticipationQuerySet.as_manager()
 
     POSSIBLE_STATUS = (
         (0, 'Invited'),
@@ -20,19 +29,7 @@ class Participation(models.Model):
     status = models.IntegerField(choices=POSSIBLE_STATUS)
 
     def __str__(self):
-        return self.user.email + " : " + str(self.status)
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-#    @staticmethod
-#    def get_un_truc(truc):
-#	return objet
-
-    #*********************************************************************************************#
-    #**                                      Methods                                            **#
-    #*********************************************************************************************#
+        return "Participation(" + ", ".join([self.user.__str__(), self.event.__str__(), str(self.status)]) + ")"
 
     def can_retrieve(self, user):
         return True

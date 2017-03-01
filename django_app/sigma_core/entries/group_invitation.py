@@ -23,4 +23,5 @@ class GroupInvitationEntrySet(entries.EntrySet):
         return response.Response(response.Success_Created, GroupInvitation.serializer(instance).data)
 
     list = entries.list(GroupInvitation.objects.get_user_invitations,GroupInvitation.serializer.default)
+    
     destroy = entries.destroy()

@@ -15,6 +15,11 @@ class GroupInvitationQuerySet(models.QuerySet):
             `group` can be a model instance, or a primary key """
         return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=False))
 
+    def get_group_invitations_pending(self,group):
+        """ Return a queryset containing the list of invitations where the user in the asker
+            `group` can be a model instance, or a primary key """
+        return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=True))    
+
 class GroupInvitation(models.Model):
     """
         Modelize an invitation to a group.

@@ -7,10 +7,6 @@ Publication = load_ressource("Publication")
 class PublicationSerializerSet(SerializerSet):
 
     class PublicationSerializer(serializers.ModelSerializer):
-        """
-            Basic default serializer for a Chat.
-            Include all fields
-        """
         class Meta:
             model = Publication.model
             exclude = ()

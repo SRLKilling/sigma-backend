@@ -1,32 +1,23 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
-class Like(models.Model):
-    """
-        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
-    """
+class LikeQuerySet(models.QuerySet):
 
-    #*********************************************************************************************#
-    #**                                       Fields                                            **#
-    #*********************************************************************************************#
+    def by_user(self, user):
+        return self.filter(user = user)
+
+    def on_publication(self, publication):
+        return self.filter(publication = publication)
+
+class Like(models.Model):
+
+    objects = LikeQuerySet.as_manager()
 
     user = models.ForeignKey("User")
     publication = models.ForeignKey("Publication")
 
     def __str__(self):
-        return self.user.email + " likes " + self.publication.title
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-#    @staticmethod
-#    def get_un_truc(truc):
-#	return objet
-
-    #*********************************************************************************************#
-    #**                                      Methods                                            **#
-    #*********************************************************************************************#
+        return "Like(" + ", ".join([self.user.__str__(), self.publication.__str__()]) + ")"
 
     def can_retrieve(self, user):
         return True

@@ -30,5 +30,7 @@ class ChatMessage(models.Model):
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
 
+    #LIST VIA CHAT entry
+    
     def can_create(self, user):
         return ChatMember.objects.is_chat_member(user, self.chat)

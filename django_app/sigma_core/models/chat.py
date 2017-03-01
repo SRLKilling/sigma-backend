@@ -1,6 +1,8 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
+Chat = load_ressource("Chat")
+ChatMember = load_ressource("ChatMember")
 
 class ChatQuerySet(models.QuerySet):
 
@@ -33,7 +35,18 @@ class Chat(models.Model):
     # Accessible qs from ForeignKeys
     # "messages" from chat_message
     # "members" from chat_member
-    
+
+    @staticmethod
+    def create_chat(group):
+        """
+            Create a chat based on the given group.
+        """
+        Chat.model(is_full_group_chat=True, group=group).save()
+
+    @property
+    def number_of_members(self):
+        return ChatMember.objects.filter(chat=self).count()
+
 
     #*********************************************************************************************#
     #**                                    Permissions                                          **#

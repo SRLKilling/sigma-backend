@@ -1,14 +1,20 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
-class Comment(models.Model):
-    """
-        This model is used to represent any kind of user's group (friends, coworkers, schools, etc...)
-    """
+class CommentQuerySet(models.QuerySet):
 
-    #*********************************************************************************************#
-    #**                                       Fields                                            **#
-    #*********************************************************************************************#
+    def sort(self):
+        return self.order_by('-date')
+
+    def by_user(self, user):
+        return self.filter(user = user)
+
+    def on_publication(self, publication):
+        return self.filter(publication = publication)
+
+class Comment(models.Model):
+
+    objects = CommentQuerySet.as_manager()
 
     user = models.ForeignKey("User")
     publication = models.ForeignKey("Publication")
@@ -16,19 +22,7 @@ class Comment(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.email + " : " + self.publication.title
-
-    #*********************************************************************************************#
-    #**                                      Getters                                            **#
-    #*********************************************************************************************#
-
-#    @staticmethod
-#    def get_un_truc(truc):
-#	return objet
-
-    #*********************************************************************************************#
-    #**                                      Methods                                            **#
-    #*********************************************************************************************#
+        return "Comment(" + ", ".join([self.user.__str__(), self.publication.__str__(), self.date.__str__()]) + ")"
 
     def can_retrieve(self, user):
         return True

@@ -16,8 +16,14 @@ class UserSerializerSet(serializers.drf.ModelSerializer):
     @serializers.sub
     class list:
         class Meta:
-            fields = None
-            #exclude = ('fields', )
+            fields = ('lastname', 'firstname', 'school')
+
+
+    @serializers.sub
+    class stranger:
+        class Meta:
+            fields = ('lastname', 'firstname', 'school','email')
+
 
 
 

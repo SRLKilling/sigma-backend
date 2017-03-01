@@ -7,8 +7,6 @@ ChatMember = load_ressource("ChatMember")
 
 class ChatEntrySet(entries.EntrySet):
 
-    #TODO : create a new route to get the chat messages relative to a chat
-
 
     list = entries.list(
         Chat.objects.my_chats,

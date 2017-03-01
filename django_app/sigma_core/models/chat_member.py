@@ -1,6 +1,9 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
+ChatMember = load_ressource("ChatMember")
+Chat = load_ressource("Chat")
+
 class ChatMemberQuerySet(models.QuerySet):
 
     def get_members_of_chat(self, chat):
@@ -28,11 +31,26 @@ class ChatMember(models.Model):
     chat = models.ForeignKey('Chat', related_name='members')
     join_date = models.DateTimeField(auto_now_add=True)
 
+
+    @staticmethod
+    def add_new_member(user,group):
+        """
+            add a new member to a chat linked to a group
+        """
+        c = Chat.objects.filter(is_full_group_chat=True, group=group)
+        try:
+            ChatMember.model(user=user,chat=c).save()
+        except c.DoesNotExist:
+            print("Error : no chat with this group")
+
+
     #*********************************************************************************************#
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
 
     #can't destroy if it's the chat of a whole group -> chat.is_full_group_chat
+
+    #LIST VIA CHAT
 
     def can_retrieve(self, user):
         return ChatMember.objects.is_chat_member(user, self.chat)
