@@ -1,7 +1,6 @@
 from sigma_api import entries, response,shortcuts
 from sigma_api.importer import load_ressource
 
-
 GroupInvitation = load_ressource("GroupInvitation")
 GroupMember = load_ressource("GroupMember")
 
@@ -23,5 +22,11 @@ class GroupInvitationEntrySet(entries.EntrySet):
         return response.Response(response.Success_Created, GroupInvitation.serializer(instance).data)
 
     list = entries.list(GroupInvitation.objects.get_user_invitations,GroupInvitation.serializer.default)
-    
+
     destroy = entries.destroy()
+
+    @entries.global_entry(methods=["post"]))
+    def accept(user, data, pk):
+        new_instance=GroupMember.model(user=user,group=instance.group)
+        new_instance.save()
+        return response.Response(response.Success_Created, GroupMember.serializer(new_instance).data)

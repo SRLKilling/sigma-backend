@@ -5,15 +5,16 @@ GroupMember = load_ressource("GroupMember")
 
 class GroupMemberEntrySet(entries.EntrySet):
 
-    @entries.global_entry(bind_set=True, methods=["post"])
-    def create(self, user, data):
-        ''' modified to handle UserConnection'''
-        #Can we access easily data.group without deserializing?
-        serializer = shortcuts.get_validated_serializer(GroupMember.serializer, data=data)
-        my_group = GroupMember.model(**serializer.validated_data).group
-        UserConnection.model.create_new_connections_gr(user, my_group)
-        return shortcuts.create(user, data, self.get_serializer(None), "create")
+    # @entries.global_entry(bind_set=True, methods=["post"])
+    # def create(self, user, data):
+    #     ''' modified to handle UserConnection'''
+    #     #Can we access easily data.group without deserializing?
+    #     serializer = shortcuts.get_validated_serializer(GroupMember.serializer, data=data)
+    #     my_group = GroupMember.model(**serializer.validated_data).group
+    #     UserConnection.model.create_new_connections_gr(user, my_group)
+    #     return shortcuts.create(user, data, self.get_serializer(None), "create")
 
+    #no need for create : Group Members are only created via the group_invitation entries
 
     list = entries.list(
         GroupMember.objects.for_user,
