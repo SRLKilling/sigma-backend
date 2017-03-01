@@ -38,6 +38,22 @@ class UserQuerySet(models.QuerySet):
         user_connections_qs = UserConnection.objects.connections_to(user)
         return self.filter(userconnection__in = user_connections_qs)
 
+    def are_connected(self, user1, user2):
+        ''' return True if there is a UserConnection for those two, or
+        a common group, or a common chat'''
+
+        if UserConnection.objects.are_connected_by_UserConnection(user1,user2):
+            return True
+
+        groups1 = Group.objects.filter(memberships__user = user1)
+        if GroupMember.objects.filter(user=user2, group__in = groups1).exists():
+            return True
+
+        chats1 = Chat.objects.filter(members = user1, group = null)
+        if ChatMember.objects.filter(user=user2, chat__in = groups1).exists():
+            return True
+
+        return False
 
 class User(AbstractBaseUser):
     """

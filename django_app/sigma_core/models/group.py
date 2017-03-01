@@ -103,3 +103,7 @@ class Group(models.Model):
 
     def can_print_invitations(self, user):
         return GroupMember.objects.is_member(group, user)
+
+    #No can_member : already handled via the queryset
+    #No can_print_invitations : same reason
+    #No list : same reason

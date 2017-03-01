@@ -4,15 +4,6 @@ from sigma_api.importer import load_ressource
 GroupMember = load_ressource("GroupMember")
 
 class GroupMemberEntrySet(entries.EntrySet):
-    
-    list = entries.list(
-        queryset = GroupMember.objects.for_user
-    )
-
-    retrieve = entries.retrieve(
-        serializer = GroupMember.serializers.retrieve
-    )
-
 
     @entries.global_entry(bind_set=True, methods=["post"])
     def create(self, user, data):
@@ -22,6 +13,14 @@ class GroupMemberEntrySet(entries.EntrySet):
         my_group = GroupMember.model(**serializer.validated_data).group
         UserConnection.model.create_new_connections_gr(user, my_group)
         return shortcuts.create(user, data, self.get_serializer(None), "create")
+
+
+    list = entries.list(
+        GroupMember.objects.for_user,
+        GroupMember.serializers.default
+    )
+
+    retrieve = entries.retrieve()
 
     update = entries.update()
 
@@ -33,3 +32,9 @@ class GroupMemberEntrySet(entries.EntrySet):
         UserConnection.destroy_gr(instance.user, instance.group)
         instance.delete()
         return response.Response(response.Success_Deleted)
+
+    my_groups = entries.sub_list(
+        action_name = "my_groups",
+        sub_queryset = GroupMember.objects.for_user,
+        serializer = GroupMember.serializer
+    )

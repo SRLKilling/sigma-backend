@@ -9,7 +9,7 @@ class UserConnectionQuerySet(models.QuerySet):
     def connections_to(self,user):
         return self.filter(models.Q(user1=user) | models.Q(user2=user))
 
-    def are_connected(self,user1,user2):
+    def are_connected_by_UserConnection(self,user1,user2):
         return self.get(models.Q(user1=user1) && models.Q(user2=user2)).exists()
             or self.get(models.Q(user1=user2) && models.Q(user2=user1)).exists()
 

@@ -10,15 +10,21 @@ class GroupInvitationQuerySet(models.QuerySet):
             `user` can be a model instance, or a primary key """
         return self.filter(invitee = user).order_by(date)
 
-    def get_group_invitations_qs(self,group):
+    def get_group_invitations_qs(self, user, group):
         """ Return a queryset containing the list of invitations where `group` is the inviter group
             `group` can be a model instance, or a primary key """
-        return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=False))
+        if GroupMember.objects.is_member(group,user):
+            return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=False))
+        else:
+            return self.none()
 
     def get_group_invitations_pending(self, user, group):
         """ Return a queryset containing the list of invitations where the user in the asker
             `group` can be a model instance, or a primary key """
-        return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=True))
+        if GroupMember.objects.is_member(group,user):
+            return self.filter(models.Q(group = group) & models.Q(issued_by_invitee=True))
+        else:
+            return self.none()
 
 class GroupInvitation(models.Model):
     """

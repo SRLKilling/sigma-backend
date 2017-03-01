@@ -126,6 +126,7 @@ class GroupMember(models.Model):
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
 
+    #No need for my_groups, list
 
     def can_retrieve(self, user):
         """ Check whether `user` can retrieve the membership.
@@ -146,12 +147,12 @@ class GroupMember(models.Model):
 
         return False
 
-    def can_change_right(self, user):
+    def can_update(self, user):
         """
             Check whether `user` can change member's rights.
             `user` has to be an admin, or if the member is an admin, a super admin.
         """
-        user_membership = GroupMember.get_membership(self.group, user)
+        user_membership = self.objects.get_membership(self.group, user)
 
         return (not self.is_super_administrator) and ( (self.is_administrator and user_membership.is_super_administrator) or user_membership.is_administrator )
 
@@ -166,3 +167,8 @@ class GroupMember(models.Model):
         user_membership = GroupMember.get_membership(self.group, user)
 
         return (user_membership != None) and (user_membership.can_kick or user_membership.is_administrator or user_membership.is_super_administrator) and (not self.is_administrator or user_membership.is_super_administrator) and (not self.is_super_administrator)
+
+
+
+    def can_create(self, user):
+        return True
