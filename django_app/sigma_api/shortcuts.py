@@ -80,6 +80,8 @@ def get_queryset(queryset_gen, *args, **kwargs):
     else:
         return queryset_gen(*args, **kwargs)
 
+def make_context(user=None, data=None, params=None):
+    return {'user':user, 'data':data, 'params':params}
 
 
 #*********************************************************************************************#
@@ -94,7 +96,7 @@ def retrieve(user, data, pk, queryset_gen, serializer_class, action_name):
     instance = get_or_raise(qs, pk)
 
     check_permission(user, instance, action_name)
-    serializer = serializer_class(instance)
+    serializer = serializer_class(instance, context=make_context(user, data))
     return response.Response(response.Success_Retrieved, serializer.data)
 
 
@@ -109,7 +111,7 @@ def list(user, data, queryset_gen, serializer_class):
     # if filter_class != None:                                                                                          # TODO : filtering
         # filter = filter_class(queryset=queryset, data=data.uri_param)
         # queryset = filter.qs()
-    serializer = serializer_class(queryset, many=True)
+    serializer = serializer_class(queryset, many=True, context=make_context(user, data))
     return response.Response(response.Success_Retrieved, serializer.data)
 
 def sub_list(user, data, pk, queryset_gen_original, queryset_gen_sub, serializer_class):
@@ -123,7 +125,7 @@ def sub_list(user, data, pk, queryset_gen_original, queryset_gen_sub, serializer
         # if filter_class != None:                                                                                          # TODO : filtering
             # filter = filter_class(queryset=queryset, data=data.uri_param)
             # queryset = filter.qs()
-        serializer = serializer_class(queryset, many=True)
+        serializer = serializer_class(queryset, many=True, context=make_context(user, data))
         return response.Response(response.Success_Retrieved, serializer.data)
 
 
@@ -133,7 +135,7 @@ def create(user, data, serializer_class, action_name):
         It deserialize the data using the provided serializer_class,
         Then check for permissions, and save the object in the database
     """
-    instance = get_deserialized_instance(serializer_class, data=data)
+    instance = get_deserialized_instance(serializer_class, data=data, context=make_context(user, data))
     check_permission(user, instance, action_name)
     instance.save()
     return response.Response(response.Success_Created, serializer_class(instance).data)
@@ -148,7 +150,7 @@ def update(user, data, pk, serializer_class, action_name):
     """
     instance = get_or_raise(serializer_class.Meta.model.objects.all(), pk)
     check_permission(user, instance, action_name, data)
-    new_ser = get_validated_serializer(serializer_class, instance, data=data, partial=True)
+    new_ser = get_validated_serializer(serializer_class, instance, data=data, partial=True, context=make_context(user, data))
     new_ser.save()
     return response.Response(response.Success_Updated, new_ser.data)
 

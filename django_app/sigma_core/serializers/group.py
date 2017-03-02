@@ -17,7 +17,7 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
         fields = ('pk', 'name', 'description', 'is_protected', 'can_anyone_ask', 'need_validation_to_join', 'members_visibility', 'group_visibility', 'fields','number_of_members')
 
     def get_number_of_members(self, obj):
-        return GroupMember.filter(group=obj).count()
+        return GroupMember.objects.filter(group=obj).count()
 
     fields = GroupField.serializers.default(many=True, read_only=True)
 

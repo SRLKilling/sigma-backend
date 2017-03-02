@@ -9,18 +9,13 @@ class UserConnectionQuerySet(models.QuerySet):
     def connections_to(self,user):
         return self.filter(models.Q(user1=user) | models.Q(user2=user))
 
-    def are_connected_by_UserConnection(self,user1,user2):
-        return self.get(models.Q(user1=user1) && models.Q(user2=user2)).exists()
-            or self.get(models.Q(user1=user2) && models.Q(user2=user1)).exists()
+    def are_connected(self, user1, user2):
+        return self.filter( (models.Q(user1=user1) and models.Q(user2=user2)) or \
+                            (models.Q(user1=user2) and models.Q(user2=user1)) ).exists()
 
-    def get_connection(self,user1,user2):
-        if not are_connected(user1,user2):
-            return None
-        else:
-            if self.get(models.Q(user1=user1) && models.Q(user2=user2)).exists():
-                return self.get(models.Q(user1=user1) && models.Q(user2=user2))
-            else:
-                return self.get(models.Q(user1=user2) && models.Q(user2=user1))
+    def between_users(self, user1, user2):
+        return self.get( (models.Q(user1=user1) and models.Q(user2=user2)) or \
+                         (models.Q(user1=user2) and models.Q(user2=user1)) )
 
 
 class UserConnection(models.Model):

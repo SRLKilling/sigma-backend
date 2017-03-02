@@ -3,9 +3,11 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from sigma_api.importer import load_ressource
 
 UserConnection = load_ressource("UserConnection")
+GroupMember = load_ressource("GroupMember")
+Chat = load_ressource("Chat")
+ChatMembers = load_ressource("ChatMembers")
 
 # TODO : Add unique username for frontends URLs
-
 
 # Basic user manager required by Django
 class UserManager(BaseUserManager):
@@ -42,15 +44,8 @@ class UserQuerySet(models.QuerySet):
         ''' return True if there is a UserConnection for those two, or
         a common group, or a common chat'''
 
-        if UserConnection.objects.are_connected_by_UserConnection(user1,user2):
-            return True
-
-        groups1 = Group.objects.filter(memberships__user = user1)
-        if GroupMember.objects.filter(user=user2, group__in = groups1).exists():
-            return True
-
-        chats1 = Chat.objects.filter(members = user1, group = null)
-        if ChatMember.objects.filter(user=user2, chat__in = groups1).exists():
+        if (UserConnection.objects.are_connected(user1, user2) or \
+                GroupMember.objects.are_connected(user1, user2)):
             return True
 
         return False
@@ -63,7 +58,7 @@ class User(AbstractBaseUser):
         As soon as someone accepts or declines the invitation, the instance is destroyed.
     """
 
-    objects = BaseUserManager.from_queryset(UserQuerySet)
+    objects = BaseUserManager.from_queryset(UserQuerySet)()
 
     #*********************************************************************************************#
     #**                                       Fields                                            **#
@@ -87,7 +82,6 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['lastname', 'firstname']
-    objects = UserManager()
 
     def get_full_name(self):
         return self.lastname + self.firstname
@@ -109,14 +103,6 @@ class User(AbstractBaseUser):
     #*********************************************************************************************#
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
-
-
-    def can_retrieve(self, user):
-        """ Check whether `user` can retrieve information about the user
-            True if you share a group with this user.
-        """
-        return True
-        #return UserConnection.model.are_users_connected(self, user) or GroupMember.has_common_memberships(self, user)
 
     def can_update(self, user):
         """ Check wheter `user` can update the user profile.

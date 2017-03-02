@@ -9,29 +9,25 @@ class UserSerializerSet(serializers.drf.ModelSerializer):
 
     class Meta:
         model = User.model
-        exclude = ('password', 'is_superuser', 'is_staff')
+        fields = ('id', 'lastname', 'firstname', 'school', 'join_date')
         read_only_fields = ('is_active', 'photo', )
         extra_kwargs = {'password': {'write_only': True, 'required': False}}
 
     @serializers.sub
     class list:
         class Meta:
-            fields = ('lastname', 'firstname', 'school')
+            fields = ('id', 'lastname', 'firstname', 'school')
 
 
     @serializers.sub
     class stranger:
         class Meta:
-            fields = ('lastname', 'firstname', 'school','email')
+            fields = ('id', 'lastname', 'firstname', 'school','email')
 
-
-
-
-    # class MinimalUserSerializer(serializers.ModelSerializer):
-        # """
-        # Serialize an User with minimal data.
-        # """
-        # class Meta:
-            # model = User
-            # fields = ('id', 'lastname', 'firstname', 'is_active')
-            # read_only_fields = ('is_active', )
+    @staticmethod
+    def from_relation(user2, *args, **kwargs):
+        user = kwargs['context'].get('user')
+        if User.objects.are_connected(user, user2):
+            return User.serializers.default(user2, *args, **kwargs)
+        else:
+            return User.serializers.stranger(user2, *args, **kwargs)

@@ -28,8 +28,8 @@ class GroupMemberQuerySet(models.QuerySet):
             return self.filter(group = group, hidden = False)
 
         elif group.members_visibility == Group.model.VISIBILITY_NORMAL:
-            # return self.filter(group = group, hidden = False, user__in = User.User.get_connected_qs(user))                                        # TODO !!
-            pass
+            # return self.filter(group = group, hidden = False, user__in = User.objects.connected_to(user))                         TODO !!!!!
+            return self
 
         return self.none()
 
@@ -43,11 +43,10 @@ class GroupMemberQuerySet(models.QuerySet):
         """ Returns True if and only if `user` is a member of the given `group`. """
         return self.filter(group=group, user=user).exists()
 
-    def are_related(self, user1, user2):
-        """ Return a queryset containing user1 memberships where user2 is also a member of the same group """                                        # TODO !!
-        # groups_user2 = self.member
-        # return GroupMember.get_user_memberships_qs(user1).filter(group__in = GroupMember.get_user_memberships_qs(user2).values('group')).exists()
-        return self
+    def are_connected(self, user1, user2):
+        """ Return True if both users are members of at least one common group """
+        groups1 = Group.objects.filter(memberships__user = user1)
+        return GroupMember.objects.filter(user=user2, group__in = groups1).exists()
 
 
 
