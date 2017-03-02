@@ -33,9 +33,3 @@ class GroupMemberEntrySet(entries.EntrySet):
         UserConnection.destroy_gr(instance.user, instance.group)
         instance.delete()
         return response.Response(response.Success_Deleted)
-
-    my_groups = entries.sub_list(
-        action_name = "my_groups",
-        sub_queryset = GroupMember.objects.for_user,
-        serializer = GroupMember.serializer
-    )

@@ -5,7 +5,7 @@ from sigma_api.importer import load_ressource
 UserConnection = load_ressource("UserConnection")
 GroupMember = load_ressource("GroupMember")
 Chat = load_ressource("Chat")
-ChatMembers = load_ressource("ChatMembers")
+ChatMember = load_ressource("ChatMember")
 
 # TODO : Add unique username for frontends URLs
 
@@ -45,7 +45,8 @@ class UserQuerySet(models.QuerySet):
         a common group, or a common chat'''
 
         if (UserConnection.objects.are_connected(user1, user2) or \
-                GroupMember.objects.are_connected(user1, user2)):
+                GroupMember.objects.are_connected(user1, user2)) or \
+                ChatMember.objects.are_connected(user1,user2):
             return True
 
         return False

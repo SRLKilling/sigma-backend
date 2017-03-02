@@ -8,7 +8,8 @@ class ChatQuerySet(models.QuerySet):
 
     def user_can_see(self, user):
         """ QS of all the chats a user can see"""
-        return self.filter(user=user)
+        chat_pks = ChatMember.objects.filter(user=user).values("chat")
+        return self.filter(pk__in = chat_pks)
 
 
 

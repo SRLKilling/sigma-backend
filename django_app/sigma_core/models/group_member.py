@@ -125,7 +125,7 @@ class GroupMember(models.Model):
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
 
-    #No need for my_groups, list
+    #No need for list
 
     def can_retrieve(self, user):
         """ Check whether `user` can retrieve the membership.
