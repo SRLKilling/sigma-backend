@@ -27,7 +27,7 @@ class PublicationEntrySet(entries.EntrySet):
     retrieve = entries.retrieve()
 
     list = entries.list(
-        queryset = Publication.objects.visible_by_user,
+        queryset = Publication.objects.sort().visible_by_user,
         serializer = Publication.serializer
     )
 
@@ -42,7 +42,7 @@ class PublicationEntrySet(entries.EntrySet):
     )
 
     comments = entries.sub_list(
-        sub_queryset = lambda user, publication: Comment.objects.on_publication(publication),
+        sub_queryset = lambda user, publication: Comment.objects.on_publication(publication).sort(),
         serializer = Comment.serializer
     )
 

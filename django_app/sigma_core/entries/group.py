@@ -22,7 +22,7 @@ class GroupEntrySet(entries.EntrySet):
     )
 
     publications = entries.sub_list(
-        sub_queryset = lambda user, group: Publication.objects.in_group(group),
+        sub_queryset = lambda user, group: Publication.objects.in_group(group).sort(),
         serializer = Publication.serializer
     )
 

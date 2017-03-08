@@ -9,7 +9,7 @@ class PublicationQuerySet(models.QuerySet):
         return self.order_by('-last_commented')
 
     def created_by(self, user):
-        return self
+        return self.filter(author = user)
 
     def visible_by_user(self, user):
         ids = SharedPublication.objects.visible_by_user(user).values('publication').distinct()
