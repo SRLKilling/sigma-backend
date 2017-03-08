@@ -8,4 +8,4 @@ class EventSerializerSet(serializers.drf.ModelSerializer):
 
     class Meta:
         model = Event.model
-        exclude = ()
+        fields = "__all__"

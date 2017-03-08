@@ -21,6 +21,10 @@ class PublicationQuerySet(models.QuerySet):
     def without_event(self):
         return self.filter(related_event__isnull=True)
 
+    def in_group(self, group):
+        ids = SharedPublication.objects.in_group(group).values('publication').distinct()
+        return self.filter(pk__in = ids)
+
 class Publication(models.Model):
     """
         An abstract publication

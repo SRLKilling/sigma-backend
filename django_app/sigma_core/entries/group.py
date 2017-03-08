@@ -4,6 +4,7 @@ from sigma_api.importer import load_ressource
 Group = load_ressource("Group")
 GroupMember = load_ressource("GroupMember")
 GroupInvitation = load_ressource("GroupInvitation")
+Publication = load_ressource("Publication")
 
 class GroupEntrySet(entries.EntrySet):
 
@@ -20,11 +21,15 @@ class GroupEntrySet(entries.EntrySet):
         serializer = GroupMember.serializer
     )
 
+    publications = entries.sub_list(
+        sub_queryset = lambda user, group: Publication.objects.in_group(group),
+        serializer = Publication.serializer
+    )
+
     invitations = entries.sub_list(
         sub_queryset = GroupInvitation.objects.get_group_invitations_pending,
         serializer = GroupInvitation.serializer
     )
-
 
     @entries.global_entry(bind_set=True, methods=["post"])
     def create(self, user, data):
