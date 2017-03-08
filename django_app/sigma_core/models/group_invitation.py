@@ -8,7 +8,7 @@ class GroupInvitationQuerySet(models.QuerySet):
     def get_user_invitations(self,user):
         """ Return a queryset containing the list of invitations where `user` is the invitee
             `user` can be a model instance, or a primary key """
-        return self.filter(invitee = user).order_by(date)
+        return self.filter(invitee = user).order_by("date")
 
     def get_group_invitations_qs(self, user, group):
         """ Return a queryset containing the list of invitations where `group` is the inviter group

@@ -68,3 +68,4 @@ def register_model(res_name):
 def register_entry(res_name, base_name):
     Res = load_ressource(res_name)
     Res.entries.register(base_name)
+    Res.model

@@ -21,10 +21,10 @@ class ChatEntrySet(entries.EntrySet):
 
     @entries.detailed_entry(methods=["post"])
     def list_messages(user, data, pk):
-        qs = ChatMessage.get_messages_of_chat(pk)
+        qs = ChatMessage.objects.get_messages_of_chat(pk)
         return shortcuts.list(user, data, qs, ChatMessage.serializer.default)
 
     @entries.detailed_entry(methods=["post"])
     def list_members(user, data, pk):
-        qs = ChatMember.get_members_of_chat(pk)
+        qs = ChatMember.objects.get_members_of_chat(pk)
         return shortcuts.list(user, data, qs, ChatMember.serializer.default)

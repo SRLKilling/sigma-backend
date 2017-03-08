@@ -23,7 +23,7 @@ class ChatMessage(models.Model):
     user = models.ForeignKey('User', related_name='my_chat_messages')
     chat = models.ForeignKey('Chat', related_name='messages')
     created_date = models.DateTimeField(auto_now_add=True)
-    message = models.TextFIeld(Default="")
+    message = models.TextField(default="")
 
 
     #*********************************************************************************************#
@@ -31,6 +31,6 @@ class ChatMessage(models.Model):
     #*********************************************************************************************#
 
     #LIST VIA CHAT entry
-    
+
     def can_create(self, user):
         return ChatMember.objects.is_chat_member(user, self.chat)
