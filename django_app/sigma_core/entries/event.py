@@ -31,7 +31,7 @@ class EventEntrySet(entries.EntrySet):
     )
 
     participants = entries.sub_list(
-        res_queryset = Event.objects,
+        #res_queryset = Event.objects,
         sub_queryset = lambda user, event: Participation.objects.for_event(event),
         serializer = Participation.serializer
     )

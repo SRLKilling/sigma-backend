@@ -31,6 +31,21 @@ class PublicationEntrySet(entries.EntrySet):
         serializer = Publication.serializer
     )
 
+    likes = entries.sub_list(
+        sub_queryset = lambda user, publication: Like.objects.on_publication(publication),
+        serializer = Like.serializer
+    )
+
+    tags = entries.sub_list(
+        sub_queryset = lambda user, publication: Tag.objects.on_publication(publication),
+        serializer = Tag.serializer
+    )
+
+    comments = entries.sub_list(
+        sub_queryset = lambda user, publication: Comment.objects.on_publication(publication),
+        serializer = Comment.serializer
+    )
+
     #@entries.detailed_entry(bind_set=True, methods=["post"])
     #def destroy(self, user, data, pk):
     #instance = GroupMember.get(pk=pk)
