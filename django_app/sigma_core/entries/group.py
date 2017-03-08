@@ -1,10 +1,12 @@
-from sigma_api import entries, response
+from sigma_api import entries, response, shortcuts
 from sigma_api.importer import load_ressource
 
 Group = load_ressource("Group")
 GroupMember = load_ressource("GroupMember")
 GroupInvitation = load_ressource("GroupInvitation")
 Publication = load_ressource("Publication")
+Chat = load_ressource("Chat")
+ChatMember = load_ressource("ChatMember")
 
 class GroupEntrySet(entries.EntrySet):
 
@@ -35,12 +37,12 @@ class GroupEntrySet(entries.EntrySet):
     def create(self, user, data):
         ''' modified to put the creator as an superadmin'''
         #Can we access easily data.group without deserializing?
-        serializer = shortcuts.get_validated_serializer(Group.serializer, data=data)
-        group = Group.model(**serializer.validated_data)
-        GroupMember.models.create_admin(user, group)
-        Chat.models.create_chat(user,group)
-        ChatMember.models.add_new_member(user,group)
-        return shortcuts.create(user, data, self.get_serializer(None), "create")
+        s=shortcuts.create(user, data, self.get_serializer(None), "create")
+        g = Group.objects.latest("pk")
+        GroupMember.model.create_admin(user, g)
+        Chat.model.create_chat(g)
+        ChatMember.model.add_new_member(user,g)
+        return s
 
     # update_right = entries.update(
         # Group.serializers.default,

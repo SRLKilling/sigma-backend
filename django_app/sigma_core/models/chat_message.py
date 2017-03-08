@@ -6,8 +6,8 @@ ChatMember = load_ressource("ChatMember")
 
 class ChatMessageQuerySet(models.QuerySet):
 
-    def get_messages_of_chat(self, chat):
-        return self.filter(chat=chat).order_by(created_date)
+    def get_messages_of_chat(self, user, chat):
+        return self.filter(chat=chat).order_by('created_date')
 
 class ChatMessage(models.Model):
     """
@@ -33,4 +33,5 @@ class ChatMessage(models.Model):
     #LIST VIA CHAT entry
 
     def can_create(self, user):
-        return ChatMember.objects.is_chat_member(user, self.chat)
+        #we need to check that the chatMessage.user is the user that sends the request
+        return ChatMember.objects.is_chat_member(user, self.chat) and self.user == user
