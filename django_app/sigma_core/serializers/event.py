@@ -1,12 +1,11 @@
-from rest_framework import serializers
+from sigma_api import serializers
 from sigma_api.importer import load_ressource
-from sigma_api.serializers import SerializerSet
 
 Event = load_ressource("Event")
 
-class EventSerializerSet(SerializerSet):
+@serializers.set
+class EventSerializerSet(serializers.drf.ModelSerializer):
 
-    class EventSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = Event.model
-            exclude = ()
+    class Meta:
+        model = Event.model
+        exclude = ()

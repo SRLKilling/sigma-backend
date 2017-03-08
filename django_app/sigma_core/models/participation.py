@@ -4,10 +4,10 @@ from sigma_api.importer import load_ressource
 class ParticipationQuerySet(models.QuerySet):
 
     def invited(self):
-        return self.filter(POSSIBLE_STATUS = 0)
+        return self.filter(status = 0)
 
     def interested(self):
-        return self.filter(POSSIBLE_STATUS = 1)
+        return self.filter(status = 1)
 
     def for_user(self, user):
        return self.filter(user = user)

@@ -1,12 +1,11 @@
-from rest_framework import serializers
+from sigma_api import serializers
 from sigma_api.importer import load_ressource
-from sigma_api.serializers import SerializerSet
 
 Publication = load_ressource("Publication")
 
-class PublicationSerializerSet(SerializerSet):
+@serializers.set
+class PublicationSerializerSet(serializers.drf.ModelSerializer):
 
-    class PublicationSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = Publication.model
-            exclude = ()
+    class Meta:
+        model = Publication.model
+        exclude = ()

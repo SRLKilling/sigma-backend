@@ -1,11 +1,11 @@
 from sigma_api import serializers
 from sigma_api.importer import load_ressource
 
-Comment = load_ressource("Comment")
+Like = load_ressource("Like")
 
 @serializers.set
-class CommentSerializerSet(serializers.drf.ModelSerializer):
+class LikeSerializerSet(serializers.drf.ModelSerializer):
 
     class Meta:
-        model = Comment.model
+        model = Like.model
         exclude = ()
