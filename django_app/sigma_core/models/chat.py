@@ -54,10 +54,13 @@ class Chat(models.Model):
     #*********************************************************************************************#
 
     def can_retrieve(self, user):
-        return user in self.get_members_qs()
+        return ChatMember.objects.is_chat_member(user, self)
 
     def can_list_chat_members(self,user):
-        return user in self.get_members_qs()
+        return ChatMember.objects.is_chat_member(user, self)
 
     def can_list_chat_messages(self,user):
-        return user in self.get_members_qs()
+        return ChatMember.objects.is_chat_member(user, self)
+
+    def can_list(self, user):
+        return True

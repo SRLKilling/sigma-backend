@@ -7,7 +7,7 @@ Chat = load_ressource("Chat")
 class ChatMemberQuerySet(models.QuerySet):
 
     def get_members_of_chat(self, chat):
-        return self.filter(chat=chat).order_by(join_date)
+        return self.filter(chat=chat).order_by("join_date")
 
     def is_chat_member(self, user, chat):
         return self.get(user=user, chat=chat).exists()
@@ -15,7 +15,7 @@ class ChatMemberQuerySet(models.QuerySet):
     def are_connected(self, user1, user2):
         """ Return True if both users are members of at least one common chat """
         chat1 = Chat.objects.filter(members_user = user1)
-        return ChatMember.objects.filter(user=user2, chat__in = groups1).exists()
+        return self.filter(user=user2, chat__in = groups1).exists()
 
 
 class ChatMember(models.Model):

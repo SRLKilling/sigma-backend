@@ -16,7 +16,7 @@ class ChatSerializerSet(serializers.drf.ModelSerializer):
         #exclude = ('is_full_group_chat',)
 
     def get_number_of_members(self, obj):
-        return ChatMember.filter(chat=obj).count()
+        return ChatMember.objects.filter(chat=obj).count()
 
     @serializers.sub
     class list:
