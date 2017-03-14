@@ -154,7 +154,7 @@ def update(user, data, pk, serializer_class, action_name):
     new_ser.save()
     return response.Response(response.Success_Updated, new_ser.data)
 
-def destroy(user, data, queryset_gen, action_name):
+def destroy(user, data, pk, queryset_gen, action_name):
     """
         This method is an entry that destroy a ressource.
         Check for permissions, and save the object in the database
