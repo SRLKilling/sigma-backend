@@ -163,9 +163,9 @@ class GroupMember(models.Model):
             If `user` is trying to kick an admin, he must be a super admin himself
             We can never kick a super admin.
         """
-        user_membership = GroupMember.get_membership(self.group, user)
+        user_membership = GroupMember.objects.get_membership(self.group, user)
 
-        return (user_membership != None) and (user_membership.can_kick or user_membership.is_administrator or user_membership.is_super_administrator) and (not self.is_administrator or user_membership.is_super_administrator) and (not self.is_super_administrator)
+        return (user_membership != None) and (user_membership.has_kick_right or user_membership.is_administrator or user_membership.is_super_administrator) and (not self.is_administrator or user_membership.is_super_administrator) and (not self.is_super_administrator)
 
 
 

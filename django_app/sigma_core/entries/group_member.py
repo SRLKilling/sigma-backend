@@ -2,6 +2,7 @@ from sigma_api import entries, response, shortcuts
 from sigma_api.importer import load_ressource
 
 GroupMember = load_ressource("GroupMember")
+UserConnection = load_ressource("UserConnection")
 
 class GroupMemberEntrySet(entries.EntrySet):
 
@@ -25,11 +26,13 @@ class GroupMemberEntrySet(entries.EntrySet):
 
     update = entries.update()
 
-    @entries.detailed_entry(bind_set=True, methods=["post"])
-    def destroy(self, user, data, pk):
-        '''modified to handle UserConnection'''
-        instance = GroupMember.get(pk=pk)
-        shortcuts.check_permission(user, instance, "destroy")
-        UserConnection.destroy_gr(instance.user, instance.group)
-        instance.delete()
-        return response.Response(response.Success_Deleted)
+    destroy = entries.destroy()
+
+    # @entries.detailed_entry(bind_set=True, methods=["post"])
+    # def destroy(self, user, data, pk):
+    #     '''modified to handle UserConnection'''
+    #     instance = GroupMember.objects.get(pk=pk)
+    #     shortcuts.check_permission(user, instance, "destroy")
+    #     #UserConnection.destroy_gr(instance.user, instance.group)
+    #     instance.delete()
+    #     return response.Response(response.Success_Deleted)
