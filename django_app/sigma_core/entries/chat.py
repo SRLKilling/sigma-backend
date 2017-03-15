@@ -13,11 +13,21 @@ class ChatEntrySet(entries.EntrySet):
         Chat.serializers.list
     )
 
-    retrieve = entries.retrieve()
+    #What's the point of a retrieve route ?
+    #retrieve = entries.retrieve()
 
-    create = entries.create()
+    @entries.global_entry(bind_set=True, methods=["post"])
+    def create(self, user, data):
+        ''' modified to put the creator as an superadmin'''
+        #Can we access easily data.group without deserializing?
+        s=shortcuts.create(user, data, self.get_serializer(None), "create")
+        c = Chat.objects.latest("pk")
+        ChatMember.model.add_new_member_to_chat(user,c)
+        return s
 
-    destroy = entries.destroy()
+
+    #TODO : Do we really make a destroy option ??
+    #destroy = entries.destroy()
 
     list_messages = entries.sub_list(
         sub_queryset = ChatMessage.objects.get_messages_of_chat,

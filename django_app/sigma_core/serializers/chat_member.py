@@ -5,8 +5,9 @@ from sigma_api.serializers import SerializerSet
 ChatMember = load_ressource("ChatMember")
 
 @serializers.set
-class ChatMemberSerializerSet(SerializerSet):
+class ChatMemberSerializerSet(serializers.drf.ModelSerializer):
 
     class Meta:
         model = ChatMember.model
+        fields = '__all__'
         #exclude = ('join_date', )
