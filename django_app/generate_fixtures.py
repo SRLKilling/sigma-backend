@@ -170,6 +170,27 @@ def randomPublication(user, group, event = 0):
     publication['last_commented'] = randomdate()
     return JSONizer('sigma_core.publication', publication)
 
+def generateGroupChat(group):
+    chat = {}
+    chat['group'] = group
+    chat['is_full_group_chat'] = True
+    return JSONizer('sigma_core.chat', chat)
+
+def generateChatMember(user, chat):
+    chatmember = {}
+    chatmember['chat']=chat
+    chatmember['user']=user
+    chatmember['join_date']=randomdate()
+    return JSONizer('sigma_core.chatmember', chatmember)
+
+def randomChatMessage(user, chat):
+    chatmessage = {}
+    chatmessage['chat']=chat
+    chatmessage['user']=user
+    chatmessage['message']="Salut, c'est cool"
+    chatmessage['created_date'] = randomdate()
+    return JSONizer('sigma_core.chatmessage', chatmessage)
+
 def randomTag(user, publication):
     tag = {}
     tag['user'] = user
@@ -212,7 +233,7 @@ def randomGroupField(group):
 
 def generateMember(group, user, sa):
     member = {}
-    member['group'] = group
+    member['group'] = group#generate chat members
     member['user'] = user
     member['created'] = randomdate()
     member['hidden'] = randombool()
@@ -312,14 +333,18 @@ def generateFixtures(filepath):
             f.write( randomGroupField(i) )
             group_fields[i].append(primary_keys["sigma_core.groupfield"])
 
-    print('OK\n  Generating memberships and field values.. ', end='')
-    for i in range(1, GROUP_NUM):
+    print('OK\n  Generating memberships, chats, chatmembers and field values.. ', end='')
+    for i in range(1, GROUP_NUM-1):
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
-        for j in range(member_num):                                     # Generate members
+        f.write(generateGroupChat(i))
+        for j in range(member_num):                                     # Generate members, chat members, chat messages
             member = randint_norepeat(members, 1, USER_NUM)
             members.append(member)
             f.write( generateMember(i, member, (j==0)) )
+            f.write( generateChatMember(member, i))
+            if random.randint(0,2)>1:
+                f.write( randomChatMessage(member, i))
 
             group_fields_value_num = random.randint(1, len(group_fields[i]))    # Generate group field values
             already_selected_fields = []
@@ -330,6 +355,8 @@ def generateFixtures(filepath):
                         break
                 already_selected_fields.append(field)
                 f.write( randomGroupFieldValue(member, field) )
+
+
 
     print('OK\n  Generating events... ', end='')
     for i in range(1, EVENT_NUM + 1):

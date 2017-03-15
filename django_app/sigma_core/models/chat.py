@@ -42,7 +42,7 @@ class Chat(models.Model):
         """
             Create a chat based on the given group.
         """
-        Chat.model(is_full_group_chat=True, group=group).save()
+        Chat(is_full_group_chat=True, group=group).save()
 
     @property
     def number_of_members(self):

@@ -1,4 +1,4 @@
-from sigma_api import entries, response
+from sigma_api import entries, response, shortcuts
 from sigma_api.importer import load_ressource
 
 Chat = load_ressource("Chat")
@@ -19,12 +19,12 @@ class ChatEntrySet(entries.EntrySet):
 
     destroy = entries.destroy()
 
-    @entries.detailed_entry(methods=["post"])
-    def list_messages(user, data, pk):
-        qs = ChatMessage.objects.get_messages_of_chat(pk)
-        return shortcuts.list(user, data, qs, ChatMessage.serializer.default)
+    list_messages = entries.sub_list(
+        sub_queryset = ChatMessage.objects.get_messages_of_chat,
+        serializer = ChatMessage.serializer.default
+    )
 
-    @entries.detailed_entry(methods=["post"])
-    def list_members(user, data, pk):
-        qs = ChatMember.objects.get_members_of_chat(pk)
-        return shortcuts.list(user, data, qs, ChatMember.serializer.default)
+    list_members = entries.sub_list(
+        sub_queryset = ChatMember.objects.get_members_of_chat,
+        serializer = ChatMessage.serializer.default
+    )

@@ -6,16 +6,16 @@ Chat = load_ressource("Chat")
 
 class ChatMemberQuerySet(models.QuerySet):
 
-    def get_members_of_chat(self, chat):
-        return self.filter(chat=chat).order_by("join_date")
+    def get_members_of_chat(self, user, chat):
+        return self.filter(chat=chat).order_by('join_date')
 
     def is_chat_member(self, user, chat):
-        return self.get(user=user, chat=chat).exists()
+        return self.filter(user=user, chat=chat).exists()
 
     def are_connected(self, user1, user2):
         """ Return True if both users are members of at least one common chat """
-        chat1 = Chat.objects.filter(members_user = user1)
-        return self.filter(user=user2, chat__in = groups1).exists()
+        chat1 = Chat.objects.filter(members__user = user1)
+        return self.filter(user=user2, chat = chat1).exists()
 
 
 class ChatMember(models.Model):
@@ -42,9 +42,9 @@ class ChatMember(models.Model):
         """
             add a new member to a chat linked to a group
         """
-        c = Chat.objects.filter(is_full_group_chat=True, group=group)
+        c = Chat.objects.get(is_full_group_chat=True, group=group)
         try:
-            ChatMember.model(user=user,chat=c).save()
+            ChatMember(user=user,chat=c).save()
         except c.DoesNotExist:
             print("Error : no chat with this group")
 

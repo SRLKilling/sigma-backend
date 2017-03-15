@@ -39,7 +39,8 @@ class Group(models.Model):
     #**                                       Fields                                            **#
     #*********************************************************************************************#
 
-    name = models.CharField(max_length=254)
+
+    name = models.CharField(max_length=254, unique=True)
     description = models.TextField(blank=True)
     is_protected = models.BooleanField(default=False) # if True, the Group cannot be deleted
 
