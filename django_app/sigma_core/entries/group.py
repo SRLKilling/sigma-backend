@@ -7,6 +7,7 @@ GroupInvitation = load_ressource("GroupInvitation")
 Publication = load_ressource("Publication")
 Chat = load_ressource("Chat")
 ChatMember = load_ressource("ChatMember")
+User = load_ressource("User")
 
 class GroupEntrySet(entries.EntrySet):
 
@@ -50,3 +51,13 @@ class GroupEntrySet(entries.EntrySet):
     # )
 
     destroy = entries.destroy()
+
+    list_members = entries.sub_list(
+        sub_queryset = GroupMember.objects.user_can_see,
+        serializer = GroupMember.serializer
+    )
+
+    my_groups = entries.sub_list(
+        sub_queryset = Group.objects.user_is_member,
+        serializer = Group.serializer.list
+    )

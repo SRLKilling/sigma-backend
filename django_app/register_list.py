@@ -11,6 +11,7 @@ register_entry("ChatMessage","chat-message")
 register_entry("ChatMember","chat-member")
 register_entry("Event", "event")
 register_entry("Publication", "publication")
+register_entry("Search","search")
 
 # Ressources to be made visible to Django, but without entries
 register_model("UserConnection")

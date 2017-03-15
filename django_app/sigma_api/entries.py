@@ -82,6 +82,7 @@ def retrieve(queryset=None, serializer=None, action_name="retrieve"):
 def list(queryset=None, serializer=None, filter_class = None, action_name="list"):
     @global_entry(name=action_name, bind_set=True)
     def entry(entryset, user, data):
+        print("OKKKKK")
         return shortcuts.list(user, data, entryset.get_queryset(queryset), entryset.get_serializer(serializer))
     return entry
 

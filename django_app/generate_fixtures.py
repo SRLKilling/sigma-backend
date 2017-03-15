@@ -5,6 +5,7 @@ import sys
 
 USER_NUM = 500
 GROUP_NUM = 300
+CHAT_NUM = 30
 MEMBER_NUM = (5, 50)
 
 ACKNOW_NUM = 700
@@ -173,6 +174,11 @@ def generateGroupChat(group):
     chat = {}
     chat['group'] = group
     chat['is_full_group_chat'] = True
+    return JSONizer('sigma_core.chat', chat)
+
+def generateNoGroupChat():
+    chat = {}
+    chat['is_full_group_chat'] = False
     return JSONizer('sigma_core.chat', chat)
 
 def generateChatMember(user, chat):
@@ -356,7 +362,17 @@ def generateFixtures(filepath):
                 already_selected_fields.append(field)
                 f.write( randomGroupFieldValue(member, field) )
 
-
+    print('OK\n Generating independant chats and chatmembers... ', end='')
+    for i in range(GROUP_NUM-1, GROUP_NUM-1+CHAT_NUM):
+        member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
+        members = []
+        f.write(generateNoGroupChat())
+        # for j in range(member_num):
+        #     member = randint_norepeat(members, 1, USER_NUM)
+        #     members.append(member)
+        #     f.write( generateChatMember(member, i))
+        #     if random.randint(0,2)>1:
+        #         f.write( randomChatMessage(member, i))
 
     print('OK\n  Generating events... ', end='')
     for i in range(1, EVENT_NUM + 1):

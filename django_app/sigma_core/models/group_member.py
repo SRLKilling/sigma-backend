@@ -33,7 +33,6 @@ class GroupMemberQuerySet(models.QuerySet):
 
         return self.none()
 
-
     def get_membership(self, group, user):
         """ Tries to get the membership corresponding to the given `user` and `group` """
         return self.get(group=group, user=user)
@@ -163,10 +162,11 @@ class GroupMember(models.Model):
             If `user` is trying to kick an admin, he must be a super admin himself
             We can never kick a super admin.
         """
-        user_membership = GroupMember.objects.get_membership(self.group, user)
-
-        return (user_membership != None) and (user_membership.has_kick_right or user_membership.is_administrator or user_membership.is_super_administrator) and (not self.is_administrator or user_membership.is_super_administrator) and (not self.is_super_administrator)
-
+        if GroupMember.objects.is_member(self.group, user):
+            print("ok")
+            user_membership = GroupMember.objects.get_membership(self.group, user)
+            return (user_membership != None) and (user_membership.has_kick_right or user_membership.is_administrator or user_membership.is_super_administrator) and (not self.is_administrator or user_membership.is_super_administrator) and (not self.is_super_administrator)
+        return False
 
 
     def can_create(self, user):
