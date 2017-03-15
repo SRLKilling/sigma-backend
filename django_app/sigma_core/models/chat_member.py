@@ -48,6 +48,16 @@ class ChatMember(models.Model):
         except c.DoesNotExist:
             print("Error : no chat with this group")
 
+    @staticmethod
+    def add_new_member_to_chat(user,chat):
+        """
+            add a new member to a chat (usefull when we create a new chat)
+        """
+        try:
+            ChatMember(user=user,chat=chat).save()
+        except c.DoesNotExist:
+            print("Error : no chat")
+
 
     #*********************************************************************************************#
     #**                                    Permissions                                          **#

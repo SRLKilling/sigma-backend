@@ -1,6 +1,6 @@
 from sigma_api import serializers
 from sigma_api.importer import load_ressource
-from sigma_api.serializers import SerializerSet
+
 
 Chat = load_ressource("Chat")
 ChatMember = load_ressource("ChatMember")
@@ -13,6 +13,7 @@ class ChatSerializerSet(serializers.drf.ModelSerializer):
     class Meta:
 
         model = Chat.model
+        fields = '__all__'
         #exclude = ('is_full_group_chat',)
 
     def get_number_of_members(self, obj):
