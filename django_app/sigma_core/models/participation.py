@@ -32,4 +32,17 @@ class Participation(models.Model):
         return "Participation(" + ", ".join([self.user.__str__(), self.event.__str__(), str(self.status)]) + ")"
 
     def can_retrieve(self, user):
-        return True
+        b = True
+        b = b and self.event.can_retrieve(self)
+        return b
+
+    def can_create(self, user):
+        b = True
+        b = b and self.event.can_retrieve(self)
+        b = b and self.user = user
+        return b
+
+    def can_destroy(self, user):
+        b = True
+        b = b and self.user == user
+        return b

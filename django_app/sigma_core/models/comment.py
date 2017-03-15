@@ -1,6 +1,8 @@
 from django.db import models
 from sigma_api.importer import load_ressource
 
+Publication = load_ressource("Publication")
+
 class CommentQuerySet(models.QuerySet):
 
     def sort(self):
@@ -25,10 +27,17 @@ class Comment(models.Model):
         return "Comment(" + ", ".join([self.user.__str__(), self.publication.__str__(), self.date.__str__()]) + ")"
 
     def can_retrieve(self, user):
-        return True
+        b = True
+        b = b and Publication.objects.visible_by_user(user).filter(pk = self.pk).exists()
+        return b
 
     def can_create(self, user):
-        return True
+        b = True
+        b = b and user == self.user
+        b = b and self.publication.can_retrieve(user)
+        return b
 
     def can_destroy(self, user):
-        return True
+        b = True
+        b = b and user == self.user
+        return b

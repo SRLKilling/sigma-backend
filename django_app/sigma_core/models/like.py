@@ -20,4 +20,17 @@ class Like(models.Model):
         return "Like(" + ", ".join([self.user.__str__(), self.publication.__str__()]) + ")"
 
     def can_retrieve(self, user):
-        return True
+        b = True
+        b = b and self.publication.can_retrieve(user)
+        return b
+
+    def can_create(self, user):
+        b = True
+        b = b and self.publication.can_retrieve(user)
+        b = b and self.user == user
+        return b
+
+    def can_destroy(self, user):
+        b = True
+        b = b and self.user == user
+        return b

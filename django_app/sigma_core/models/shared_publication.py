@@ -31,6 +31,8 @@ class SharedPublication(models.Model):
 
     publication = models.ForeignKey("Publication", related_name='shared')
 
+    author = models.ForeignKey("Author", related_name='shared')
+
     group = models.ForeignKey("Group", related_name='shared_publications')
     approved = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now_add=True)
@@ -49,4 +51,16 @@ class SharedPublication(models.Model):
         return pub
 
     def can_retrieve(self, user):
-        return True
+        b = True
+        # TODO
+        return b
+
+    def can_create(self, user):
+        b = True
+        # TODO
+        return b
+
+    def can_destroy(self, user):
+        b = True
+        # TODO
+        return b

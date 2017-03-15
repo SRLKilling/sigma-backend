@@ -32,7 +32,6 @@ class Publication(models.Model):
 
     objects = PublicationQuerySet.as_manager()
 
-    group = models.ForeignKey("Group", related_name='publications')
     author = models.ForeignKey("User")
     date = models.DateTimeField(auto_now_add=True)
 
@@ -53,4 +52,17 @@ class Publication(models.Model):
         return s
 
     def can_retrieve(self, user):
+        b = True
+        b = b and Publication.objects.visible_by_user(user).filter(pk = self.pk).exists()
+        return b
+
+    def can_create(self, user):
+        b = True
+        b = b and self.author == user
+        b = b and self.related_event.can_retrieve(user)
+        return True
+
+    def can_destroy(self, user):
+        b = True
+        b = b and self.author == user
         return True

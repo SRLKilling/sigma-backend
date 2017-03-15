@@ -24,4 +24,17 @@ class Tag(models.Model):
         return "Tag(" + ", ".join([self.user.__str__()  +  self.tagged.__str__() + self.publication.__str__()]) + ")"
 
     def can_retrieve(self, user):
-        return True
+        b = True
+        b = b and self.publication.can_retrieve(user)
+        return b
+
+    def can_create(self, user):
+        b = True
+        b = b and self.publication.can_retrieve(user)
+        b = b and self.user == user
+        return b
+
+    def can_destroy(self, user):
+        b = True
+        b = b and self.user == user
+        return b

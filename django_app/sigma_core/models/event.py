@@ -84,4 +84,16 @@ class Event(models.Model):
         self.delete()
 
     def can_retrieve(self, user):
-        return True
+        b = True
+        b = b and Event.objects.visible_by_user(user).filter(pk = self.pk).exists()
+        return b
+
+    def can_create(self, user):
+        b = True
+        b = b and user == self.author
+        return b
+
+    def can_destroy(self, user):
+        b = True
+        b = b and user == self.author
+        return b
