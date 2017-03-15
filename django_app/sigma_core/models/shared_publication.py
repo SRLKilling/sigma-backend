@@ -31,7 +31,7 @@ class SharedPublication(models.Model):
 
     publication = models.ForeignKey("Publication", related_name='shared')
 
-    author = models.ForeignKey("Author", related_name='shared')
+    author = models.ForeignKey("User", related_name='shared')
 
     group = models.ForeignKey("Group", related_name='shared_publications')
     approved = models.BooleanField(default=True)

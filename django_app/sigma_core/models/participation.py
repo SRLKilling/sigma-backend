@@ -39,7 +39,7 @@ class Participation(models.Model):
     def can_create(self, user):
         b = True
         b = b and self.event.can_retrieve(self)
-        b = b and self.user = user
+        b = b and self.user == user
         return b
 
     def can_destroy(self, user):

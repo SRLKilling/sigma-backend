@@ -159,7 +159,6 @@ def randomParticipation(user, event):
 
 def randomPublication(user, group, event = 0):
     publication = {}
-    publication['group'] = group
     publication['author'] = user
     if event:
         publication['related_event'] = event
@@ -217,6 +216,7 @@ def share(publication, group):
     shared = {}
     shared['group'] = group
     shared['publication'] = publication
+    shared['author'] = user
     shared['date'] = randomdate()
     date = randomdate()
     return JSONizer('sigma_core.sharedpublication', shared)
