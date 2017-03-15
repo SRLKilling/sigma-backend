@@ -42,6 +42,16 @@ class EventEntrySet(entries.EntrySet):
         serializer = Participation.serializer
     )
 
+    my_invitations = entries.sub_list(
+        sub_queryset = lambda user, event: Participation.objects.for_user(user).invited(),
+        serializer = Participation.serializer
+    )
+
+    my_interest = entries.sub_list(
+        sub_queryset = lambda user, event: Participation.objects.for_user(user).interested(),
+        serializer = Participation.serializer
+    )
+
     #@entries.detailed_entry(bind_set=True, methods=["post"])
     #def destroy(self, user, data, pk):
     #instance = GroupMember.get(pk=pk)

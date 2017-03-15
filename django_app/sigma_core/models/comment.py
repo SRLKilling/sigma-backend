@@ -26,3 +26,9 @@ class Comment(models.Model):
 
     def can_retrieve(self, user):
         return True
+
+    def can_create(self, user):
+        return True
+
+    def can_destroy(self, user):
+        return True
