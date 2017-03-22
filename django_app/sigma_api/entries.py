@@ -60,53 +60,50 @@ class Entry(object):
 def global_entry(name = None, **kwargs):
     """ This is the decorator used to generate global entries (i.e. not bound to a specific ressource) """
     def decorator(func):
-        n = (name) if (name != None) else (func.__name__)
-        return Entry(n, func, False, **kwargs)
+        # n = (name) if (name != None) else (func.__name__)
+        return Entry(name, func, False, **kwargs)
     return decorator
 
 def detailed_entry(name = None, **kwargs):
     """ Generate a detailed entry (i.e. with a pk) """
     def decorator(func):
-        n = (name) if (name != None) else (func.__name__)
-        return Entry(n, func, True, **kwargs)
+        # n = (name) if (name != None) else (func.__name__)
+        return Entry(name, func, True, **kwargs)
     return decorator
 
 #*********************************************************************************************#
 
-def retrieve(queryset=None, serializer=None, action_name="retrieve"):
+def retrieve(queryset=None, serializer=None, action_name=None):
     @detailed_entry(name=action_name, bind_set=True)
     def entry(entryset, user, data, pk):
         return shortcuts.retrieve(user, data, pk, entryset.get_queryset(queryset), entryset.get_serializer(serializer), action_name)
     return entry
 
-def list(queryset=None, serializer=None, filter_class = None, action_name="list"):
+def list(queryset=None, serializer=None, filter_class = None, action_name=None):
     @global_entry(name=action_name, bind_set=True)
     def entry(entryset, user, data):
-        print("OKKKKK")
         return shortcuts.list(user, data, entryset.get_queryset(queryset), entryset.get_serializer(serializer))
     return entry
 
-def sub_list(action_name = None, res_queryset=None, sub_queryset=None, serializer=None, filter_class = None):
+def sub_list(res_queryset=None, sub_queryset=None, serializer=None, filter_class = None, action_name = None):
     @detailed_entry(name=action_name, bind_set=True)
     def entry(entryset, user, data, pk):
         return shortcuts.sub_list(user, data, pk, entryset.get_queryset(res_queryset), entryset.get_queryset(sub_queryset), entryset.get_serializer(serializer))
     return entry
 
-lambda pk: Group.objets.for_group(pk).for_user
-
-def create(serializer=None, action_name="create"):
+def create(serializer=None, action_name=None):
     @global_entry(name=action_name, bind_set=True, methods=["post"])
     def entry(cls, user, data):
         return shortcuts.create(user, data, cls.get_serializer(serializer), action_name)
     return entry
 
-def update(serializer=None, action_name="update"):
+def update(serializer=None, action_name=None):
     @detailed_entry(name=action_name, bind_set=True, methods=["post"])
     def entry(cls, user, data, pk):
         return shortcuts.update(user, data, pk, cls.get_serializer(serializer), action_name)
     return entry
 
-def destroy(queryset=None, action_name="destroy"):
+def destroy(queryset=None, action_name=None):
     @detailed_entry(name=action_name, bind_set=True, methods=["post"])
     def entry(cls, user, data, pk):
         return shortcuts.destroy(user, data, pk, cls.get_queryset(queryset), action_name)

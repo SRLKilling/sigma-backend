@@ -29,7 +29,7 @@ def entry_to_view(entry, entryname):
 
     if not hasattr(entry, "name") or entry.name == None:
         entry.name = entryname;
-
+        
     # Simulate detail/list route decorator, only if not an existing entry
     if entry.name not in ["list", "retrieve", "create", "update", "destroy"]:
         view.bind_to_methods = (['get'] if (not "method" in entry.kwargs) else entry.kwargs["method"])
