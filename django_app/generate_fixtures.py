@@ -218,7 +218,7 @@ def randomComment(user, publication):
     return JSONizer('sigma_core.comment', comment)
 
 
-def share(publication, group):
+def share(publication, group, user):
     shared = {}
     shared['group'] = group
     shared['publication'] = publication
@@ -394,12 +394,12 @@ def generateFixtures(filepath):
             f.write(randomPublication(user, group, event))
         else:
             f.write(randomPublication(user, group))
-        f.write(share(i, group))
+        f.write(share(i, group, user))
         groups = [group]
         for k in range(SHARED_NUM):
             if random.random() < 0.1:
                 group = randint_norepeat(groups, 1, GROUP_NUM)
-                f.write(share(i, group))
+                f.write(share(i, group, user))
         for k in range(COMMENT_NUM):
             if random.random() < 0.3:
                 user = random.randint(1, USER_NUM)

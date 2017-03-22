@@ -1,7 +1,9 @@
 **/db.sqlite3
 **/fixtures.json
-data-server/django_app/static/
-data-server/django_app/sigma_core/migrations/*
+django_app/static/
+django_app/sigma_core/migrations/*
+
+venv/
 
 .env/
 

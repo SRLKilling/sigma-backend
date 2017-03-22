@@ -44,7 +44,7 @@ class Publication(models.Model):
     # last_commented : also when shared
 
     def __str__(self):
-        return "Publication(" + ", ".join([self.title, self.group.__str__(), self.author.__str__(), str(self.internal)]) + ")"
+        return "Publication(" + ", ".join([self.title, self.author.__str__(), str(self.internal)]) + ")"
 
     def share(self, group):
         s = SharedPublication.model(publication = self, group = group)
