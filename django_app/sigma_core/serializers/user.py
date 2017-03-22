@@ -7,6 +7,8 @@ User = load_ressource("User")
 @serializers.set
 class UserSerializerSet(serializers.drf.ModelSerializer):
 
+    score = serializers.drf.SerializerMethodField()
+
     class Meta:
         model = User.model
         fields = ('id', 'lastname', 'firstname', 'school', 'join_date')
@@ -16,13 +18,16 @@ class UserSerializerSet(serializers.drf.ModelSerializer):
     @serializers.sub
     class list:
         class Meta:
-            fields = ('id', 'lastname', 'firstname', 'school')
+            fields = ('id', 'lastname', 'firstname', 'school','score')
 
 
     @serializers.sub
     class stranger:
         class Meta:
             fields = ('id', 'lastname', 'firstname', 'school','email')
+
+    def get_score(self, user):
+        return 1 #TODO : create a formula for the score
 
     @staticmethod
     def from_relation(user2, *args, **kwargs):

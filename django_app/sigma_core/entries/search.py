@@ -1,6 +1,7 @@
 from sigma_api.importer import load_ressource
-from sigma_api import shortcuts, entries
+from sigma_api import shortcuts, entries, response
 from sigma_core.serializers.word import WordSerializer
+from django.db.models import Q
 
 Group = load_ressource("Group")
 GroupMember = load_ressource("GroupMember")
@@ -10,33 +11,26 @@ AcknowledgmentInvitation = load_ressource("AcknowledgmentInvitation")
 
 class SearchEntrySet(entries.EntrySet):
 
-    @entries.global_entry(methods=["post"])
-    def print_list(user, data):
+    @entries.global_entry(method=["post"])
+    def groups(user, data):
         """
             REST list action.
         """
 
-        word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data.word
+        word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data["word"]
 
         group_qs = Group.objects.filter(name__contains = word)
-        user_qs = User.objects.filter(name__contains = word)
 
-        group_serializer = Group.serializer.list(group_qs,many=True)
-        user_serializer = User.serializer.list(user_qs,many=True)
-        search_serializer = Search.Serializer(user=user_serializer,group=group_serializer)
+        return shortcuts.list(user, data, group_qs, Group.serializer.search)
 
-        return response.Response(response.Success_Retrieved, search_serializer.data)
+    @entries.global_entry(method=["post"])
+    def users(user, data):
+        """
+            REST list action.
+        """
 
-    @entries.global_entry(bind_set=True, methods=["post"])
-    def create(self, user, data):
+        word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data["word"]
 
-        word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data.word
+        user_qs = User.objects.filter(Q(firstname__contains = word) | Q(lastname__contains = word))
 
-        group_qs = Group.objects.filter(name__contains = word)
-        user_qs = User.objects.filter(name__contains = word)
-
-        group_serializer = Group.serializer.list(group_qs,many=True)
-        user_serializer = User.serializer.list(user_qs,many=True)
-        search_serializer = Search.Serializer(user=user_serializer,group=group_serializer)
-
-        return response.Response(response.Success_Retrieved, search_serializer.data)
+        return shortcuts.list(user, data, user_qs, User.serializer.list)

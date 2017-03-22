@@ -57,7 +57,7 @@ class GroupEntrySet(entries.EntrySet):
         serializer = GroupMember.serializer
     )
 
-    my_groups = entries.sub_list(
-        sub_queryset = Group.objects.user_is_member,
+    my_groups = entries.list(
+        queryset = Group.objects.user_is_member,
         serializer = Group.serializer.list
     )

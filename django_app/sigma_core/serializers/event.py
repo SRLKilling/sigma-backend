@@ -9,6 +9,7 @@ class EventSerializerSet(serializers.drf.ModelSerializer):
 
     number_interested = serializers.drf.SerializerMethodField()
     number_invited = serializers.drf.SerializerMethodField()
+    score = serializers.drf.SerializerMethodField()
 
     class Meta:
         model = Event.model
@@ -19,3 +20,6 @@ class EventSerializerSet(serializers.drf.ModelSerializer):
 
     def get_number_invited(self, event):
         return Participation.objects.for_event(event).invited().count()
+
+    def get_score(self, event):
+        return 1
