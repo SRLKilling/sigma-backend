@@ -121,6 +121,7 @@ def sub_list(user, data, pk, queryset_gen_original, queryset_gen_sub, serializer
             the sublist depends on.
         """
         instance = get_or_raise(queryset_gen_original, pk)
+        check_permission(user, instance, "retrieve")
         queryset = get_queryset(queryset_gen_sub, user, instance)
         # if filter_class != None:                                                                                          # TODO : filtering
             # filter = filter_class(queryset=queryset, data=data.uri_param)

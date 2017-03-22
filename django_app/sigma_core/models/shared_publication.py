@@ -39,7 +39,6 @@ class SharedPublication(models.Model):
 
     def __str__(self):
         return "SharedPublication(" + ", ".join([self.publication.__str__(), self.group.__str__(), str(self.approved), self.date.__str__()]) + ")"
-        return self.publication.title
 
     @staticmethod
     def post_internal(user, group, title, content, event = 0):
