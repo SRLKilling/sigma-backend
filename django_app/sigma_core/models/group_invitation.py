@@ -77,11 +77,13 @@ class GroupInvitation(models.Model):
             * If the invitation is issued by the invitee, the group must allow users to ask for invitations.
             * Otherwise, the inviter must have the corresponding right.
         """
+
         if self.issued_by_invitee:
             return (self.invitee == user) and (self.group.can_anyone_ask)
 
         else:
-            inviter_mb = GroupMember.objects.get_membership(user, self.group)
+            inviter_mb = GroupMember.objects.get(user=user, group=self.group)
+
             return inviter_mb != None and inviter_mb.has_invite_right
 
 

@@ -35,4 +35,4 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     @serializers.sub
     class search:
         class Meta:
-            fields = ('pk', 'name', 'number_of_members')
+            fields = ('pk', 'name', 'number_of_members','score')

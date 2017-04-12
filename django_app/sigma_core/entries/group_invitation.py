@@ -7,13 +7,13 @@ GroupMember = load_ressource("GroupMember")
 class GroupInvitationEntrySet(entries.EntrySet):
 
     retrieve = entries.retrieve()
-    
+
     @entries.global_entry(methods=["post"])
     def create(user, data):
         serializer = shortcuts.get_validated_serializer(GroupInvitation.serializer, data=data)
         instance = GroupInvitation.model(**serializer.validated_data)
         shortcuts.check_permission(user, instance, "create")
-        if instance.user==user:
+        if instance.invitee==user:
             if not instance.group.need_validation_to_join:
                 new_instance=GroupMember.model(user=user,group=instance.group)
                 new_instance.save()
@@ -25,9 +25,10 @@ class GroupInvitationEntrySet(entries.EntrySet):
 
     destroy = entries.destroy()
 
-    @entries.global_entry(methods=["get"])
+    @entries.detailed_entry(methods=["post"])
     def accept(user, data, pk):
-        invit = GroupInvitation.objects.get(pk=pk)
+        invit=GroupInvitation.objects.get(pk=pk)
         new_instance=GroupMember.model(user=invit.invitee,group=invit.group)
         new_instance.save()
+        invit.delete()
         return response.Response(response.Success_Created, GroupMember.serializer(new_instance).data)
