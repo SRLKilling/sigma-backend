@@ -33,4 +33,4 @@ class SearchEntrySet(entries.EntrySet):
 
         user_qs = User.objects.filter(Q(firstname__contains = word) | Q(lastname__contains = word))
 
-        return shortcuts.list(user, data, user_qs, User.serializer.list)
+        return shortcuts.list(user, data, user_qs, User.serializer.search)

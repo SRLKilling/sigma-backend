@@ -8,6 +8,7 @@ User = load_ressource("User")
 class UserSerializerSet(serializers.drf.ModelSerializer):
 
     score = serializers.drf.SerializerMethodField()
+    fullname = serializers.drf.SerializerMethodField()
 
     class Meta:
         model = User.model
@@ -36,3 +37,11 @@ class UserSerializerSet(serializers.drf.ModelSerializer):
             return User.serializers.default(user2, *args, **kwargs)
         else:
             return User.serializers.stranger(user2, *args, **kwargs)
+
+    @serializers.sub
+    class search:
+        class Meta:
+            fields =  ('id', 'fullname')
+
+    def get_fullname(self, user):
+        return user.firstname+" "+user.lastname
