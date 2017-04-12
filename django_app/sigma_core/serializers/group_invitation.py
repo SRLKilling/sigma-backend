@@ -13,5 +13,5 @@ class GroupInvitationSerializerSet(SerializerSet):
         """
         class Meta:
             model = GroupInvitation.model
-            fields = ('group', 'invitee', 'issued_by_invitee', 'date')
+            fields = ('pk','group', 'invitee', 'issued_by_invitee', 'date')
             required = ('group', 'invitee', 'issued_by_invitee')

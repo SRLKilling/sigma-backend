@@ -26,11 +26,12 @@ class GroupQuerySet(models.QuerySet):
         """ Filter all groups that are aknowledging by a given one """
         return self.filter(pk__in = Acknowledgment.objects.acknowledging(group))
 
-
-    def user_is_member(self, user, group):
+    def user_is_member(self, user):
         """Filter to get all groups a user is member of"""
         membersof = GroupMember.objects.for_user(user).values('group')
         return self.filter(models.Q(pk__in = membersof))
+
+
 
 class Group(models.Model):
     """
