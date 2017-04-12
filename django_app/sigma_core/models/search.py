@@ -6,14 +6,7 @@ Group = load_ressource("Group")
 User = load_ressource("User")
 Event = load_ressource("Event")
 
-class SearchQuerySet(models.QuerySet):
-    pass
-
 class Search(models.Model):
-    """
-        fantom
-    """
-    objects = SearchQuerySet.as_manager()
 
     #*********************************************************************************************#
     #**                                    Permissions                                          **#
@@ -25,7 +18,7 @@ class Search(models.Model):
 
         c_effacement = 1
         c_insertion = 1
-        c_substitution = 1
+        c_substitution = 2
 
         d = [[0 for k in range(m + 1)] for k in range(n + 1)]
         for i in range(n + 1):
@@ -47,14 +40,32 @@ class Search(models.Model):
     def can_print_list(self, user):
         return True
 
-    def user(self, s):
-        if len(s) >= 2:
-            words = s.split(" ")
-            l = Group.objects
-            for x in words:
-                a = l.filter(firstname__contains(x))
-                b = l.filter(lastname__contains(x))
-                l = a | b
-            return l
-        else:
-            return []
+    def users(user, s):
+        words = s.split(" ")
+        l = User.objects.get_visible_users(user)
+        for x in words:
+            a = l.filter(firstname__contains = x)
+            b = l.filter(lastname__contains = x)
+            l = a | b
+        return l
+
+    def groups(user, s):
+        words = s.split(" ")
+        l = Group.objects.user_can_see(user)
+        for x in words:
+            a = l.filter(name__contains = x)
+            b = l.filter(description__contains = x)
+            l = a | b
+        return l
+
+    def events(user, s):
+        words = s.split(" ")
+        l = Event.objects.visible_by_user(user)
+        for x in words:
+            a = l.filter(name__contains = x)
+            b = l.filter(description__contains = x)
+            c = l.filter(place_name__contains = x)
+            l = a | b | c
+        return l
+
+

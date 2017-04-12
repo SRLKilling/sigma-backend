@@ -6,6 +6,7 @@ from django.db.models import Q
 Group = load_ressource("Group")
 GroupMember = load_ressource("GroupMember")
 User = load_ressource("User")
+Event = load_ressource("Event")
 Search = load_ressource("Search")
 AcknowledgmentInvitation = load_ressource("AcknowledgmentInvitation")
 
@@ -13,26 +14,18 @@ class SearchEntrySet(entries.EntrySet):
 
     @entries.global_entry(method=["post"])
     def groups(user, data):
-        """
-            REST list action.
-        """
-
         word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data["word"]
-
-        group_qs = Group.objects.filter(name__contains = word)
-
+        group_qs = Search.model.groups(user, word)
         return shortcuts.list(user, data, group_qs, Group.serializer.search)
 
     @entries.global_entry(method=["post"])
     def users(user, data):
-        """
-            REST list action.
-        """
-
         word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data["word"]
+        user_qs = Search.model.users(user, word)
+        return shortcuts.list(user, data, user_qs, User.serializer.search)
 
-        user_qs = Search.user(word)
-        print(user_qs)
-        user_qs = User.objects.filter(Q(firstname__contains = word) | Q(lastname__contains = word))
-
-        return shortcuts.list(user, data, user_qs, User.serializer.list)
+    @entries.global_entry(method=["post"])
+    def events(user, data):
+        word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data["word"]
+        event_qs = Search.model.events(user, word)
+        return shortcuts.list(user, data, event_qs, Event.serializer)
