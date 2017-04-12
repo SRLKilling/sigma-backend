@@ -44,12 +44,12 @@ class Entry(object):
     def __get__(self, obj, klass=None):
         if klass is None:
             klass = type(obj)
-        self.klass = klass
+        self.set = klass
         return self
 
     def __call__(self, *args, **kwargs):
         if self.bind_set:
-            return self.func(self.klass, *args, **kwargs)
+            return self.func(self, *args, **kwargs)
         else:
             return self.func(*args, **kwargs)
 
@@ -75,38 +75,38 @@ def detailed_entry(name = None, **kwargs):
 
 def retrieve(queryset=None, serializer=None, action_name=None):
     @detailed_entry(name=action_name, bind_set=True)
-    def entry(entryset, user, data, pk):
-        return shortcuts.retrieve(user, data, pk, entryset.get_queryset(queryset), entryset.get_serializer(serializer), action_name)
+    def entry(entry, user, data, pk):
+        return shortcuts.retrieve(user, data, pk, entry.set.get_queryset(queryset), entry.set.get_serializer(serializer), entry.name)
     return entry
 
 def list(queryset=None, serializer=None, filter_class = None, action_name=None):
     @global_entry(name=action_name, bind_set=True)
-    def entry(entryset, user, data):
-        return shortcuts.list(user, data, entryset.get_queryset(queryset), entryset.get_serializer(serializer))
+    def entry(entry, user, data):
+        return shortcuts.list(user, data, entry.set.get_queryset(queryset), entry.set.get_serializer(serializer))
     return entry
 
 def sub_list(res_queryset=None, sub_queryset=None, serializer=None, filter_class = None, action_name = None):
     @detailed_entry(name=action_name, bind_set=True)
-    def entry(entryset, user, data, pk):
-        return shortcuts.sub_list(user, data, pk, entryset.get_queryset(res_queryset), entryset.get_queryset(sub_queryset), entryset.get_serializer(serializer))
+    def entry(entry, user, data, pk):
+        return shortcuts.sub_list(user, data, pk, entry.set.get_queryset(res_queryset), entry.set.get_queryset(sub_queryset), entry.set.get_serializer(serializer))
     return entry
 
 def create(serializer=None, action_name=None):
     @global_entry(name=action_name, bind_set=True, methods=["post"])
-    def entry(cls, user, data):
-        return shortcuts.create(user, data, cls.get_serializer(serializer), action_name)
+    def entry(entry, user, data):
+        return shortcuts.create(user, data, entry.set.get_serializer(serializer), entry.name)
     return entry
 
 def update(serializer=None, action_name=None):
     @detailed_entry(name=action_name, bind_set=True, methods=["post"])
-    def entry(cls, user, data, pk):
-        return shortcuts.update(user, data, pk, cls.get_serializer(serializer), action_name)
+    def entry(entry, user, data, pk):
+        return shortcuts.update(user, data, pk, entry.set.get_serializer(serializer), entry.name)
     return entry
 
 def destroy(queryset=None, action_name=None):
     @detailed_entry(name=action_name, bind_set=True, methods=["post"])
-    def entry(cls, user, data, pk):
-        return shortcuts.destroy(user, data, pk, cls.get_queryset(queryset), action_name)
+    def entry(entry, user, data, pk):
+        return shortcuts.destroy(user, data, pk, entry.set.get_queryset(queryset), entry.name)
     return entry
 
 #*********************************************************************************************#
@@ -123,6 +123,8 @@ class EntrySet():
                     continue
                 f = getattr(cls, fn)
                 if isinstance(f, Entry):
+                    if f.name == None:
+                        f.name = fn
                     cls._entries.append((fn, f))
 
         return cls._entries
