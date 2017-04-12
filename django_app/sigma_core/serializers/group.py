@@ -35,4 +35,5 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     @serializers.sub
     class search:
         class Meta:
+            score = serializers.drf.SerializerMethodField()
             fields = ('pk', 'name', 'number_of_members','score')
