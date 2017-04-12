@@ -82,11 +82,19 @@ def randint_norepeat(l, a, b):
         c = random.randint(a, b)
     return c
 
-def randomdate():
-    s=[str(random.randint(1,9)) for i in range(12)]
-    p=[str(random.randint(0,5)) for i in range(2)]
-    d="20"+s[0]+s[1]+"-0"+s[2]+"-0"+s[3]+"T1"+s[4]+":"+p[0]+s[6]+":"+p[1]+s[8]+".008Z"
+def date(h, j = 15, m = 4, y = 2017):
+    d = str(y).zfill(4) + "-"
+    d += str(m).zfill(2) + "-"
+    d += str(j).zfill(2)
+    d += "T" + str(h).zfill(2)
+    d += ":30:00.008000Z"
     return d
+
+def randomdate():
+    j = random.randint(1, 28)
+    m = random.randint(1, 12)
+    h = random.randint(8, 20)
+    return date(h, j, m)
 
 #*********************************************************************************************#
 #**                                Random model generators                                  **#
@@ -145,8 +153,13 @@ def randomEvent(user):
     event = {}
     event['name'] = randomlower(10)
     event['description'] = randomlower(50)
-    event['date_start'] = randomdate()
-    event['date_end'] = randomdate()
+
+    h = random.randint(7, 20)
+    h_fin = h + random.randint(1, 3)
+    d = random.randint(1, 30)
+
+    event['date_start'] = date(h, d)
+    event['date_end'] = date(h_fin, d)
     event['place_name'] = randomlower(20)
     event['author'] = user
     return JSONizer('sigma_core.event', event)
