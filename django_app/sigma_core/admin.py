@@ -12,6 +12,10 @@ from sigma_core.models.publication import Publication
 from sigma_core.models.event import Event
 from sigma_core.models.shared_publication import SharedPublication
 admin.site.unregister(AuthGroup)
+from sigma_core.models.chat import Chat
+from sigma_core.models.chat_member import ChatMember
+from sigma_core.models.chat_message import ChatMessage
+from sigma_core.models.group_invitation import GroupInvitation
 
 
 from sigma_core.models.acknowledgment import Acknowledgment
@@ -29,6 +33,10 @@ admin.site.register(Participation)
 admin.site.register(GroupField)
 admin.site.register(GroupFieldValue)
 
+admin.site.register(GroupInvitation)
+admin.site.register(Chat)
+admin.site.register(ChatMember)
+admin.site.register(ChatMessage)
 
 class ParticipationInline(admin.TabularInline):
     model = Participation
