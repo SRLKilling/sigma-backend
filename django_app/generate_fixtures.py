@@ -26,6 +26,8 @@ GROUP_FIELD_NUM = (1, 5)
 prenoms = ["Alderick","Alexim","Antoine","Aubert","Billy","Carl","Christian","Colin","Darek","Didier","Edouard","Elliot","Émilien","Esteban","Florian","Gabriel","Grégoire","Henry","Isaac","James","Jeffrey","Joakim","Julien","Karl","Kylian","Laurier","Loic","Louis","Loukian","Maddox","Malek","Marius","Matis","Maxance","Médérick","Nicolas","Norbert","Patrice","Pierre-Olivier","Rémy","Shawn","Théo","Tom","Victor","Wyatt","Yoran","Zachariel"]
 noms = ["Martel", "Matton", "Pécatte", "Dardinier", "Gendre", "Delétang", "Deltour", "Tourneur", "Chirac"]
 lieux = ["BôBar", "Poincaré", "PC 64", "Local JTX", "Terrain d'honneur", "Paris", "ENSTA"]
+mots =  ["de","la","le","et","les","des","en","un","du","une","que","est","pour","qui","dans","a","par","plus","pas","au","sur","ne","se","Le","ce","il","sont","La","Les","ou","avec","son","Il","aux","d'un","En","cette","d'une","ont","ses","mais","comme","on","tout","nous","sa","Mais","fait","été","aussi","leur","bien","peut","ces","y","deux","A","ans","l","encore","n'est","marché","d","Pour","donc","cours","qu'il","moins","sans","C'est","Et","si","entre","Un","Ce","faire","elle","c'est","peu","vous","Une","prix","On","dont","lui","également","Dans","effet","pays","cas","De","millions","Belgique","BEF","mois","leurs","taux","années","temps","groupe","ainsi","toujours","société","depuis","tous","soit","faut","Bruxelles","fois","quelques","sera","entreprises","F","contre","francs","je","n'a","Nous","Cette","dernier","était","Si","s'est","chez","L","monde","alors","sous","actions","autres","Au","ils","reste","trois","non","notre","doit","nouveau","milliards","avant","exemple","compte","belge","premier","s","nouvelle","Elle","l'on","terme","avait","produits","cela","d'autres","fin","niveau","bénéfice","toute","travail","partie","trop","hausse","secteur","part","beaucoup","Je","valeur","croissance","rapport","USD","aujourd'hui","année","base","Bourse","lors","vers","souvent","vie","l'entreprise","autre","peuvent","bon","surtout","toutes","nombre","fonds","point","grande","jour","va","avoir","nos","quelque","place","grand","personnes","plusieurs","certains","d'affaires","permet","politique","cet","chaque","chiffre","pourrait","devrait","produit","l'année","Par","rien","mieux","celui","qualité","France","Ils","Ces","s'agit","vente","jamais","production","action","baisse","Avec","résultats","Des","votre","risque","début","banque","an","voir","avons","qu'un","qu'","elles","moment","qu'on","question","pouvoir","titre","doute","long","petit","d'ailleurs","notamment","FB","droit","qu'elle","heures","cependant","service","Etats-Unis","qu'ils","l'action","jours","celle","demande","belges","ceux","services","bonne","seront","économique","raison","car","situation","Depuis","entreprise","me","nouvelles","n'y","possible","toutefois","tant","nouveaux","selon","parce","dit","seul","qu'une","sociétés","vient","jusqu'","quatre","marchés","mise","seulement","Van","semble","clients","Tout","Cela","serait","fort","frais","lieu","gestion","font","quand","capital","gouvernement","projet","grands","réseau","l'autre","données","prendre","plan","points","outre","pourtant","Ainsi","ni","type","Europe","pendant","Comme","mesure","actuellement","public","dire","important","mis","partir","parfois","nom","n'ont","veut","présent","passé","forme","autant","développement","mettre","grandes","vue","investisseurs","D","trouve","maison","mal","l'an","moyen","choix","doivent","NLG","direction","Sur","simple","période","enfants","dollars","personnel","assez","programme","général","banques","eux","semaine","président","personne","européenne","moyenne","tard","loi","petite","certaines","savoir","loin","explique","plupart","jeunes","cinq","contrat","Banque","valeurs","seule","rendement","nombreux","fonction","offre","client","activités","eu","environ","ministre","cadre","sens","étaient","sécurité","recherche","Paris","sorte","décembre","Son","suite","davantage","ensuite","janvier","donne","vrai","cause","d'abord","conditions","suis","juin","peine","certain","septembre","sommes","famille","l'indice","pris","laquelle","directeur","qu'en","propose","gens","derniers","étant","fut","chose","portefeuille","obligations","afin","différents","technique","Aujourd'hui","ailleurs","P","l'ensemble","américain","ventes","Selon","rue","livre","octobre","vraiment","sein","Or","dollar","Enfin","haut","Plus","petits","porte","tel","durée","domaine","aurait","jeune","présente","passe","PC","lorsque","choses","puis","Vous","aucun","l'un","n'en","tandis","coup","existe","propre","carte","crise","importante","atteint","revenus","montant","forte","ici","s'il","Quant","vu","rapidement","j'ai","ville","etc","mars","s'en","mon","premiers","bas","marque","véritable","ligne","longtemps","propres","devant","passer","départ","pu","total","série","quoi","particulier","concurrence","élevé","position"]
+print(mots)
 
 #*********************************************************************************************#
 #**                                  Useful methods                                         **#
@@ -65,6 +67,11 @@ def JSONizer(model, obj, sep=True):
     json += '\n} }'
     return json
 
+def randomphrase(a, b=-1):
+    n = a
+    if b != -1:
+        n = random.randint(a, b)
+    return " ".join([random.choice(mots) for k in range(n)])
 
 def randomlower(length):
     """
@@ -135,8 +142,8 @@ def randomUser():
 
 def randomGroup():
     group = {}
-    group['name'] = randomlower(15)
-    group['description'] = randomlower(50)
+    group['name'] = randomphrase(3, 6)
+    group['description'] = randomphrase(10, 50)
     group['is_protected'] = False
     group['can_anyone_ask'] = randombool()
     group['need_validation_to_join'] = randombool()
@@ -157,8 +164,8 @@ def polytechnique():
 
 def randomEvent(user):
     event = {}
-    event['name'] = randomlower(10)
-    event['description'] = randomlower(50)
+    event['name'] = randomphrase(1, 4)
+    event['description'] = randomphrase(10, 50)
 
     h = random.randint(7, 20)
     h_fin = h + random.randint(1, 3)
@@ -183,8 +190,8 @@ def randomPublication(user, group, event = 0):
     if event:
         publication['related_event'] = event
     publication['date'] = randomdate()
-    publication['title'] = randomlower(15)
-    publication['content'] = randomlower(100)
+    publication['title'] = randomphrase(1, 4)
+    publication['content'] = randomphrase(10, 200)
     publication['internal'] = randombool(0.8)
     publication['last_commented'] = randomdate()
     return JSONizer('sigma_core.publication', publication)
@@ -233,7 +240,7 @@ def randomComment(user, publication):
     comment['publication'] = publication
     comment['user'] = user
     comment['date'] = randomdate()
-    comment['comment'] = randomlower(random.randint(50, 1000))
+    comment['comment'] = randomphrase(10, 200)
     return JSONizer('sigma_core.comment', comment)
 
 
@@ -249,7 +256,7 @@ def share(publication, group, user):
 def randomGroupField(group):
     group_field = {}
     group_field['group'] = group
-    group_field['name'] = randomlower(8)
+    group_field['name'] = randomphrase(1)
     group_field['type'] = random.randint(0, 3)
     group_field['accept'] = ""
     group_field['protected'] = randombool(0.5)
@@ -275,7 +282,7 @@ def randomGroupFieldValue(member, field):
     group_field_value = {}
     group_field_value['membership'] = member
     group_field_value['field'] = field
-    group_field_value['value'] = randomlower(8)
+    group_field_value['value'] = randomphrase(1)
     return JSONizer('sigma_core.groupfieldvalue', group_field_value)
 
 
@@ -381,7 +388,7 @@ def generateFixtures(filepath):
                 already_selected_fields.append(field)
                 f.write( randomGroupFieldValue(member, field) )
 
-    print('OK\n Generating independant chats and chatmembers...', end='')
+    print('OK\n  Generating independant chats and chatmembers...', end='')
     for i in range(GROUP_NUM-1, GROUP_NUM-1+CHAT_NUM):
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
