@@ -15,7 +15,7 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
 
         model = Group.model
         read_only_fields = ('pk', 'fields')
-        fields = ('pk', 'name', 'description', 'is_protected', 'can_anyone_ask', 'need_validation_to_join', 'members_visibility', 'group_visibility', 'fields','number_of_members')
+        fields = ('pk', 'name', 'description', 'is_protected', 'can_anyone_ask', 'need_validation_to_join', 'members_visibility', 'group_visibility', 'fields','number_of_members', 'score')
 
     def get_number_of_members(self, obj):
         return GroupMember.objects.filter(group=obj).count()
@@ -30,7 +30,7 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     @serializers.sub
     class list:
         class Meta:
-            fields = ('pk', 'name', 'description', 'is_protected', 'can_anyone_ask', 'need_validation_to_join', 'members_visibility', 'group_visibility','number_of_members')
+            fields = ('pk', 'name', 'description', 'is_protected', 'can_anyone_ask', 'need_validation_to_join', 'members_visibility', 'group_visibility','number_of_members', 'score')
 
     @serializers.sub
     class search:
