@@ -28,4 +28,4 @@ class SearchEntrySet(entries.EntrySet):
     def events(user, data):
         word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data["word"]
         event_qs = Search.model.events(user, word)
-        return shortcuts.list(user, data, event_qs, Event.serializer)
+        return shortcuts.list(user, data, event_qs, Event.serializer.search)

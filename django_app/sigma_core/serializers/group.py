@@ -10,6 +10,7 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
 
     number_of_members = serializers.drf.SerializerMethodField()
     score = serializers.drf.SerializerMethodField()
+    status = serializers.drf.SerializerMethodField()
 
     class Meta:
 
@@ -20,8 +21,12 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     def get_number_of_members(self, obj):
         return GroupMember.objects.filter(group=obj).count()
 
-    def get_score(self, user):
-        return 1 #TODO : create a formula for the score
+    def get_score(self, group):
+        # TODO
+        return 1
+
+    def get_status(self, group):
+        return "group"
 
     fields = GroupField.serializers.default(many=True, read_only=True)
 
@@ -35,5 +40,4 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     @serializers.sub
     class search:
         class Meta:
-            score = serializers.drf.SerializerMethodField()
-            fields = ('pk', 'name', 'number_of_members','score')
+            fields = ('id', 'name', 'score', 'status')

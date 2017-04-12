@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 import random
 import string
 import sys
@@ -20,6 +22,10 @@ LIKE_NUM = 50
 TAG_NUM = 20
 
 GROUP_FIELD_NUM = (1, 5)
+
+prenoms = ["Alderick","Alexim","Antoine","Aubert","Billy","Carl","Christian","Colin","Darek","Didier","Edouard","Elliot","Émilien","Esteban","Florian","Gabriel","Grégoire","Henry","Isaac","James","Jeffrey","Joakim","Julien","Karl","Kylian","Laurier","Loic","Louis","Loukian","Maddox","Malek","Marius","Matis","Maxance","Médérick","Nicolas","Norbert","Patrice","Pierre-Olivier","Rémy","Shawn","Théo","Tom","Victor","Wyatt","Yoran","Zachariel"]
+noms = ["Martel", "Matton", "Pécatte", "Dardinier", "Gendre", "Delétang", "Deltour", "Tourneur", "Chirac"]
+lieux = ["BôBar", "Poincaré", "PC 64", "Local JTX", "Terrain d'honneur", "Paris", "ENSTA"]
 
 #*********************************************************************************************#
 #**                                  Useful methods                                         **#
@@ -104,8 +110,8 @@ def superUser():
     user = {}
     user["password"] = "pbkdf2_sha256$24000$023IXGyjNKJm$V2EYuhPjLnergchTULv4WNVgjUMUBqhYxkt6UP7Pd/0="
     user["email"] = "admin@sigma.fr"
-    user["lastname"] = randomlower(8)
-    user["firstname"] = randomlower(8)
+    user["lastname"] = "Toutpuissant"
+    user["firstname"] = "Bruce"
     user["join_date"] = "2016-05-08T15:35:59.028Z"
     user["is_active"] = True
     user["is_superuser"] = True
@@ -116,8 +122,8 @@ def randomUser():
     user = {}
     user["password"] = "pbkdf2_sha256$24000$9Z4lf8RjlRPh$OGIP7SSJIzxqtjbCCDL8J7+O4SnBPx3jd6/kOnqBRww="
     user["email"] = randomlower(20) + "@sigma.fr"
-    user["lastname"] = randomlower(8)
-    user["firstname"] = randomlower(8)
+    user["lastname"] = random.choice(noms)
+    user["firstname"] = random.choice(prenoms)
     user["join_date"] = randomdate()
     user["is_active"] = True
     user["is_superuser"] = False
@@ -160,7 +166,7 @@ def randomEvent(user):
 
     event['date_start'] = date(h, d)
     event['date_end'] = date(h_fin, d)
-    event['place_name'] = randomlower(20)
+    event['place_name'] = random.choice(lieux)
     event['author'] = user
     return JSONizer('sigma_core.event', event)
 
@@ -329,21 +335,21 @@ def generateFixtures(filepath):
     f = open(filepath, 'w')
     f.write('[')
 
-    print('  Generating superuser... ', end='')
+    print('  Generating superuser...', end='')
     f.write( superUser() )                                              # Generate admin
 
     f.write(polytechnique())
 
-    print('OK\n  Generating users... ', end='')
+    print('OK\n  Generating users...', end='')
     for i in range(USER_NUM):                                           # Generate users
         f.write( randomUser() )
 
-    print('OK\n  Generating groups... ', end='')
+    print('OK\n  Generating groups...', end='')
     for i in range(GROUP_NUM-1):                                          # Generate groups
         f.write( randomGroup() )
 
 
-    print('OK\n  Generating group fields.. ', end='')
+    print('OK\n  Generating group fields...', end='')
     group_fields = {}
     for i in range(1, GROUP_NUM):
         group_fields_num = random.randint(GROUP_FIELD_NUM[0], GROUP_FIELD_NUM[1])
@@ -352,7 +358,7 @@ def generateFixtures(filepath):
             f.write( randomGroupField(i) )
             group_fields[i].append(primary_keys["sigma_core.groupfield"])
 
-    print('OK\n  Generating memberships, chats, chatmembers and field values.. ', end='')
+    print('OK\n  Generating memberships, chats, chatmembers and field values...', end='')
     for i in range(1, GROUP_NUM-1):
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
@@ -375,7 +381,7 @@ def generateFixtures(filepath):
                 already_selected_fields.append(field)
                 f.write( randomGroupFieldValue(member, field) )
 
-    print('OK\n Generating independant chats and chatmembers... ', end='')
+    print('OK\n Generating independant chats and chatmembers...', end='')
     for i in range(GROUP_NUM-1, GROUP_NUM-1+CHAT_NUM):
         member_num = random.randint(MEMBER_NUM[0], MEMBER_NUM[1])
         members = []
@@ -387,7 +393,7 @@ def generateFixtures(filepath):
         #     if random.randint(0,2)>1:
         #         f.write( randomChatMessage(member, i))
 
-    print('OK\n  Generating events... ', end='')
+    print('OK\n  Generating events...', end='')
     for i in range(1, EVENT_NUM + 1):
         user = random.randint(1, USER_NUM)
         f.write(randomEvent(user))
@@ -426,15 +432,15 @@ def generateFixtures(filepath):
                 user = random.randint(1, USER_NUM)
                 f.write(randomTag(user, i))
 
-    print('OK\n  Generating aknowledgment... ', end='')
+    print('OK\n  Generating aknowledgment...', end='')
     for i in range(1, ACKNOW_NUM):                                       # Generate aknowledgments
         f.write( randomAknowledgment() )
 
-    print('OK\n  Generating aknowledgment invitations... ', end='')
+    print('OK\n  Generating aknowledgment invitations...', end='')
     for i in range(1, ACKNOW_INV_NUM):                                       # Generate aknowledgments invitations
         f.write( randomAknowledgmentInvitation() )
 
-    print('OK\n  Generation OAuth client... ', end='')
+    print('OK\n  Generation OAuth client...', end='')
     f.write(generateOAuthClient())
 
     print('OK\n')
