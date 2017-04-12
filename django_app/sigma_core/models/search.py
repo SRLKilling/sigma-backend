@@ -2,10 +2,12 @@ from django.db import models
 from sigma_api.importer import load_ressource
 
 Search = load_ressource("Search")
+Group = load_ressource("Group")
+User = load_ressource("User")
+Event = load_ressource("Event")
 
 class SearchQuerySet(models.QuerySet):
     pass
-
 
 class Search(models.Model):
     """
@@ -17,7 +19,7 @@ class Search(models.Model):
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
 
-    def levenshtein_distance(a, b):
+    def levenshtein_distance(self, a, b):
         n = len(a)
         m = len(b)
 
@@ -44,3 +46,15 @@ class Search(models.Model):
 
     def can_print_list(self, user):
         return True
+
+    def user(self, s):
+        if len(s) >= 2:
+            words = s.split(" ")
+            l = Group.objects
+            for x in words:
+                a = l.filter(firstname__contains(x))
+                b = l.filter(lastname__contains(x))
+                l = a | b
+            return l
+        else:
+            return []

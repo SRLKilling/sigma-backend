@@ -31,6 +31,8 @@ class SearchEntrySet(entries.EntrySet):
 
         word = shortcuts.get_validated_serializer(WordSerializer,data=data).validated_data["word"]
 
+        user_qs = Search.user(word)
+        print(user_qs)
         user_qs = User.objects.filter(Q(firstname__contains = word) | Q(lastname__contains = word))
 
         return shortcuts.list(user, data, user_qs, User.serializer.list)
