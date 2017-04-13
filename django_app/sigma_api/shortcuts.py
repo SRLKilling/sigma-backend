@@ -150,7 +150,7 @@ def update(user, data, pk, serializer_class, action_name):
         If true, we merge them, save the result, and returns the new object serialized
     """
     instance = get_or_raise(serializer_class.Meta.model.objects.all(), pk)
-    check_permission(user, instance, action_name, data)
+    check_permission(user, instance, action_name)
     new_ser = get_validated_serializer(serializer_class, instance, data=data, partial=True, context=make_context(user, data))
     new_ser.save()
     return response.Response(response.Success_Updated, new_ser.data)

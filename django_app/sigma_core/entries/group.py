@@ -45,10 +45,7 @@ class GroupEntrySet(entries.EntrySet):
         ChatMember.model.add_new_member(user,g)
         return s
 
-    # update_right = entries.update(
-        # Group.serializers.default,
-        # 'update_right'
-    # )
+    update = entries.update(Group.serializer.update)
 
     destroy = entries.destroy()
 

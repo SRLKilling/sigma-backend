@@ -24,3 +24,9 @@ class GroupMemberSerializerSet(serializers.drf.ModelSerializer):
                     'is_administrator', 'is_super_administrator', 'has_invite_right', 'has_contact_right', 'has_publish_right', 'has_kick_right', 'field_values')
 
         field_values = GroupFieldValue.serializers.default(many=True)
+
+    @serializers.sub
+    class update:
+        class Meta:
+            fields = ('pk',
+                    'is_administrator', 'is_super_administrator', 'has_invite_right', 'has_contact_right', 'has_publish_right', 'has_kick_right')

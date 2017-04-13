@@ -24,7 +24,7 @@ class GroupMemberEntrySet(entries.EntrySet):
 
     retrieve = entries.retrieve()
 
-    update = entries.update()
+    update = entries.update(GroupMember.serializer.update)
 
     destroy = entries.destroy()
 

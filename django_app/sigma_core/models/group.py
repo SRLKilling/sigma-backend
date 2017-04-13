@@ -113,3 +113,9 @@ class Group(models.Model):
     #No can_member : already handled via the queryset
     #No can_print_invitations : same reason
     #No list : same reason
+
+    def can_update(self, user):
+        mship = GroupMember.objects.get_membership(self, user)
+        if (mship!=None) and (mship.is_administrator or mship.is_super_administrator):
+            return True
+        return False
