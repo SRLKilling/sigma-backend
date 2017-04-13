@@ -6,6 +6,7 @@ UserConnection = load_ressource("UserConnection")
 GroupMember = load_ressource("GroupMember")
 Chat = load_ressource("Chat")
 ChatMember = load_ressource("ChatMember")
+Group = load_ressource("Group")
 
 # TODO : Add unique username for frontends URLs
 
@@ -38,7 +39,11 @@ class UserQuerySet(models.QuerySet):
         #return User.filter(groupMember__group__in = group_qs)
 
         user_connections_qs = UserConnection.objects.connections_to(user)
-        return self.filter(userconnection__in = user_connections_qs)
+        group_qs = Group.objects.user_can_see(user)
+        chat_qs = Chat.objects.user_can_see(user)
+        group_connections_qs = UserConnection.objects.connections_to(user)
+        return self.filter(models.Q(memberships__group__in = group_qs) | models.Q(chats__chat__in = chat_qs) \
+        | models.Q(connections1__in = user_connections_qs) | models.Q(connections2__in = user_connections_qs)).distinct()
 
     def are_connected(self, user1, user2):
         ''' return True if there is a UserConnection for those two, or

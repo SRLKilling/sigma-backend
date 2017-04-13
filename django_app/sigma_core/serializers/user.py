@@ -40,7 +40,7 @@ class UserSerializerSet(serializers.drf.ModelSerializer):
             return User.serializers.stranger(user2, *args, **kwargs)
 
     def get_name(self, user):
-        return user.firstname+" "+user.lastnam
+        return user.firstname+" "+user.lastname
 
     @serializers.sub
     class search:

@@ -10,6 +10,7 @@ Participation = load_ressource("Participation")
 class UserEntrySet(entries.EntrySet):
 
     list = entries.list(
+        queryset = User.objects.get_visible_users,
         serializer = User.serializers.list
     )
 
