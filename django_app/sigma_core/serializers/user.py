@@ -39,10 +39,10 @@ class UserSerializerSet(serializers.drf.ModelSerializer):
         else:
             return User.serializers.stranger(user2, *args, **kwargs)
 
-    def get_name(self, user):
+    def get_fullname(self, user):
         return user.firstname+" "+user.lastname
 
     @serializers.sub
     class search:
         class Meta:
-            fields =  ('id', 'name', 'score', 'status')
+            fields =  ('id', 'fullname','score')
