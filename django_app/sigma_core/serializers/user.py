@@ -7,8 +7,6 @@ User = load_ressource("User")
 @serializers.set
 class UserSerializerSet(serializers.drf.ModelSerializer):
 
-
-
     class Meta:
         model = User.model
         fields = ('id', 'lastname', 'firstname', 'school', 'join_date')
@@ -41,7 +39,7 @@ class UserSerializerSet(serializers.drf.ModelSerializer):
     class search:
 
         fullname = serializers.drf.SerializerMethodField()
-        
+
         class Meta:
             fields =  ('id', 'fullname')
 
