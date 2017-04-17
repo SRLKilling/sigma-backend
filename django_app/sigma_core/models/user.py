@@ -42,18 +42,19 @@ class UserQuerySet(models.QuerySet):
         group_qs = Group.objects.user_can_see(user)
         chat_qs = Chat.objects.user_can_see(user)
         group_connections_qs = UserConnection.objects.connections_to(user)
-        return self.filter(models.Q(memberships__group__in = group_qs) | models.Q(chats__chat__in = chat_qs) \
-        | models.Q(connections1__in = user_connections_qs) | models.Q(connections2__in = user_connections_qs)).distinct()
+        return self.filter(models.Q(memberships__group__in = group_qs))
+        # | models.Q(chats__chat__in = chat_qs) \
+        #| models.Q(connections1__in = user_connections_qs) | models.Q(connections2__in = user_connections_qs)).distinct()
 
     def are_connected(self, user1, user2):
         ''' return True if there is a UserConnection for those two, or
         a common group, or a common chat'''
 
-        if (UserConnection.objects.are_connected(user1, user2) or \
-                GroupMember.objects.are_connected(user1, user2)) or \
-                ChatMember.objects.are_connected(user1,user2):
+        #if (UserConnection.objects.are_connected(user1, user2) or \
+        #        GroupMember.objects.are_connected(user1, user2)) or \
+        #        ChatMember.objects.are_connected(user1,user2):
+        if  GroupMember.objects.are_connected(user1, user2):
             return True
-
         return False
 
 class User(AbstractBaseUser):
@@ -110,7 +111,11 @@ class User(AbstractBaseUser):
     #**                                    Permissions                                          **#
     #*********************************************************************************************#
 
+    def can_retrieve(self, user):
+        #you can retrieve people who share at least one group with
+        return User.objects.are_connected(self, user)
+
     def can_update(self, user):
-        """ Check wheter `user` can update the user profile.
+        """ Check whether `user` can update the user profile.
             A user can only edit its own profile """
         return self == user

@@ -37,6 +37,25 @@ class Search(models.Model):
                 d[i][j] = r
         return d[n][m]
 
+    def minimal_distance(self, s, object_name):
+        #s : words written in the search bar
+        #object_name : one of the possibility
+
+        words = s.split()
+        words_object = object_name.split()
+
+        score = 0 #sum
+        for w in words:
+            mini = levenshtein_distance(w,words_object[0])
+            best_word = words_object[0]
+            for o in words_object:
+                if levenshtein_distance(w, o)<mini:
+                    best_word=o
+                    mini = levenshtein_distance(w, o)
+            score+=mini
+        return score    
+
+
     def can_print_list(self, user):
         return True
 
@@ -67,5 +86,3 @@ class Search(models.Model):
             c = l.filter(place_name__contains = x)
             l = a | b | c
         return l
-
-

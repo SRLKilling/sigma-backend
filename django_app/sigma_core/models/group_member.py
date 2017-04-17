@@ -44,8 +44,11 @@ class GroupMemberQuerySet(models.QuerySet):
 
     def are_connected(self, user1, user2):
         """ Return True if both users are members of at least one common group """
-        groups1 = Group.objects.filter(memberships__user = user1)
-        return GroupMember.objects.filter(user=user2, group__in = groups1).exists()
+
+        groups1 = user1.memberships.values("group")
+        groups2 = user2.memberships.values("group")
+
+        return (groups1 & groups2).exists()
 
 
 

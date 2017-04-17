@@ -14,8 +14,11 @@ class ChatMemberQuerySet(models.QuerySet):
 
     def are_connected(self, user1, user2):
         """ Return True if both users are members of at least one common chat """
-        chat1 = Chat.objects.filter(members__user = user1)
-        return self.filter(user=user2, chat = chat1).exists()
+
+        chats1 = user1.chats.values("chat")
+        chats2 = user2.chats.values("chat")
+
+        return chats1 & chats2
 
 
 class ChatMember(models.Model):
