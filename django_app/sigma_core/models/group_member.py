@@ -101,6 +101,8 @@ class GroupMember(models.Model):
     """ If True, the member can kick other members (except admins if he is not an admin) """
     has_kick_right = models.BooleanField(default=False)
 
+    nb_clicks_today = models.IntegerField(default=0)
+    average_clicks_last_month = models.IntegerField(default=0)
 
     def __str__(self):
         return "User \"%s\" in Group \"%s\"" % (self.user.__str__(), self.group.__str__())

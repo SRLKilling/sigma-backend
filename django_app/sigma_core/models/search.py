@@ -1,5 +1,6 @@
 from django.db import models
 from sigma_api.importer import load_ressource
+import time
 
 Search = load_ressource("Search")
 Group = load_ressource("Group")
@@ -53,29 +54,43 @@ class Search(models.Model):
                     best_word=o
                     mini = levenshtein_distance(w, o)
             score+=mini
-        return score    
+        return score
 
 
     def can_print_list(self, user):
         return True
 
     def users(user, s):
+        t=time.time()
         words = s.split(" ")
         l = User.objects.get_visible_users(user)
         for x in words:
             a = l.filter(firstname__contains = x)
             b = l.filter(lastname__contains = x)
             l = a | b
+        print(time.time()-t)
         return l
 
+    #Pre-filter : no longer, eliminate absurd candidates
     def groups(user, s):
+        t=time.time()
         words = s.split(" ")
         l = Group.objects.user_can_see(user)
+        big_l = []
         for x in words:
-            a = l.filter(name__contains = x)
-            b = l.filter(description__contains = x)
-            l = a | b
+            if len(x)>=3:
+                    l=l.filter(name__contains = x[0:3])
+        print(time.time()-t)
         return l
+
+    # def groups(user, s):
+    #     words = s.split(" ")
+    #     l = Group.objects.user_can_see(user)
+    #     for x in words:
+    #         a = l.filter(name__contains = x)
+    #         b = l.filter(description__contains = x)
+    #         l = a | b
+    #     return l
 
     def events(user, s):
         words = s.split(" ")

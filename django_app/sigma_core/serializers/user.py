@@ -39,11 +39,15 @@ class UserSerializerSet(serializers.drf.ModelSerializer):
     class search:
 
         fullname = serializers.drf.SerializerMethodField()
-
+        score = serializers.drf.SerializerMethodField()
         class Meta:
-            fields =  ('id', 'fullname')
+            fields =  ('id', 'fullname','score')
 
-
+    def get_score(self, user):
+    # 1 if they share the school, 0 if not
+        if user.school == self.context["user"].school:
+            return 1
+        return 0
 
     def get_fullname(self, user):
         return user.firstname+" "+user.lastname

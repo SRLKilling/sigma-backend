@@ -20,9 +20,13 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     def get_number_of_members(self, obj):
         return GroupMember.objects.filter(group=obj).count()
 
-    def get_score(self, group):
-        # TODO
-        return 1
+    def get_score(self, obj):
+        print(obj)
+        print(self.context["user"])
+        return max(1,GroupMember.objects.get(group=obj,user=self.context["user"]).average_clicks_last_month//10)
+
+        #return max(1,GroupMember.objects.filter(group=group, user=self).count())
+
 
     def get_status(self, group):
         return "group"
@@ -39,7 +43,7 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     @serializers.sub
     class search:
         class Meta:
-            fields = ('id', 'name', 'score', 'status')
+            fields = ('id', 'name','score', 'status','number_of_members')
 
     @serializers.sub
     class update:
