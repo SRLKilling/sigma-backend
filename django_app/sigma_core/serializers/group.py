@@ -23,7 +23,11 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
     def get_score(self, obj):
         print(obj)
         print(self.context["user"])
-        return max(1,GroupMember.objects.get(group=obj,user=self.context["user"]).average_clicks_last_month//10)
+        if not GroupMember.objects.filter(group=obj,user=self.context["user"]).exists():
+            print("ok")
+            return 0
+        else:
+            return min(1,GroupMember.objects.get(group=obj,user=self.context["user"]).average_clicks_last_month//10)
 
         #return max(1,GroupMember.objects.filter(group=group, user=self).count())
 
