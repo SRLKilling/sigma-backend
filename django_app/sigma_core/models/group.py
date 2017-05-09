@@ -107,7 +107,7 @@ class Group(models.Model):
 
         return False
 
-    def can_print_invitations(self, user):
+    def can_invitations(self, user):
         return GroupMember.objects.is_member(group, user)
 
     #No can_member : already handled via the queryset

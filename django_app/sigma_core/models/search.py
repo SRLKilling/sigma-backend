@@ -60,27 +60,35 @@ class Search(models.Model):
     def can_print_list(self, user):
         return True
 
+    # def users(user, s):
+    #     t=time.time()
+    #     words = s.split(" ")
+    #     l = User.objects.get_visible_users(user)
+    #     for x in words:
+    #         a = l.filter(firstname__contains = x)
+    #         b = l.filter(lastname__contains = x)
+    #         l = a | b
+    #     print(time.time()-t)
+    #     return l
+
+    #Pre-filter :  eliminate absurd candidates
     def users(user, s):
-        t=time.time()
         words = s.split(" ")
         l = User.objects.get_visible_users(user)
         for x in words:
-            a = l.filter(firstname__contains = x)
-            b = l.filter(lastname__contains = x)
-            l = a | b
-        print(time.time()-t)
+            if len(x)>=3:
+                    a = l.filter(firstname__contains = x[0:3])
+                    b = l.filter(lastname__contains = x[0:3])
+                    l = a | b
         return l
 
-    #Pre-filter : no longer, eliminate absurd candidates
+    #Pre-filter : eliminate absurd candidates
     def groups(user, s):
-        t=time.time()
         words = s.split(" ")
         l = Group.objects.user_can_see(user)
-        big_l = []
         for x in words:
             if len(x)>=3:
                     l=l.filter(name__contains = x[0:3])
-        print(time.time()-t)
         return l
 
     # def groups(user, s):
@@ -92,12 +100,22 @@ class Search(models.Model):
     #         l = a | b
     #     return l
 
+    # def events(user, s):
+    #     words = s.split(" ")
+    #     l = Event.objects.visible_by_user(user)
+    #     for x in words:
+    #         a = l.filter(name__contains = x)
+    #         b = l.filter(description__contains = x)
+    #         c = l.filter(place_name__contains = x)
+    #         l = a | b | c
+    #     return l
+
     def events(user, s):
         words = s.split(" ")
         l = Event.objects.visible_by_user(user)
         for x in words:
-            a = l.filter(name__contains = x)
-            b = l.filter(description__contains = x)
-            c = l.filter(place_name__contains = x)
-            l = a | b | c
+            if len(x)>=3:
+                a = l.filter(name__contains = x[0:3])
+                b = l.filter(place_name__contains = x[0:3])
+                l = a | b
         return l
