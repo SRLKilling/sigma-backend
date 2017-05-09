@@ -36,7 +36,7 @@ class GroupEntrySet(entries.EntrySet):
 
     @entries.global_entry(bind_set=True, methods=["post"])
     def create(self, user, data):
-        ''' modified to put the creator as an superadmin'''
+        ''' modified to put the creator as a superadmin'''
         #Can we access easily data.group without deserializing?
         s=shortcuts.create(user, data, self.get_serializer(None), "create")
         g = Group.objects.latest("pk")
@@ -48,11 +48,6 @@ class GroupEntrySet(entries.EntrySet):
     update = entries.update(Group.serializer.update)
 
     destroy = entries.destroy()
-
-    list_members = entries.sub_list(
-        sub_queryset = GroupMember.objects.user_can_see,
-        serializer = GroupMember.serializer
-    )
 
     my_groups = entries.list(
         queryset = Group.objects.user_is_member,
