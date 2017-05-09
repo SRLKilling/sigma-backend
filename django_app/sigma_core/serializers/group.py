@@ -24,9 +24,8 @@ class GroupSerializerSet(serializers.drf.ModelSerializer):
         if not GroupMember.objects.filter(group=obj,user=self.context["user"]).exists():
             return 0
         else:
-            return min(1,GroupMember.objects.get(group=obj,user=self.context["user"]).average_clicks_last_month//10)
+            return min(1,GroupMember.objects.get(group=obj,user=self.context["user"]).average_clicks_last_month/30)
 
-        #return max(1,GroupMember.objects.filter(group=group, user=self).count())
 
 
     def get_status(self, group):

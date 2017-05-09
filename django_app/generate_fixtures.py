@@ -274,6 +274,7 @@ def generateMember(group, user, sa):
     member['has_contact_right'] = member['is_administrator'] or randombool(0.2)
     member['has_publish_right'] = member['is_administrator'] or randombool(0.2)
     member['has_kick_right'] = member['is_administrator'] or randombool(0.2)
+    member['average_clicks_last_month'] = random.randint(0, 30)
 
     return JSONizer('sigma_core.groupmember', member)
 

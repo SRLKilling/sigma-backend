@@ -111,7 +111,6 @@ class Group(models.Model):
         return GroupMember.objects.is_member(group, user)
 
     #No can_member : already handled via the queryset
-    #No can_print_invitations : same reason
     #No list : same reason
 
     def can_update(self, user):
