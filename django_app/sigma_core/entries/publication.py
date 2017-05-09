@@ -24,6 +24,8 @@ class PublicationEntrySet(entries.EntrySet):
     #    GroupMember.serializers.default
     #)
 
+    create = entries.create()
+    
     retrieve = entries.retrieve()
 
     list = entries.list(
