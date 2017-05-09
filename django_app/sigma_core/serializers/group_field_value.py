@@ -12,13 +12,16 @@ class GroupFieldValueSerializerSet(serializers.drf.ModelSerializer):
         read_only_fields = ('pk', 'membership', 'field')
         fields = ('pk', 'membership', 'field', 'value')
 
+    membership = serializers.drf.PrimaryKeyRelatedField(read_only=True)
+
+
     #*********************************************************************************************#
-    
+
     number_re = re.compile(r'^[+-]?[0-9]+$')
     def is_number_valid(self, accept, value):
         if accept == '' or (not GroupFieldValueSerializer.number_re.match(value)):
             return True
-        
+
         value = int(value)
         a,b = accept.split('_')
         if not a == '':
@@ -33,10 +36,10 @@ class GroupFieldValueSerializerSet(serializers.drf.ModelSerializer):
                 return value <= int(b)
             else:
                 return True
-    
+
     def is_string_valid(self, accept, value):
         return True
-                
+
     def is_choice_valid(self, accept, value):
         if accept == '':
             return False
@@ -48,15 +51,15 @@ class GroupFieldValueSerializerSet(serializers.drf.ModelSerializer):
             suffixes = accept.split()
             return value.endswith(tuple(suffixes))
         return True
-    
+
     def validate(self, data):
         group_field = data['field']
         mship = data['membership']
-        
+
         # First, check that the membership group correspond to the field group
         if group_field.group != mship.group:
             raise serializers.ValidationError("Condition (field.group == membership.group) is not verified.")
-            
+
         # Then, check that the content is valid
         validate_methods = [
             self.is_number_valid,

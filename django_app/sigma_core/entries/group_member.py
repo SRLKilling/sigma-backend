@@ -19,7 +19,7 @@ class GroupMemberEntrySet(entries.EntrySet):
 
     list = entries.list(
         GroupMember.objects.for_user,
-        GroupMember.serializers.default
+        GroupMember.serializers.list
     )
 
     retrieve = entries.retrieve()
