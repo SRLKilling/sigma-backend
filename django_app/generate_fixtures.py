@@ -153,7 +153,7 @@ def randomGroup():
 def polytechnique():
     group = {}
     group['name'] = "polytechnique"
-    group['description'] = "l'ecole de denis merigoux"
+    group['description'] = ""
     group['is_protected'] = True
     group['can_anyone_ask'] = False
     group['need_validation_to_join'] = True
